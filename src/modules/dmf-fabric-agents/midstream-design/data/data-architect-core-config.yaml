@@ -1,0 +1,229 @@
+# DataArchitect Configuration
+
+# Agent: DataArchitect
+# Phase: MIDSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "data-architect"
+  name: "DataArchitect"
+  version: "1.0"
+  phase: "MIDSTREAM"
+  icon: "🏗️"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/architecture"
+  formats:
+    - markdown
+    - yaml
+    - diagrams
+    - json
+    - html
+
+# Artifact Definitions
+artifacts:
+  architecture:
+    name: "Architecture Document"
+    filename: "architecture.md"
+    required_for_gate: 2
+    required_sections:
+      - "Executive Summary"
+      - "Architecture Overview"
+      - "Data Layers"
+      - "Technology Stack"
+      - "Data Flow"
+      - "Security"
+      - "Scalability"
+    quality_criteria:
+      - "All layers clearly defined"
+      - "Technology stack documented"
+      - "Data flow diagrams included"
+      - "Security considerations addressed"
+
+  data-model:
+    name: "Data Model"
+    filename: "data-model.md"
+    required_for_gate: 2
+    required_sections:
+      - "Model Overview"
+      - "Entity Definitions"
+      - "Relationships"
+      - "Naming Conventions"
+    quality_criteria:
+      - "All entities documented"
+      - "Relationships defined with PK/FK"
+      - "Data types specified"
+      - "Naming conventions followed"
+
+  decisions:
+    name: "Architecture Decision Records"
+    filename: "decisions.md"
+    required_for_gate: 2
+    required_sections:
+      - "ADR Index"
+      - "Individual ADRs"
+    quality_criteria:
+      - "At least 3 ADRs documented"
+      - "Each has context and decision"
+      - "Consequences listed"
+      - "Alternatives considered"
+    adr_template:
+      fields:
+        - name: "ID"
+          required: true
+        - name: "Title"
+          required: true
+        - name: "Status"
+          required: true
+          options: ["Proposed", "Accepted", "Deprecated", "Superseded"]
+        - name: "Context"
+          required: true
+        - name: "Decision"
+          required: true
+        - name: "Consequences"
+          required: true
+        - name: "Alternatives"
+          required: true
+
+  tech-stack:
+    name: "Technology Stack"
+    filename: "tech-stack.md"
+    required_for_gate: false
+    sections:
+      - "Stack Overview"
+      - "Component Details"
+      - "Integration Points"
+
+  security:
+    name: "Security Design"
+    filename: "security.md"
+    required_for_gate: false
+    sections:
+      - "Security Requirements"
+      - "Access Control"
+      - "Encryption"
+      - "Compliance"
+
+  architecture-spec:
+    name: "Architecture Specification (JSON)"
+    filename: "architecture-spec.json"
+    required_for_gate: 2
+    generated_by: "create-architecture"
+    description: "Machine-readable specification consumed by downstream agents (canonical data source)"
+    required_fields:
+      - "metadata"
+      - "principles"
+      - "layers"
+      - "tech_stack"
+      - "sla_targets"
+      - "adrs"
+
+  tobe-architecture-html:
+    name: "TO-BE Architecture Presentation"
+    filename: "tobe-target-architecture.html"
+    required_for_gate: 2
+    generated_by: "create-architecture"
+    description: "Executive visual presentation for Gate 2 stakeholder review"
+    template: "tobe-target-architecture-tmpl.html"
+
+# Command Configuration
+commands:
+  create-architecture:
+    description: "Design data architecture — generates JSON + MD + HTML"
+    prerequisites:
+      - "sttm.md exists"
+      - "Gate 1 passed"
+    steps:
+      - "Review STTM and requirements"
+      - "Define data layers"
+      - "Select technology stack"
+      - "Design data flow"
+      - "Address security and scalability"
+      - "Consolidate decisions"
+      - "Generate architecture-spec.json (canonical)"
+      - "Generate architecture.md from JSON"
+      - "Generate tobe-target-architecture.html from JSON"
+
+  create-data-model:
+    description: "Create data model"
+    prerequisites:
+      - "sttm.md exists"
+      - "Architecture direction clear"
+    steps:
+      - "Identify all entities from STTM"
+      - "Define relationships"
+      - "Specify data types"
+      - "Apply naming conventions"
+      - "Document constraints"
+      - "Generate data-model.md"
+
+  document-decisions:
+    description: "Create ADRs"
+    prerequisites:
+      - "Significant decisions made"
+    steps:
+      - "Identify key decisions"
+      - "Document context for each"
+      - "State decision clearly"
+      - "List consequences"
+      - "Document alternatives"
+      - "Generate decisions.md"
+
+# Architecture Patterns
+patterns:
+  lakehouse:
+    description: "Unified analytics on Delta Lake"
+    layers:
+      - "Landing (Raw)"
+      - "Bronze (Cleansed)"
+      - "Silver (Curated)"
+      - "Gold (Aggregated)"
+    technologies:
+      - "Delta Lake"
+      - "Spark"
+      - "Unity Catalog"
+  
+  data_warehouse:
+    description: "Traditional DW approach"
+    layers:
+      - "Staging"
+      - "ODS"
+      - "Data Warehouse"
+      - "Data Marts"
+    technologies:
+      - "SQL Server"
+      - "Synapse"
+      - "Fabric"
+
+# Integration Settings
+integration:
+  receives_from:
+    - agent: "business-analyst"
+      artifacts: ["sttm.md", "analytical-questions.md"]
+      required: true
+    - agent: "data-strategist"
+      artifacts: ["problem-statement.md", "kpis.md"]
+      required: false
+    
+  handoff_to:
+    - agent: "data-steward"
+      trigger: "architecture complete"
+      context: ["architecture.md", "data-model.md"]
+    - agent: "dataflow"
+      trigger: "Gate 2 passed"
+      context: ["architecture.md", "data-model.md", "decisions.md"]
+    
+  gate_contribution:
+    gate: 2
+    artifacts:
+      - "architecture.md"
+      - "data-model.md"
+      - "decisions.md"
+
+# Quality Thresholds
+quality:
+  minimum_adrs: 3
+  minimum_entities: 5
+  architecture_completeness: 100%

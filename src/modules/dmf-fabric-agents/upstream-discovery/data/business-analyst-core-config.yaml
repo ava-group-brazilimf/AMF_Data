@@ -1,0 +1,193 @@
+# BusinessAnalyst Configuration
+
+# Agent: BusinessAnalyst
+# Phase: UPSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "business-analyst"
+  name: "BusinessAnalyst"
+  version: "1.0"
+  phase: "UPSTREAM"
+  icon: "📊"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/requirements"
+  formats:
+    - markdown
+    - yaml
+
+# Artifact Definitions
+artifacts:
+  sttm:
+    name: "Source-to-Target Mapping"
+    filename: "sttm.md"
+    required_for_gate: 1
+    required_sections:
+      - "Source Systems Overview"
+      - "Target Layers"
+      - "Field Mapping"
+      - "Transformation Rules"
+    quality_criteria:
+      - "All source systems documented"
+      - "All target tables defined"
+      - "Complete field mapping"
+      - "Transformation rules specified"
+    mapping_template:
+      source_fields:
+        - name: "Source System"
+          required: true
+        - name: "Source Table"
+          required: true
+        - name: "Source Column"
+          required: true
+        - name: "Source Data Type"
+          required: true
+      target_fields:
+        - name: "Target Layer"
+          required: true
+          options: ["Landing", "Bronze", "Silver", "Gold"]
+        - name: "Target Table"
+          required: true
+        - name: "Target Column"
+          required: true
+        - name: "Target Data Type"
+          required: true
+        - name: "Transformation"
+          required: true
+        - name: "PK/FK"
+          required: false
+
+  analytical-questions:
+    name: "Analytical Questions"
+    filename: "analytical-questions.md"
+    required_for_gate: 1
+    required_sections:
+      - "Question Overview"
+      - "Question Details"
+      - "Data Requirements"
+    quality_criteria:
+      - "At least 5 questions defined"
+      - "Questions are specific and measurable"
+      - "Priority assigned to each"
+      - "Data sources identified"
+    question_template:
+      fields:
+        - name: "Question ID"
+          required: true
+        - name: "Question Text"
+          required: true
+        - name: "Business Context"
+          required: true
+        - name: "Priority"
+          required: true
+          options: ["High", "Medium", "Low"]
+        - name: "Linked KPI"
+          required: false
+        - name: "Data Sources"
+          required: true
+        - name: "Expected Grain"
+          required: true
+        - name: "Dimensions"
+          required: true
+        - name: "Measures"
+          required: true
+
+  dq-initial:
+    name: "Initial Data Quality Requirements"
+    filename: "dq-initial.md"
+    required_for_gate: 1
+    required_sections:
+      - "DQ Dimensions"
+      - "Critical Fields"
+      - "Thresholds"
+      - "Validation Rules"
+    quality_criteria:
+      - "Quality dimensions defined"
+      - "Critical fields identified"
+      - "Thresholds specified"
+    dq_dimensions:
+      - name: "Completeness"
+        description: "Data is not missing"
+        default_threshold: "95%"
+      - name: "Accuracy"
+        description: "Data is correct"
+        default_threshold: "98%"
+      - name: "Timeliness"
+        description: "Data is up-to-date"
+        default_threshold: "SLA defined"
+      - name: "Consistency"
+        description: "Data is consistent across sources"
+        default_threshold: "99%"
+      - name: "Uniqueness"
+        description: "No duplicates"
+        default_threshold: "100%"
+      - name: "Validity"
+        description: "Data conforms to rules"
+        default_threshold: "99%"
+
+# Command Configuration
+commands:
+  create-sttm:
+    description: "Create Source-to-Target Mapping"
+    prerequisites:
+      - "problem-statement.md exists"
+      - "Data sources identified"
+    steps:
+      - "Identify all source systems"
+      - "Document source tables and columns"
+      - "Define target layers and tables"
+      - "Map source to target fields"
+      - "Document transformations"
+      - "Generate sttm.md"
+
+  analytical-questions:
+    description: "Define analytical questions"
+    prerequisites:
+      - "kpis.md exists"
+      - "Business objectives understood"
+    steps:
+      - "Review KPIs and objectives"
+      - "Formulate specific questions"
+      - "Prioritize questions"
+      - "Identify required data"
+      - "Generate analytical-questions.md"
+
+  dq-initial:
+    description: "Define initial DQ requirements"
+    prerequisites:
+      - "sttm.md exists or being created"
+    steps:
+      - "Identify DQ dimensions"
+      - "Mark critical fields"
+      - "Set thresholds"
+      - "Define validation rules"
+      - "Generate dq-initial.md"
+
+# Integration Settings
+integration:
+  receives_from:
+    - agent: "data-strategist"
+      artifacts: ["problem-statement.md", "kpis.md"]
+      required: true
+    
+  handoff_to:
+    - agent: "data-architect"
+      trigger: "sttm and questions complete"
+      context: ["sttm.md", "analytical-questions.md", "dq-initial.md"]
+    
+  gate_contribution:
+    gate: 1
+    artifacts:
+      - "sttm.md"
+      - "analytical-questions.md"
+      - "dq-initial.md"
+
+# Quality Thresholds
+quality:
+  minimum_questions: 5
+  minimum_source_systems: 1
+  minimum_dq_dimensions: 3
+  sttm_completeness: 100%

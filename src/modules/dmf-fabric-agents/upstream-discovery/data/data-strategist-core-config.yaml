@@ -1,0 +1,172 @@
+# DataStrategist Configuration
+
+# Agent: DataStrategist
+# Phase: UPSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "data-strategist"
+  name: "DataStrategist"
+  version: "1.0"
+  phase: "UPSTREAM"
+  icon: "🎯"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/strategy"
+  formats:
+    - markdown
+    - yaml
+
+# Artifact Definitions
+artifacts:
+  problem-statement:
+    name: "Problem Statement"
+    filename: "problem-statement.md"
+    required_for_gate: 1
+    required_sections:
+      - "Business Context"
+      - "Problem Description"
+      - "Impact Analysis"
+      - "Scope Definition"
+      - "Stakeholders"
+    quality_criteria:
+      - "Business context clearly explained"
+      - "Problem impact quantified"
+      - "Scope boundaries defined"
+      - "Stakeholders identified"
+
+  kpis:
+    name: "Key Performance Indicators"
+    filename: "kpis.md"
+    required_for_gate: 1
+    required_sections:
+      - "KPI Overview"
+      - "KPI Details"
+      - "Measurement Plan"
+    quality_criteria:
+      - "At least 3 KPIs defined"
+      - "Each KPI has baseline value"
+      - "Each KPI has target value"
+      - "Calculation method documented"
+    kpi_template:
+      fields:
+        - name: "KPI Name"
+          required: true
+        - name: "Description"
+          required: true
+        - name: "Baseline"
+          required: true
+        - name: "Target"
+          required: true
+        - name: "Calculation"
+          required: true
+        - name: "Data Source"
+          required: true
+        - name: "Frequency"
+          required: false
+        - name: "Owner"
+          required: false
+
+  success-criteria:
+    name: "Success Criteria"
+    filename: "success-criteria.md"
+    required_for_gate: 1
+    required_sections:
+      - "Criteria Overview"
+      - "Measurable Outcomes"
+      - "Acceptance Thresholds"
+    quality_criteria:
+      - "Criteria are specific and measurable"
+      - "Thresholds are defined"
+      - "Validation method specified"
+
+  stakeholders:
+    name: "Stakeholder Map"
+    filename: "stakeholders.md"
+    required_for_gate: false
+    sections:
+      - "Stakeholder Identification"
+      - "Interest/Influence Matrix"
+      - "Communication Plan"
+
+  value-proposition:
+    name: "Data Value Proposition"
+    filename: "value-proposition.md"
+    required_for_gate: false
+    sections:
+      - "Current State"
+      - "Future State"
+      - "Value Drivers"
+      - "ROI Estimate"
+
+# Command Configuration
+commands:
+  define-problem:
+    description: "Guide through problem statement creation"
+    steps:
+      - "Gather business context"
+      - "Identify the core problem"
+      - "Quantify the impact"
+      - "Define scope boundaries"
+      - "Identify stakeholders"
+      - "Generate problem-statement.md"
+
+  create-kpis:
+    description: "Create KPIs based on business objectives"
+    steps:
+      - "Review problem statement"
+      - "Identify success dimensions"
+      - "Define measurable indicators"
+      - "Set baseline and targets"
+      - "Document calculation methods"
+      - "Generate kpis.md"
+
+  success-criteria:
+    description: "Define measurable success criteria"
+    steps:
+      - "Review KPIs"
+      - "Define acceptance criteria"
+      - "Set thresholds"
+      - "Specify validation method"
+      - "Generate success-criteria.md"
+
+  stakeholders:
+    description: "Identify and document stakeholders"
+    steps:
+      - "List all stakeholders"
+      - "Assess interest and influence"
+      - "Create RACI matrix"
+      - "Define communication plan"
+      - "Generate stakeholders.md"
+
+  value-prop:
+    description: "Create data value proposition with factory vs. manual performance gain"
+    steps:
+      - "Document current state"
+      - "Define desired future state"
+      - "Identify value drivers"
+      - "Estimate ROI"
+      - "Calculate factory vs. manual performance gain percentage"
+      - "Generate value-proposition.md"
+
+# Integration Settings
+integration:
+  handoff_to:
+    - agent: "business-analyst"
+      trigger: "problem-statement and kpis complete"
+      context: ["problem-statement.md", "kpis.md"]
+    
+  gate_contribution:
+    gate: 1
+    artifacts:
+      - "problem-statement.md"
+      - "kpis.md"
+
+# Quality Thresholds
+quality:
+  minimum_kpis: 3
+  minimum_stakeholders: 2
+  problem_statement_min_length: 500
+  kpi_completeness: 100%

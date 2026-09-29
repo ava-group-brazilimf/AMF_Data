@@ -1,0 +1,30 @@
+learn:
+  # Map agent failures to the correct instruction file
+  targets:
+    discovery-scout:
+      file: src/modules/dmf-fabric-agents/upstream-discovery/agents/discovery-scout/discovery-scout.md
+      section: "## Known Issues and Corrections"
+    logic-extractor:
+      file: src/modules/dmf-fabric-agents/upstream-discovery/agents/logic-extractor/logic-extractor.md
+      section: "## Known Issues and Corrections"
+    code-generator:
+      file: src/modules/dmf-fabric-agents/midstream-design/agents/code-generator/code-generator.md
+      section: "## Known Issues and Corrections"
+    quality-gate:
+      file: src/modules/dmf-fabric-agents/midstream-quality/agents/quality-gate/quality-gate.md
+      section: "## Known Issues and Corrections"
+    reconciliation:
+      file: src/modules/dmf-fabric-agents/downstream-execution/agents/reconciliation/reconciliation.md
+      section: "## Known Issues and Corrections"
+
+  # Failure patterns to capture
+  failure_patterns:
+    - "gate.*fail"
+    - "error.*scan"
+    - "invalid.*wave"
+    - "missing.*artifact"
+    - "encoding.*error"
+    - "0 objects detected"
+
+  # Only learn from actual failures, not warnings
+  min_severity: error

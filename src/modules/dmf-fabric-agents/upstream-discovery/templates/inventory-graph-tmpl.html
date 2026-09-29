@@ -1,0 +1,740 @@
+<!--
+  📊 Inventory Graph Visualization Template
+  Discovery Scout 🔍 — AI-Agent Migration Factory™ v3 | Avanade Edition
+
+  USAGE:
+    This template is automatically populated by Scout during
+    the *generate-inventory command. The {{...}} placeholders are
+    replaced with real inventory data.
+
+  PLACEHOLDERS:
+    {{PROJECT_NAME}}       — Project name
+    {{SOURCE_PLATFORM}}    — Source platform
+    {{TARGET_PLATFORM}}    — Target platform
+    {{TOTAL_PIPELINES}}    — Total pipelines
+    {{TOTAL_TABLES}}       — Total tables
+    {{DATA_VOLUME}}        — Estimated total volume
+    {{PIPELINES_JSON}}     — JSON array of pipelines (see schema below)
+    {{TABLES_JSON}}        — JSON array of tables
+    {{EDGES_JSON}}         — JSON array of DAG edges
+    {{SCAN_DATE}}          — Scan date
+    {{LOW_COUNT}}          — Low complexity count
+    {{MEDIUM_COUNT}}       — Medium complexity count
+    {{HIGH_COUNT}}         — High complexity count
+
+  PIPELINES_JSON SCHEMA (array of objects):
+    {
+      id:         string,   // pipeline_id
+      name:       string,   // friendly name
+      layer:      string,   // config | bronze | silver | gold | raw | staging
+      complexity: string,   // low | medium | high
+      score:      number,   // complexity_score
+      lang:       string,   // primary language
+      loc:        number,   // lines of code
+      transforms: string[], // list of transformations
+      inputs:     string[], // input tables
+      outputs:    string[], // output tables
+      deps:       string[], // dependency pipeline_ids
+      dependents: string[], // dependent pipeline_ids
+      pii:        boolean,  // has PII?
+      piiCols:    string[], // columns with PII
+      runtime:    number,   // estimated runtime (min)
+      desc:       string    // description
+    }
+
+  TABLES_JSON SCHEMA (array of objects):
+    { name: string, layer: string, rows: number, size: string }
+
+  EDGES_JSON SCHEMA (array of objects):
+    { from: string, to: string }
+
+  BRAND: Avanade — Digital Innovation
+    Primary Orange : #FF5800
+    Dark Gray      : #1F1F1F
+    White          : #FFFFFF
+    Mid Gray       : #6E6E6E
+    Light Gray     : #E6E6E6
+    Font           : Segoe UI (Semibold for headings)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline Inventory — {{PROJECT_NAME}}</title>
+  <script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, system-ui, sans-serif;
+      background: #FFFFFF;
+      color: #1F1F1F;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: #1F1F1F;
+      border-bottom: 3px solid #FF5800;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-accent {
+      width: 4px; height: 28px;
+      background: #FF5800;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-size: 18px; font-weight: 600;
+      color: #FFFFFF; letter-spacing: -0.3px;
+    }
+
+    .header .badge {
+      background: #FF5800; color: #FFFFFF;
+      padding: 3px 10px; border-radius: 3px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.4px; text-transform: uppercase;
+    }
+
+    .header .meta {
+      margin-left: auto; font-size: 12px; color: #A0A0A0;
+    }
+
+    .layout { display: flex; height: calc(100vh - 71px); }
+
+    /* ---- Graph Panel ---- */
+    .graph-panel { flex: 1; position: relative; overflow: hidden; }
+
+    #graph { width: 100%; height: 100%; background: #F5F5F5; }
+
+    .graph-legend {
+      position: absolute; top: 16px; left: 16px;
+      background: #FFFFFF;
+      border: 1px solid #E6E6E6;
+      border-left: 3px solid #FF5800;
+      border-radius: 4px; padding: 14px 18px; font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      z-index: 10; color: #1F1F1F;
+    }
+
+    .graph-legend h3 {
+      font-size: 11px; margin-bottom: 10px; color: #1F1F1F;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .legend-section { margin-bottom: 10px; }
+
+    .legend-section h4 {
+      font-size: 10px; color: #6E6E6E; margin-bottom: 5px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px; font-size: 12px; color: #1F1F1F;
+    }
+
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.1); flex-shrink: 0;
+    }
+
+    .legend-border { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ---- Side Panel ---- */
+    .side-panel {
+      width: 380px; background: #FAFAFA;
+      border-left: 1px solid #E6E6E6;
+      overflow-y: auto; display: flex; flex-direction: column;
+    }
+
+    .side-panel::-webkit-scrollbar { width: 5px; }
+    .side-panel::-webkit-scrollbar-track { background: transparent; }
+    .side-panel::-webkit-scrollbar-thumb { background: #E6E6E6; border-radius: 3px; }
+
+    /* ---- Summary Cards ---- */
+    .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px; }
+
+    .summary-card {
+      background: #FFFFFF;
+      border: 1px solid #E6E6E6;
+      border-radius: 4px; padding: 14px; text-align: center;
+    }
+
+    .summary-card .value { font-size: 26px; font-weight: 700; color: #FF5800; }
+    .summary-card .label {
+      font-size: 10px; color: #6E6E6E; margin-top: 2px;
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+
+    .summary-card.neutral .value { color: #1F1F1F; }
+    .summary-card.success .value { color: #16A34A; }
+    .summary-card.warn    .value { color: #D97706; }
+    .summary-card.danger  .value { color: #DC2626; }
+
+    /* ---- Complexity Bar ---- */
+    .complexity-bar-section { padding: 0 16px 16px; }
+
+    .complexity-bar-section h3 {
+      font-size: 11px; font-weight: 700; margin-bottom: 8px; color: #1F1F1F;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+
+    .complexity-bar { display: flex; border-radius: 3px; overflow: hidden; height: 22px; }
+
+    .complexity-bar .segment {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: #fff;
+    }
+
+    .complexity-bar .low    { background: #16A34A; }
+    .complexity-bar .medium { background: #D97706; }
+    .complexity-bar .high   { background: #DC2626; }
+
+    .section-title {
+      font-size: 11px; font-weight: 700; color: #1F1F1F;
+      padding: 14px 16px 8px; border-top: 1px solid #E6E6E6;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+
+    /* ---- Tables ---- */
+    .tables-grid { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 5px; }
+
+    .table-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; background: #FFFFFF;
+      border: 1px solid #E6E6E6; border-radius: 4px; font-size: 12px;
+    }
+
+    .table-row .layer-badge {
+      padding: 2px 7px; border-radius: 3px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase; flex-shrink: 0;
+    }
+
+    .table-row .layer-badge.bronze  { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+    .table-row .layer-badge.silver  { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+    .table-row .layer-badge.gold    { background: #FFFBEB; color: #78350F; border: 1px solid #FDE68A; }
+    .table-row .layer-badge.raw     { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .table-row .layer-badge.staging { background: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+    .table-row .layer-badge.config  { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+
+    .table-row .name {
+      flex: 1; font-family: 'Cascadia Code', 'Consolas', monospace; color: #1F1F1F;
+    }
+
+    .table-row .size { color: #6E6E6E; flex-shrink: 0; font-size: 11px; }
+
+    /* ---- Detail Panel ---- */
+    .detail-panel { padding: 16px; border-top: 1px solid #E6E6E6; }
+
+    .detail-panel h3 { font-size: 15px; color: #1F1F1F; margin-bottom: 4px; font-weight: 600; }
+
+    .detail-panel .subtitle {
+      font-size: 12px; color: #6E6E6E; margin-bottom: 14px;
+      font-family: 'Cascadia Code', monospace;
+    }
+
+    .detail-panel .desc { font-size: 13px; line-height: 1.5; margin-bottom: 14px; color: #3F3F3F; }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
+    .detail-item {
+      background: #FFFFFF; border: 1px solid #E6E6E6;
+      border-radius: 4px; padding: 10px;
+    }
+
+    .detail-item .label {
+      font-size: 10px; color: #6E6E6E; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 600;
+    }
+
+    .detail-item .value { font-size: 14px; font-weight: 600; margin-top: 2px; color: #1F1F1F; }
+    .detail-item .value.low    { color: #16A34A; }
+    .detail-item .value.medium { color: #D97706; }
+    .detail-item .value.high   { color: #DC2626; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+    .tag {
+      background: #F5F5F5; border: 1px solid #E6E6E6; border-radius: 3px;
+      padding: 2px 8px; font-size: 11px; color: #6E6E6E;
+      font-family: 'Cascadia Code', monospace;
+    }
+
+    .io-section { margin-bottom: 10px; }
+
+    .io-section h4 {
+      font-size: 10px; color: #6E6E6E; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px;
+    }
+
+    .no-selection { padding: 40px 16px; text-align: center; color: #A0A0A0; font-size: 13px; }
+    .no-selection .icon { font-size: 40px; margin-bottom: 12px; }
+
+    .pii-badge {
+      background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;
+      padding: 2px 8px; border-radius: 3px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase;
+    }
+
+    /* ---- Controls ---- */
+    .controls {
+      position: absolute; bottom: 16px; left: 16px;
+      display: flex; gap: 8px; z-index: 10;
+    }
+
+    .controls button {
+      background: #FFFFFF; border: 1px solid #E6E6E6;
+      color: #1F1F1F; padding: 7px 14px; border-radius: 3px;
+      cursor: pointer; font-size: 12px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .controls button:hover { background: #FF5800; color: #FFFFFF; border-color: #FF5800; }
+
+    /* ---- Tabs ---- */
+    .tab-bar { display: flex; border-bottom: 1px solid #E6E6E6; background: #FFFFFF; }
+
+    .tab-bar button {
+      flex: 1; background: transparent; border: none; color: #6E6E6E;
+      padding: 10px; font-size: 12px; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      transition: color 0.15s;
+    }
+
+    .tab-bar button.active { color: #FF5800; border-bottom-color: #FF5800; font-weight: 600; }
+    .tab-bar button:hover:not(.active) { color: #1F1F1F; background: #F5F5F5; }
+
+    .tab-content { display: none; flex: 1; overflow-y: auto; }
+    .tab-content.active { display: flex; flex-direction: column; }
+
+    /* ---- Pipeline List ---- */
+    .pipeline-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+    .pipeline-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; background: #FFFFFF;
+      border: 1px solid #E6E6E6; border-radius: 4px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+
+    .pipeline-item:hover { border-color: #FF5800; background: #FFFAF8; }
+
+    .pipeline-item.selected {
+      border-color: #FF5800; background: #FFF5F0;
+      border-left: 3px solid #FF5800;
+    }
+
+    .pipeline-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pipeline-item .name { flex: 1; font-size: 12px; font-weight: 500; color: #1F1F1F; }
+
+    .complexity-badge {
+      padding: 2px 8px; border-radius: 3px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+    }
+
+    .complexity-badge.low    { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+    .complexity-badge.medium { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .complexity-badge.high   { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      .side-panel { width: 100%; height: 50vh; border-left: none; border-top: 1px solid #E6E6E6; }
+      .graph-panel { height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-accent"></div>
+  <h1>Pipeline Inventory — {{PROJECT_NAME}}</h1>
+  <span class="badge">Migration Factory</span>
+  <span class="meta">{{SOURCE_PLATFORM}} → {{TARGET_PLATFORM}} &nbsp;·&nbsp; {{TOTAL_PIPELINES}} Pipelines &nbsp;·&nbsp; {{SCAN_DATE}}</span>
+</div>
+
+<div class="layout">
+
+  <!-- ════════ Graph Panel ════════ -->
+  <div class="graph-panel">
+    <div id="graph"></div>
+
+    <div class="graph-legend">
+      <h3>Legend</h3>
+      <div class="legend-section">
+        <h4>Layer (Color)</h4>
+        <div class="legend-item"><div class="legend-dot" style="background:#9CA3AF"></div> Config / Raw</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#CD7F32"></div> Bronze</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6B7280"></div> Silver / Staging</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div> Gold</div>
+      </div>
+      <div class="legend-section">
+        <h4>Complexity (Border)</h4>
+        <div class="legend-item"><div class="legend-border" style="border:3px solid #16A34A"></div> Low</div>
+        <div class="legend-item"><div class="legend-border" style="border:3px solid #D97706"></div> Medium</div>
+        <div class="legend-item"><div class="legend-border" style="border:3px solid #DC2626"></div> High</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button onclick="network.fit()">⊞ Fit</button>
+      <button onclick="toggleLayout()">↻ Layout</button>
+      <button onclick="togglePhysics()">☰ Physics</button>
+    </div>
+  </div>
+
+  <!-- ════════ Side Panel ════════ -->
+  <div class="side-panel">
+    <div class="tab-bar">
+      <button class="active" onclick="switchTab('overview')">Overview</button>
+      <button onclick="switchTab('pipelines')">Pipelines</button>
+      <button onclick="switchTab('detail')">Details</button>
+    </div>
+
+    <!-- Tab: Overview -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="value" id="card-pipelines">—</div>
+          <div class="label">Pipelines</div>
+        </div>
+        <div class="summary-card neutral">
+          <div class="value" id="card-tables">—</div>
+          <div class="label">Tables</div>
+        </div>
+        <div class="summary-card success">
+          <div class="value" id="card-low">—</div>
+          <div class="label">Low</div>
+        </div>
+        <div class="summary-card warn">
+          <div class="value" id="card-medium">—</div>
+          <div class="label">Medium</div>
+        </div>
+        <div class="summary-card danger">
+          <div class="value" id="card-high">—</div>
+          <div class="label">High</div>
+        </div>
+        <div class="summary-card">
+          <div class="value" id="card-volume">—</div>
+          <div class="label">Volume</div>
+        </div>
+      </div>
+
+      <div class="complexity-bar-section">
+        <h3>Complexity Distribution</h3>
+        <div class="complexity-bar" id="complexity-bar"></div>
+      </div>
+
+      <div class="section-title">📊 Tables (<span id="table-count"></span>)</div>
+      <div class="tables-grid" id="tables-grid"></div>
+    </div>
+
+    <!-- Tab: Pipelines -->
+    <div id="tab-pipelines" class="tab-content">
+      <div class="pipeline-list" id="pipeline-list"></div>
+    </div>
+
+    <!-- Tab: Detail -->
+    <div id="tab-detail" class="tab-content">
+      <div id="detail-content">
+        <div class="no-selection">
+          <div class="icon">👆</div>
+          Click on a node in the graph or<br>select a pipeline from the list
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA — Injected by Scout during *generate-inventory
+// ═══════════════════════════════════════════════
+const inventory = {
+  pipelines: {{PIPELINES_JSON}},
+  tables:    {{TABLES_JSON}},
+  edges:     {{EDGES_JSON}}
+};
+
+// ═══════════════════════════════════════════════
+// LAYER COLORS (Avanade light theme)
+// ═══════════════════════════════════════════════
+const layerColors = {
+  config:  { bg: "#9CA3AF", font: "#FFFFFF" },
+  raw:     { bg: "#9CA3AF", font: "#FFFFFF" },
+  bronze:  { bg: "#CD7F32", font: "#FFFFFF" },
+  silver:  { bg: "#6B7280", font: "#FFFFFF" },
+  staging: { bg: "#7C3AED", font: "#FFFFFF" },
+  gold:    { bg: "#D97706", font: "#FFFFFF" }
+};
+
+const complexityBorder = { low: "#16A34A", medium: "#D97706", high: "#DC2626" };
+
+function getLayerColor(layer) {
+  return layerColors[layer] || { bg: "#6E6E6E", font: "#FFFFFF" };
+}
+
+// ═══════════════════════════════════════════════
+// POPULATE SUMMARY CARDS
+// ═══════════════════════════════════════════════
+const lowCount    = inventory.pipelines.filter(p => p.complexity === "low").length;
+const medCount    = inventory.pipelines.filter(p => p.complexity === "medium").length;
+const highCount   = inventory.pipelines.filter(p => p.complexity === "high").length;
+const totalPipes  = inventory.pipelines.length;
+const totalTables = inventory.tables.length;
+
+document.getElementById("card-pipelines").textContent = totalPipes;
+document.getElementById("card-tables").textContent    = totalTables;
+document.getElementById("card-low").textContent       = lowCount;
+document.getElementById("card-medium").textContent    = medCount;
+document.getElementById("card-high").textContent      = highCount;
+document.getElementById("card-volume").textContent    = "{{DATA_VOLUME}}";
+document.getElementById("table-count").textContent    = totalTables;
+
+// Complexity bar
+const bar = document.getElementById("complexity-bar");
+if (lowCount)  bar.innerHTML += `<div class="segment low"    style="flex:${lowCount}">${lowCount} Low</div>`;
+if (medCount)  bar.innerHTML += `<div class="segment medium" style="flex:${medCount}">${medCount} Med</div>`;
+if (highCount) bar.innerHTML += `<div class="segment high"   style="flex:${highCount}">${highCount} High</div>`;
+
+// ═══════════════════════════════════════════════
+// BUILD GRAPH
+// ═══════════════════════════════════════════════
+const nodes = new vis.DataSet(
+  inventory.pipelines.map(p => ({
+    id: p.id,
+    label: p.name + "\n" + p.layer.toUpperCase(),
+    shape: "box",
+    font: { color: getLayerColor(p.layer).font, size: 13, face: "Segoe UI", multi: true },
+    color: {
+      background: getLayerColor(p.layer).bg,
+      border: complexityBorder[p.complexity] || "#6E6E6E",
+      highlight: { background: getLayerColor(p.layer).bg, border: "#FF5800" },
+      hover:      { background: getLayerColor(p.layer).bg, border: "#FF5800" }
+    },
+    borderWidth: 3, borderWidthSelected: 4,
+    margin: { top: 12, bottom: 12, left: 16, right: 16 },
+    shadow: { enabled: true, color: "rgba(0,0,0,0.12)", size: 6, x: 2, y: 2 },
+    widthConstraint: { minimum: 140 }
+  }))
+);
+
+const edgesData = new vis.DataSet(
+  inventory.edges.map((e, i) => ({
+    id: i, from: e.from, to: e.to,
+    arrows: { to: { enabled: true, scaleFactor: 0.7 } },
+    color: { color: "#CCCCCC", highlight: "#FF5800", hover: "#FF5800" },
+    width: 2,
+    smooth: { type: "cubicBezier", forceDirection: "vertical", roundness: 0.4 }
+  }))
+);
+
+const container = document.getElementById("graph");
+let isHierarchical = true, physicsEnabled = true;
+
+const options = {
+  layout: {
+    hierarchical: {
+      enabled: true, direction: "UD", sortMethod: "directed",
+      levelSeparation: 120, nodeSpacing: 180, treeSpacing: 200
+    }
+  },
+  physics: {
+    enabled: true,
+    hierarchicalRepulsion: { nodeDistance: 180, centralGravity: 0.1 },
+    stabilization: { iterations: 150 }
+  },
+  interaction: { hover: true, tooltipDelay: 100, zoomView: true, dragView: true },
+  nodes: { shapeProperties: { borderRadius: 6 } }
+};
+
+const network = new vis.Network(container, { nodes, edges: edgesData }, options);
+
+// ═══════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════
+network.on("click", params => {
+  if (params.nodes.length > 0) {
+    showDetail(params.nodes[0]);
+    switchTab("detail");
+    highlightPipelineItem(params.nodes[0]);
+  }
+});
+
+network.on("hoverNode", () => container.style.cursor = "pointer");
+network.on("blurNode",  () => container.style.cursor = "default");
+network.once("stabilizationIterationsDone", () => network.fit({ animation: { duration: 500 } }));
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function switchTab(name) {
+  const tabs = ["overview", "pipelines", "detail"];
+  document.querySelectorAll(".tab-bar button").forEach((b, i) => b.classList.toggle("active", tabs[i] === name));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+}
+
+// ═══════════════════════════════════════════════
+// TABLES GRID
+// ═══════════════════════════════════════════════
+const tablesGrid = document.getElementById("tables-grid");
+inventory.tables.forEach(t => {
+  const row = document.createElement("div");
+  row.className = "table-row";
+  row.innerHTML = `
+    <span class="layer-badge ${t.layer}">${t.layer}</span>
+    <span class="name">${t.name}</span>
+    <span class="size">${t.rows ? t.rows.toLocaleString() + ' rows · ' : ''}${t.size}</span>
+  `;
+  tablesGrid.appendChild(row);
+});
+
+// ═══════════════════════════════════════════════
+// PIPELINE LIST
+// ═══════════════════════════════════════════════
+const pipelineList = document.getElementById("pipeline-list");
+inventory.pipelines.forEach(p => {
+  const item = document.createElement("div");
+  item.className = "pipeline-item";
+  item.dataset.id = p.id;
+  item.innerHTML = `
+    <div class="dot" style="background:${getLayerColor(p.layer).bg}"></div>
+    <span class="name">${p.name}</span>
+    ${p.pii ? '<span class="pii-badge">PII</span>' : ''}
+    <span class="complexity-badge ${p.complexity}">${p.complexity}</span>
+  `;
+  item.addEventListener("click", () => {
+    showDetail(p.id);
+    network.selectNodes([p.id]);
+    network.focus(p.id, { scale: 1.2, animation: { duration: 400 } });
+    switchTab("detail");
+    highlightPipelineItem(p.id);
+  });
+  pipelineList.appendChild(item);
+});
+
+function highlightPipelineItem(id) {
+  document.querySelectorAll(".pipeline-item").forEach(el => el.classList.toggle("selected", el.dataset.id === id));
+}
+
+// ═══════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════
+function showDetail(pipelineId) {
+  const p = inventory.pipelines.find(x => x.id === pipelineId);
+  if (!p) return;
+
+  document.getElementById("detail-content").innerHTML = `
+    <div class="detail-panel">
+      <h3>${p.name} ${p.pii ? '<span class="pii-badge">PII</span>' : ''}</h3>
+      <div class="subtitle">${p.id}</div>
+      <div class="desc">${p.desc}</div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="label">Layer</div>
+          <div class="value">${p.layer.toUpperCase()}</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Complexity</div>
+          <div class="value ${p.complexity}">${p.complexity.toUpperCase()} (${p.score})</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Language</div>
+          <div class="value">${p.lang}</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Lines of Code</div>
+          <div class="value">${p.loc}</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Runtime est.</div>
+          <div class="value">${p.runtime} min</div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Transforms</div>
+          <div class="value">${p.transforms.length}</div>
+        </div>
+      </div>
+
+      ${p.inputs.length ? `
+        <div class="io-section">
+          <h4>📥 Input Tables</h4>
+          <div class="tag-list">${p.inputs.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>` : ''}
+
+      ${p.outputs.length ? `
+        <div class="io-section">
+          <h4>📤 Output Tables</h4>
+          <div class="tag-list">${p.outputs.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>` : ''}
+
+      <div class="io-section">
+        <h4>🔄 Transformations (${p.transforms.length})</h4>
+        <div class="tag-list">${p.transforms.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+
+      ${p.pii ? `
+        <div class="io-section">
+          <h4>🔒 PII Fields</h4>
+          <div class="tag-list">
+            ${p.piiCols.map(t => `<span class="tag" style="border-color:#FECACA;color:#DC2626">${t}</span>`).join('')}
+          </div>
+        </div>` : ''}
+
+      ${p.deps.length ? `
+        <div class="io-section">
+          <h4>⬆️ Depends on</h4>
+          <div class="tag-list">
+            ${p.deps.map(d => `<span class="tag" style="cursor:pointer;border-color:#FDBA74;color:#FF5800"
+              onclick="showDetail('${d}');network.selectNodes(['${d}']);network.focus('${d}',{scale:1.2,animation:{duration:400}})">${d}</span>`).join('')}
+          </div>
+        </div>` : ''}
+
+      ${p.dependents.length ? `
+        <div class="io-section">
+          <h4>⬇️ Dependents</h4>
+          <div class="tag-list">
+            ${p.dependents.map(d => `<span class="tag" style="cursor:pointer;border-color:#BBF7D0;color:#16A34A"
+              onclick="showDetail('${d}');network.selectNodes(['${d}']);network.focus('${d}',{scale:1.2,animation:{duration:400}})">${d}</span>`).join('')}
+          </div>
+        </div>` : ''}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════
+function toggleLayout() {
+  isHierarchical = !isHierarchical;
+  network.setOptions(isHierarchical
+    ? {
+        layout: { hierarchical: { enabled: true, direction: "UD", sortMethod: "directed", levelSeparation: 120, nodeSpacing: 180 } },
+        physics: { enabled: true, hierarchicalRepulsion: { nodeDistance: 180 } }
+      }
+    : {
+        layout: { hierarchical: false },
+        physics: { enabled: true, barnesHut: { gravitationalConstant: -3000, springLength: 200 } }
+      }
+  );
+}
+
+function togglePhysics() {
+  physicsEnabled = !physicsEnabled;
+  network.setOptions({ physics: { enabled: physicsEnabled } });
+}
+</script>
+
+</body>
+</html>

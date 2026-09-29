@@ -1,6 +1,6 @@
 # Data Migration Factory
 
-> **Platform-agnostic, multi-agent migration factory** — 21 specialized AI agents (20 active + 1 deprecated), three quality gates, 23 governance scripts, and an AST Engine (`src/shared/pipeline_ast/`) for deterministic multi-platform generation. Orchestrates the full lifecycle of data platform migrations from legacy discovery to production reconciliation.
+> **Platform-agnostic, multi-agent migration factory** — 21 specialized AI agents (20 active + 1 deprecated), three quality gates, 25 governance scripts, and an AST Engine (`src/shared/pipeline_ast/`) for deterministic multi-platform generation. Orchestrates the full lifecycle of data platform migrations from legacy discovery to production reconciliation.
 
 ---
 
@@ -79,11 +79,11 @@ The human operator manually switches between agents and triggers the next phase.
 
 - **21 chatmode agents (20 active + 1 deprecated)** — each with a defined persona, commands, tools, and artifact ownership
 - **Three quality gates** — GateScore formula with 4 weighted dimensions; ≥ 85 to promote
-- **23 governance scripts** — production Python modules covering gates, KPIs, reconciliation, policy, and data contracts
+- **25 governance scripts** — production Python modules covering gates, KPIs, reconciliation, policy, and data contracts
 - **283 automated tests** — full pytest coverage, all green
 - **AST Engine module** — canonical model + SQL/SSIS parsers + lineage + generators (Fabric/Databricks/Airflow)
 - **91 AST tests** — 89 passing + 2 conditional skips (when `sqlglot` is not installed)
-- **26 domain skills** — knowledge packs loaded on demand by agents (agent-governance, data-quality-frameworks, sql-optimization-patterns, etc.)
+- **28 domain skills** — knowledge packs loaded on demand by agents (agent-governance, data-quality-frameworks, sql-optimization-patterns, etc.)
 - **Token optimization** — optional Headroom AI integration reduces LLM token consumption by 30–60% on large artifacts via context compression
 - **7-job CI pipeline** — tests, linting (Ruff), security (Bandit), agent contracts, chatmode alignment, gate validation, policy schema
 - **Platform agnostic** — no hardcoded target platform; supports Databricks, Fabric, Snowflake, or any target
@@ -219,7 +219,7 @@ imfai-ava-fabric-data-agents/
 │   │   ├── discovery-scout.chatmode.md
 │   │   ├── agent-designer.chatmode.md
 │   │   └── ...
-│   ├── skills/                 # 26 domain skills (knowledge packs)
+│   ├── skills/                 # 28 domain skills (knowledge packs)
 │   │   ├── ava-dmf-agent-governance/
 │   │   ├── ava-dmf-data-quality/
 │   │   └── ...
@@ -235,7 +235,7 @@ imfai-ava-fabric-data-agents/
 │   │   └── core-coordination/      # 3 agents, 15 tasks, 6 templates
 │   └── shared/
 │       ├── ast/                    # AST Engine (model, parsers, lineage, generators, tests)
-│       ├── scripts/                # 23 Python governance modules
+│       ├── scripts/                # 25 Python governance modules
 │       ├── tests/                  # 271 pytest tests (all green)
 │       ├── templates/              # Shared cross-module templates
 │       ├── schemas/                # JSON schemas for agent outputs
@@ -435,7 +435,7 @@ Code Generator → produces generated-code/{fabric|databricks|airflow}/
 
 ### Skills System
 
-Agents load **26 domain skills** on demand from `.github/skills/`. Skills are knowledge packs that provide specialized context:
+Agents load **28 domain skills** on demand from `.github/skills/`. Skills are knowledge packs that provide specialized context:
 
 | Category | Skills |
 | --- | --- |
@@ -773,7 +773,7 @@ GitHub Actions workflow (`.github/workflows/ci-governance.yml`) runs **7 jobs** 
 | Document | Purpose |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Canonical agent reference (commands, conventions, structure) |
-| [scripts/README.md](scripts/README.md) | Detailed API docs for all 23 governance scripts |
+| [scripts/README.md](scripts/README.md) | Detailed API docs for all 25 governance scripts |
 | [wave-config-sample.yaml](wave-config-sample.yaml) | Wave configuration template with all fields documented |
 
 ### Agent Workspaces
@@ -865,7 +865,7 @@ Reference guides for the Azure + Databricks integration sub-project:
 ## Status
 
 - All 4 sprints complete: B-001 → B-019 implemented
-- 283/283 tests GREEN across 23 governance scripts
+- 283/283 tests GREEN across 25 governance scripts
 - AST Engine test suite: 89 passed, 2 skipped (`sqlglot`-dependent)
 - 21 chatmode agents (20 active + 1 deprecated), platform-agnostic
 - 26 skills installed in `.github/skills/`

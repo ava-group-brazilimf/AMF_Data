@@ -1,0 +1,380 @@
+# Project Estimation Template
+
+project_name: ""
+estimated_by: ""
+estimation_date: ""
+version: "1.0"
+
+## PROJECT OVERVIEW
+project_description: |
+  Brief description of the project
+
+business_objective: |
+  What business problem does this solve?
+
+success_criteria:
+  - criterion_1: ""
+  - criterion_2: ""
+  - criterion_3: ""
+
+## SCOPE
+in_scope:
+  - item_1: ""
+  - item_2: ""
+
+out_of_scope:
+  - item_1: ""
+  - item_2: ""
+
+## EFFORT ESTIMATION
+
+### Development Effort (Hours)
+roles:
+  data_engineer:
+    junior: 0
+    mid: 0
+    senior: 0
+    lead: 0
+  data_scientist:
+    junior: 0
+    mid: 0
+    senior: 0
+    lead: 0
+  data_analyst:
+    junior: 0
+    mid: 0
+    senior: 0
+  devops_engineer:
+    junior: 0
+    mid: 0
+    senior: 0
+  solution_architect:
+    senior: 0
+    lead: 0
+  qa_engineer:
+    mid: 0
+    senior: 0
+  business_analyst:
+    mid: 0
+    senior: 0
+  project_manager:
+    senior: 0
+    lead: 0
+
+### Effort by Phase (Hours)
+phases:
+  requirements_analysis: 0
+  architecture_design: 0
+  development: 0
+  testing: 0
+  deployment: 0
+  documentation: 0
+  project_management: 0
+
+### Total Effort
+total_hours: 0
+full_time_equivalents: 0 # Total hours / 2080
+duration_months: 0
+
+## COST ESTIMATION (USD)
+
+### Labor Costs
+labor_cost_by_role:
+  data_engineer: 0
+  data_scientist: 0
+  data_analyst: 0
+  devops_engineer: 0
+  solution_architect: 0
+  qa_engineer: 0
+  business_analyst: 0
+  project_manager: 0
+
+total_labor_cost: 0
+
+### Infrastructure Costs
+
+#### Azure Resources (Monthly)
+azure:
+  compute:
+    databricks: 0
+    synapse_dedicated_pool: 0
+    vm_instances: 0
+    adf_integration_runtime: 0
+  storage:
+    blob_storage_hot: 0
+    blob_storage_cool: 0
+    data_lake_gen2: 0
+    sql_database: 0
+  analytics_ai:
+    azure_openai: 0
+    machine_learning: 0
+    power_bi: 0
+  networking_security:
+    vpn_gateway: 0
+    key_vault: 0
+    monitor: 0
+
+azure_monthly_total: 0
+azure_project_total: 0 # Monthly x Duration
+
+#### AWS Resources (Monthly)
+aws:
+  compute:
+    ec2_instances: 0
+    emr_cluster: 0
+    redshift: 0
+    glue_dpu: 0
+  storage:
+    s3_standard: 0
+    s3_glacier: 0
+    ebs: 0
+    rds: 0
+  analytics_ai:
+    bedrock: 0
+    sagemaker: 0
+    athena: 0
+    quicksight: 0
+
+aws_monthly_total: 0
+aws_project_total: 0 # Monthly x Duration
+
+#### Other Costs
+other_costs:
+  software_licenses: 0
+  third_party_tools: 0
+  training: 0
+  travel: 0
+
+total_infrastructure_cost: 0
+
+### Total Project Cost
+subtotal: 0 # Labor + Infrastructure
+contingency_percentage: 15 # 10-20% recommended
+contingency_amount: 0
+total_project_cost: 0
+
+## COST BREAKDOWN BY PHASE
+cost_by_phase:
+  requirements_analysis: 0
+  architecture_design: 0
+  development: 0
+  testing: 0
+  deployment: 0
+  documentation: 0
+  project_management: 0
+
+## TIMELINE
+
+### Project Phases
+timeline:
+  - phase: "Requirements & Analysis"
+    duration_weeks: 0
+    start_date: ""
+    end_date: ""
+
+  - phase: "Architecture & Design"
+    duration_weeks: 0
+    start_date: ""
+    end_date: ""
+
+  - phase: "Development"
+    duration_weeks: 0
+    start_date: ""
+    end_date: ""
+
+  - phase: "Testing & QA"
+    duration_weeks: 0
+    start_date: ""
+    end_date: ""
+
+  - phase: "Deployment & Go-Live"
+    duration_weeks: 0
+    start_date: ""
+    end_date: ""
+
+### Key Milestones
+milestones:
+  - name: "Requirements Sign-Off"
+    target_date: ""
+
+  - name: "Architecture Approved"
+    target_date: ""
+
+  - name: "Development Complete"
+    target_date: ""
+
+  - name: "UAT Passed"
+    target_date: ""
+
+  - name: "Production Go-Live"
+    target_date: ""
+
+## ONGOING COSTS (Annual)
+
+### Year 1-5 Projections
+ongoing_costs:
+  year_1:
+    infrastructure: 0
+    support_maintenance: 0
+    enhancements: 0
+    total: 0
+
+  year_2:
+    infrastructure: 0
+    support_maintenance: 0
+    enhancements: 0
+    total: 0
+
+  year_3:
+    infrastructure: 0
+    support_maintenance: 0
+    enhancements: 0
+    total: 0
+
+  year_4:
+    infrastructure: 0
+    support_maintenance: 0
+    enhancements: 0
+    total: 0
+
+  year_5:
+    infrastructure: 0
+    support_maintenance: 0
+    enhancements: 0
+    total: 0
+
+### Total Cost of Ownership (5 Years)
+tco_5_year:
+  initial_development: 0
+  ongoing_operations: 0
+  total: 0
+
+## COST OPTIMIZATION OPPORTUNITIES
+
+optimization_opportunities:
+  - opportunity: "Reserved Instances"
+    potential_savings: "$0/yr"
+
+  - opportunity: "Auto-Scaling & Scheduling"
+    potential_savings: "$0/yr"
+
+  - opportunity: "Serverless Architecture"
+    potential_savings: "$0/yr"
+
+  - opportunity: "Offshore/Nearshore Mix"
+    potential_savings: "$0/yr"
+
+  - opportunity: "Agentic AI Adoption"
+    potential_savings: "$0/yr"
+
+total_optimization_savings: 0
+
+## RISKS & ASSUMPTIONS
+
+### Key Assumptions
+assumptions:
+  - assumption_1: ""
+  - assumption_2: ""
+  - assumption_3: ""
+
+### Top Risks
+risks:
+  - risk: ""
+    impact: "High/Medium/Low"
+    probability: "High/Medium/Low"
+    mitigation: ""
+
+  - risk: ""
+    impact: "High/Medium/Low"
+    probability: "High/Medium/Low"
+    mitigation: ""
+
+## ROI ANALYSIS
+
+### Business Benefits (Annual)
+benefits:
+  operational_efficiency: 0
+  cost_avoidance: 0
+  revenue_increase: 0
+  risk_reduction: 0
+  total_annual_benefit: 0
+
+### ROI Calculation
+roi:
+  total_investment: 0 # Initial + Year 1 ongoing
+  year_1_benefit: 0
+  year_1_roi_percentage: 0
+
+  cumulative_5_year_benefit: 0
+  cumulative_5_year_cost: 0
+  net_5_year_value: 0
+  roi_5_year_percentage: 0
+
+  payback_period_months: 0
+
+## COMPARISON: WITH vs WITHOUT AI
+
+### Traditional Approach
+traditional:
+  total_effort_hours: 0
+  duration_months: 0
+  team_size: 0
+  labor_cost: 0
+  infrastructure_cost: 0
+  total_cost: 0
+
+### With Agentic AI
+with_ai:
+  total_effort_hours: 0
+  effort_reduction_percentage: 0 # 40-70% typical
+  duration_months: 0
+  team_size: 0
+  labor_cost: 0
+  infrastructure_cost: 0
+  ai_tools_cost: 0
+  total_cost: 0
+
+### Savings
+ai_impact:
+  effort_savings_hours: 0
+  cost_savings: 0
+  savings_percentage: 0
+  time_to_market_improvement: "X months faster"
+
+## APPROVAL
+
+### Stakeholder Sign-Off
+approvals:
+  - role: "Business Sponsor"
+    name: ""
+    signature: ""
+    date: ""
+
+  - role: "Technical Lead"
+    name: ""
+    signature: ""
+    date: ""
+
+  - role: "Finance"
+    name: ""
+    signature: ""
+    date: ""
+
+### Next Steps
+next_steps:
+  - action: "Review estimate with stakeholders"
+    owner: ""
+    target_date: ""
+
+  - action: "Finalize budget approval"
+    owner: ""
+    target_date: ""
+
+  - action: "Begin resource allocation"
+    owner: ""
+    target_date: ""
+
+# Template metadata
+template_version: "1.0"
+last_updated: "January 22, 2026"
+maintained_by: "Delivery Lead Practice"

@@ -1,0 +1,184 @@
+# =============================================================================
+# Data Migration Factory v3 — .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+.installed.cfg
+MANIFEST
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.coveragerc
+junit*.xml
+
+# mypy / ruff / pyright
+.mypy_cache/
+.ruff_cache/
+.pyright/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# -----------------------------------------------------------------------------
+# Secrets & credentials — NEVER commit these
+# -----------------------------------------------------------------------------
+*.pem
+*.key
+.copilot-key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.env.local
+*.env.*.local
+.env.production
+.env.staging
+secrets.yaml
+secrets.yml
+reconciliation-connection.yaml    # template is -sample.yaml; real config has credentials
+*-credentials.yaml
+*-credentials.json
+*credentials*.json
+
+# Azure / cloud auth
+.azure/
+azureauth.json
+service-principal.json
+
+# -----------------------------------------------------------------------------
+# Wave execution outputs (generated at runtime — not source-controlled)
+# -----------------------------------------------------------------------------
+**/gate1-decision.md
+**/gate2-decision.md
+**/gate3-decision.md
+**/*-outputs/
+wave-execution-logs/
+reconciliation-reports/
+
+# -----------------------------------------------------------------------------
+# Projects — all content ignored (runtime artifacts, not source-controlled)
+# -----------------------------------------------------------------------------
+projects/
+
+# Legacy root project/ folder (renamed to projects/einstein-hiae/ — keep ignored)
+project/
+
+# -----------------------------------------------------------------------------
+# VS Code
+# -----------------------------------------------------------------------------
+.vscode/
+# Keep: .github/ entirely (agents, skills, instructions)
+
+# -----------------------------------------------------------------------------
+# Node / npm (MCP servers, azure-mcp-server)
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm/
+
+# -----------------------------------------------------------------------------
+# OS artifacts
+# -----------------------------------------------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# -----------------------------------------------------------------------------
+# Logs & temp files
+# -----------------------------------------------------------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.orig
+*.rej
+
+# -----------------------------------------------------------------------------
+# Database / data files (not source — use samples instead)
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.parquet
+*.avro
+*.orc
+*.json.gz
+
+# Exceptions: keep small fixture/sample files if explicitly named
+!tests/fixtures/**
+!**/sample*.csv
+
+# -----------------------------------------------------------------------------
+# Compiled / generated docs
+# -----------------------------------------------------------------------------
+site/
+docs/_build/
+.docusaurus/
+
+# -----------------------------------------------------------------------------
+# Local-only working notes (not for the repo)
+# -----------------------------------------------------------------------------
+mapa-prioridades-outputs.md
+
+# -----------------------------------------------------------------------------
+# Terraform / IaC (if added later)
+# -----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraformrc
+terraform.rc

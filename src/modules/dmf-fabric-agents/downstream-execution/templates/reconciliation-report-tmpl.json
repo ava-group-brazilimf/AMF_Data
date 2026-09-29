@@ -1,0 +1,146 @@
+{
+  "_template_metadata": {
+    "name": "reconciliation-report-tmpl.json",
+    "owner_agent": "reconciliation",
+    "phase": "DOWNSTREAM",
+    "gate": 3,
+    "version": "1.0",
+    "purpose": "Canonical machine-readable reconciliation report. SINGLE SOURCE OF TRUTH read by Diego (downstream-executor) for the wave-report GateScore, by Orion (migration-coordinator) for Gate 3 promotion, by Scribe (documentation) for the migration-report and by validate_gate3_artifacts.py in CI. Both reconciliation-report.md and reconciliation-dashboard.html are derived from this file. The fields parity_pct and status MUST be top-level for CI parsing.",
+    "instructions_for_llm": [
+      "Replace EVERY {{...}} placeholder with project data. Do NOT leave placeholders in the final file.",
+      "Remove this _template_metadata block from the produced reconciliation-report.json.",
+      "status MUST be one of: APPROVED | PARTIAL | FAILED.",
+      "parity_pct is a number 0.0-100.0 with up to 2 decimal places.",
+      "sign_off_eligible MUST be true only when status = APPROVED, parity_pct >= sign_off_threshold_pct AND critical_count = 0.",
+      "Each levels.L*.status MUST be one of: PASS | WARN | FAIL | MANUAL.",
+      "Recompute summary counts and tables[] aggregates before persisting; do not trust template defaults.",
+      "Every table in tables[] with parity_pct < 100 MUST appear in critical_issues[] OR warnings[] depending on severity.",
+      "L5_business_rules.status defaults to MANUAL when no automated business-rule suite exists.",
+      "Persist this file at: projects/{project_name}/outputs/downstream/reconciliation/reconciliation-report.json"
+    ]
+  },
+  "metadata": {
+    "agent": "reconciliation",
+    "agent_persona": "Balance",
+    "wave_id": "{{WAVE_ID}}",
+    "wave_number": 1,
+    "project": "{{PROJECT_NAME}}",
+    "environment": "DEV",
+    "timestamp": "{{TIMESTAMP_ISO8601}}",
+    "duration_minutes": 0,
+    "trace_id": "{{TRACE_ID}}",
+    "version": "{{VERSION}}",
+    "gate": 3
+  },
+  "parity_pct": 0.0,
+  "status": "APPROVED",
+  "sign_off_eligible": false,
+  "sign_off_threshold_pct": 99.9,
+  "summary": {
+    "total_tables": 0,
+    "tables_passed": 0,
+    "tables_failed": 0,
+    "tables_warning": 0,
+    "critical_count": 0,
+    "warning_count": 0,
+    "info_count": 0
+  },
+  "levels": {
+    "L1_row_count": {
+      "status": "PASS",
+      "tables_passed": 0,
+      "tables_failed": 0,
+      "source_rows": 0,
+      "target_rows": 0,
+      "delta": 0,
+      "delta_pct": 0.0
+    },
+    "L2_checksum": {
+      "status": "PASS",
+      "tables_passed": 0,
+      "tables_failed": 0,
+      "match_pct": 0.0,
+      "algorithm": "SHA-256",
+      "mismatches": []
+    },
+    "L3_schema_diff": {
+      "status": "PASS",
+      "tables_identical": 0,
+      "tables_with_diffs": 0,
+      "differences": []
+    },
+    "L4_data_profile": {
+      "status": "PASS",
+      "tables_no_drift": 0,
+      "tables_with_drift": 0,
+      "findings": []
+    },
+    "L5_business_rules": {
+      "status": "MANUAL",
+      "rules_evaluated": 0,
+      "rules_passed": 0,
+      "rules_failed": 0,
+      "notes": "{{BUSINESS_RULES_NOTES}}"
+    }
+  },
+  "tables": [
+    {
+      "name": "{{SCHEMA}}.{{TABLE}}",
+      "source_rows": 0,
+      "target_rows": 0,
+      "delta": 0,
+      "parity_pct": 100.0,
+      "row_count_status": "PASS",
+      "checksum_status": "PASS",
+      "schema_status": "PASS",
+      "profile_status": "PASS",
+      "overall_status": "PASS"
+    }
+  ],
+  "critical_issues": [
+    {
+      "id": "CRIT-001",
+      "table": "{{SCHEMA}}.{{TABLE}}",
+      "check": "row_count",
+      "level": "L1",
+      "detail": "{{DETAIL}}",
+      "action_required": "{{ACTION}}",
+      "owner": "{{OWNER_NAME}}"
+    }
+  ],
+  "warnings": [
+    {
+      "id": "WARN-001",
+      "table": "{{SCHEMA}}.{{TABLE}}",
+      "check": "data_profile",
+      "level": "L4",
+      "detail": "{{DETAIL}}",
+      "action_required": "{{ACTION}}"
+    }
+  ],
+  "info": [
+    {
+      "id": "INFO-001",
+      "table": "{{SCHEMA}}.{{TABLE}}",
+      "check": "schema_diff",
+      "detail": "{{DETAIL}}"
+    }
+  ],
+  "parity_trend": [
+    {
+      "wave_id": "{{PRIOR_WAVE_ID}}",
+      "parity_pct": 0.0,
+      "critical_count": 0,
+      "warning_count": 0,
+      "status": "APPROVED"
+    }
+  ],
+  "recommendations": [
+    "{{RECOMMENDATION_1}}"
+  ],
+  "sign_off": {
+    "reconciliation_lead":   { "name": "{{NAME}}", "date": null, "decision": null },
+    "migration_coordinator": { "name": "{{NAME}}", "date": null, "decision": null },
+    "data_steward":          { "name": "{{NAME}}", "date": null, "decision": null }
+  }
+}

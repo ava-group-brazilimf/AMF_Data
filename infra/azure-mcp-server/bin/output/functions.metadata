@@ -1,0 +1,315 @@
+[
+  {
+    "name": "CreateSqlWarehouse",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.CreateSqlWarehouse",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "create_sql_warehouse",
+        "description": "Creates a SQL Warehouse in Azure Databricks. Returns the warehouse ID and HTTP path for connection.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL (e.g., adb-123456.14.azuredatabricks.net)",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      },
+      {
+        "name": "warehouseName",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "warehouse_name",
+        "propertyType": "string",
+        "description": "Name for the SQL Warehouse",
+        "properties": {}
+      },
+      {
+        "name": "clusterSize",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "cluster_size",
+        "propertyType": "string",
+        "description": "Size of the cluster: 2X-Small, X-Small, Small, Medium, Large",
+        "properties": {}
+      },
+      {
+        "name": "autoStopMins",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "propertyName": "auto_stop_mins",
+        "propertyType": "integer",
+        "description": "Minutes of inactivity before auto-stop",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "ListSqlWarehouses",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.ListSqlWarehouses",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "list_sql_warehouses",
+        "description": "Lists all SQL Warehouses in an Azure Databricks workspace.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "ExecuteSqlQuery",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.ExecuteSqlQuery",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "execute_sql_query",
+        "description": "Executes a SQL query on a Databricks SQL Warehouse and returns the results.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      },
+      {
+        "name": "warehouseId",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "warehouse_id",
+        "propertyType": "string",
+        "description": "The SQL Warehouse ID",
+        "properties": {}
+      },
+      {
+        "name": "sqlQuery",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "sql_query",
+        "propertyType": "string",
+        "description": "The SQL query to execute",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "GetWarehouseStatus",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.GetWarehouseStatus",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "get_warehouse_status",
+        "description": "Gets the current status of a SQL Warehouse.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      },
+      {
+        "name": "warehouseId",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "warehouse_id",
+        "propertyType": "string",
+        "description": "The SQL Warehouse ID",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "StartWarehouse",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.StartWarehouse",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "start_warehouse",
+        "description": "Starts a stopped SQL Warehouse.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      },
+      {
+        "name": "warehouseId",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "warehouse_id",
+        "propertyType": "string",
+        "description": "The SQL Warehouse ID to start",
+        "properties": {}
+      }
+    ]
+  },
+  {
+    "name": "StopWarehouse",
+    "scriptFile": "azure-mcp-server.dll",
+    "entryPoint": "AzureMcpServer.DatabricksTools.StopWarehouse",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "context",
+        "direction": "In",
+        "type": "mcpToolTrigger",
+        "toolName": "stop_warehouse",
+        "description": "Stops a running SQL Warehouse.",
+        "properties": {}
+      },
+      {
+        "name": "databricksHost",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_host",
+        "propertyType": "string",
+        "description": "The Databricks workspace URL",
+        "properties": {}
+      },
+      {
+        "name": "databricksToken",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "databricks_token",
+        "propertyType": "string",
+        "description": "The Databricks Personal Access Token",
+        "properties": {}
+      },
+      {
+        "name": "warehouseId",
+        "direction": "In",
+        "type": "mcpToolProperty",
+        "dataType": "String",
+        "propertyName": "warehouse_id",
+        "propertyType": "string",
+        "description": "The SQL Warehouse ID to stop",
+        "properties": {}
+      }
+    ]
+  }
+]

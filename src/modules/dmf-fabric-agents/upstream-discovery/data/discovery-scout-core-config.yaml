@@ -1,0 +1,116 @@
+# Discovery Scout Agent Configuration
+agent:
+  id: discovery-scout
+  name: Scout
+  title: "Legacy Environment Discovery & Inventory"
+  icon: "🔍"
+  version: "4.0"
+  phase: "UPSTREAM"
+  language: "pt-BR"
+  framework: "AI-Agent Migration Factory - Avanade-Enhanced Edition"
+
+output:
+  base_folder: "./discovery-outputs"
+  subfolders: [inventory, dependency-graphs, dead-code-reports, volume-estimates]
+
+autonomy:
+  default_level: 3
+  yolo_eligible: true
+  yolo_scope: "scan operations only"
+
+commands:
+  scan-repo:
+    description: "Scan source platform for all objects"
+    task: "scan-repo"
+    output: "inventory.json"
+  classify:
+    description: "Classify pipelines by complexity"
+    task: "classify-pipelines"
+    output: "classification.json"
+  map-dependencies:
+    description: "Generate dependency graph"
+    task: "map-dependencies"
+    output: "dependency-graph.json"
+  detect-dead-code:
+    description: "Find orphan and unused objects"
+    task: "detect-dead-code"
+    output: "dead-code-report.md"
+  estimate-volume:
+    description: "Estimate data volumes and transfer times"
+    task: "estimate-volume"
+    output: "data-volume-estimate.json"
+  generate-inventory:
+    description: "Generate complete inventory report"
+    task: "generate-inventory"
+    outputs:
+      - "inventory-enriched.json"
+      - "inventory-report.md"
+      - "asis-platform-landscape.html"
+      - "all-objects-inventory.csv"
+
+dependencies:
+  upstream:
+    - agent: "migration-coordinator"
+      artifacts: ["migration-plan.md", "source-connection-config.yaml"]
+  downstream:
+    - agent: "logic-extractor"
+      artifacts: ["inventory.json", "dependency-graph.json"]
+    - agent: "migration-coordinator"
+      artifacts: ["dead-code-report.md", "data-volume-estimate.json"]
+
+supported_platforms:
+  - name: "Cloudera/Hadoop"
+    connectors: [hive-metastore, hdfs, oozie, hue]
+  - name: "SSIS"
+    connectors: [msdb-catalog, dtsx-parser]
+  - name: "Airflow"
+    connectors: [airflow-api, dag-parser]
+  - name: "Informatica PowerCenter"
+    connectors: [pmrep-cli, xml-export-parser, workflow-xml-parser]
+    export_format: "XML Repository Export (.xml)"
+    object_types:
+      - Mapping
+      - Session
+      - Workflow
+      - Worklet
+      - Mapplet
+      - Source Definition
+      - Target Definition
+      - Transformation
+      - Shortcut
+  - name: "SAP BODS"
+    connectors: [bods-repository, xml-parser]
+  - name: "Generic Spark / Mixed Code"
+    connectors: [file-scanner, tsql-parser, python-ast, scala-parser]
+    source_format: "Repositório de arquivos (.sql, .py, .scala, .sh)"
+    object_types:
+      - Table (DDL)
+      - Stored Procedure
+      - Python Script
+      - Scala Job
+      - Shell Script
+      - Filesystem Artifact (flag files, CSVs intermediários)
+      - External Dependency (linked servers, conexões externas)
+    notes: >
+      Para legados sem plataforma de orquestração formal - código misto
+      acoplado por filesystem. Aliases aceitos: spark, mixed, sqlserver, mssql.
+  - name: "Azure Synapse Analytics"
+    connectors: [synapse-git-export-parser, tsql-parser, adf-json-parser]
+    source_format: "Synapse Workspace Git Export (pastas pipeline/, dataset/, notebook/, sqlscript/, dataflow/, linkedService/, trigger/)"
+    object_types:
+      - Pipeline (JSON)
+      - Mapping Data Flow (JSON)
+      - Dataset
+      - Linked Service
+      - Notebook (Spark Pool)
+      - SQL Script (Dedicated/Serverless)
+      - Stored Procedure (Dedicated SQL Pool)
+      - External Table
+      - Trigger
+    notes: >
+      Formato de entrada preferencial: repositório Git conectado ao workspace
+      Synapse (integração nativa). Alternativa: export ARM template do workspace.
+
+settings:
+  language: "pt-BR"
+  date_format: "YYYY-MM-DD"

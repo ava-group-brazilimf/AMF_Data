@@ -1,0 +1,741 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  Data Model — Visual ER — Reference Template
+  Owner: data-modeler (Sofia 🧱) — DMF Fabric Agents
+  Phase: MIDSTREAM | Gate: 2 | Version: 1.0
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Visual stakeholder-facing entity-relationship diagram for the Gate 2
+  data model. Derived from data-model.json (canonical source of truth).
+  The LLM MUST read this file BEFORE generating the project HTML output
+  and reproduce the structure, fonts, CSS variables, medallion color
+  banding, hover patterns and section ordering exactly. Visual style
+  is INTENTIONALLY identical to tobe-target-architecture-tmpl.html
+  (light theme, same medallion palette).
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-2-2026-05-01)
+    {{WAVE_ID}}                 Wave identifier
+    {{DATE}}                    YYYY-MM-DD
+    {{PATTERN}}                 Lakehouse / Star / Snowflake / Hybrid
+    {{TARGET_PLATFORM}}         Microsoft Fabric / Databricks / Snowflake
+    {{KPI_ENTITIES_TOTAL}}      Numeric KPI
+    {{KPI_FACTS}}               Numeric KPI
+    {{KPI_DIMS}}                Numeric KPI
+    {{KPI_SCD2}}                Numeric KPI
+    {{KPI_RELATIONSHIPS}}       Numeric KPI
+    {{LAYER_BRONZE_BLOCK}}      Repeated entity-card markup (bronze)
+    {{LAYER_SILVER_BLOCK}}      Repeated entity-card markup (silver)
+    {{LAYER_GOLD_FACTS_BLOCK}}  Repeated entity-card markup (gold facts)
+    {{LAYER_GOLD_DIMS_BLOCK}}   Repeated entity-card markup (gold dims)
+    {{ER_SVG_BLOCK}}            Inline <svg> diagram with entities + relationships
+    {{RELATIONSHIPS_ROWS_BLOCK}}Repeated <tr> rows
+    {{NAMING_ROWS_BLOCK}}       Repeated <tr> rows (from naming_conventions)
+    {{VALIDATION_BLOCK}}        Repeated <li> items
+
+  FONTS (Google Fonts CDN; include local fallback)
+    Playfair Display   — headings (elegant serif)
+    JetBrains Mono     — labels, tags, metadata, table values
+    Plus Jakarta Sans  — body copy
+
+  COLOR SCHEME (light theme — identical to TO-BE target architecture)
+    --bg #F7F8FA         --surface #FFFFFF
+    --fabric #0078D4     (informational / relationships / pk)
+    --bronze #C0782A     (Bronze layer)
+    --silver #5B7FA6     (Silver layer)
+    --gold   #A8860C     (Gold facts)
+    --green  #1A7A4A     (Gold dims / SCD2 success)
+
+  LAYER → COLOR MAP (use as --c on .entity-card)
+    bronze     → var(--bronze)
+    silver     → var(--silver)
+    gold_facts → var(--gold)
+    gold_dims  → var(--green)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Model ER — {{PROJECT_NAME}} · Gate 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES (mirror TO-BE light theme) ──────────── */
+    :root {
+      --bg: #F7F8FA;
+      --surface: #FFFFFF;
+      --surface2: #F2F4F7;
+      --surface3: #E8ECF2;
+      --border: rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.12);
+      --text: #0F1117;
+      --text2: #4A5168;
+      --text3: #8892A4;
+      --fabric: #0078D4;       --fabric-light: #EBF3FC;   --fabric-mid: #B3D4F0;
+      --bronze: #C0782A;       --bronze-light: #FDF3E7;   --bronze-mid: #F0C898;
+      --silver: #5B7FA6;       --silver-light: #EDF2F8;   --silver-mid: #B8CFDF;
+      --gold: #A8860C;         --gold-light: #FDF7E3;     --gold-mid: #E8D080;
+      --green: #1A7A4A;        --green-light: #EDFBF3;    --green-mid: #A6E0BF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    .header {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 44px;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--bronze) 0%, var(--silver) 35%, var(--gold) 70%, var(--green) 100%);
+    }
+    .header-left { max-width: 720px; }
+    .badge-gate {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--fabric-light);
+      color: var(--fabric);
+      border: 1px solid var(--fabric-mid);
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48px;
+      font-weight: 600;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+    h1 em { font-style: italic; color: var(--fabric); }
+    .subtitle { font-size: 16px; color: var(--text2); max-width: 640px; }
+    .header-meta {
+      text-align: right;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    section { margin-bottom: 56px; }
+
+    /* ─── KPI ROW ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 22px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--c, var(--fabric));
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .kpi-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--c, var(--fabric));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text3); }
+
+    /* ─── LAYER FILTER ──────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-bar button {
+      background: var(--surface);
+      color: var(--text2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-bar button:hover { border-color: var(--border2); color: var(--text); }
+    .filter-bar button.active {
+      background: var(--fabric-light);
+      color: var(--fabric);
+      border-color: var(--fabric-mid);
+    }
+    .filter-bar button[data-layer="bronze"].active { background: var(--bronze-light); color: var(--bronze); border-color: var(--bronze-mid); }
+    .filter-bar button[data-layer="silver"].active { background: var(--silver-light); color: var(--silver); border-color: var(--silver-mid); }
+    .filter-bar button[data-layer="gold_facts"].active { background: var(--gold-light); color: var(--gold); border-color: var(--gold-mid); }
+    .filter-bar button[data-layer="gold_dims"].active { background: var(--green-light); color: var(--green); border-color: var(--green-mid); }
+
+    /* ─── LAYER BANDS ───────────────────────────────────────── */
+    .layer-band {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--c, var(--fabric));
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .layer-band[data-layer="bronze"]     { --c: var(--bronze); }
+    .layer-band[data-layer="silver"]     { --c: var(--silver); }
+    .layer-band[data-layer="gold_facts"] { --c: var(--gold); }
+    .layer-band[data-layer="gold_dims"]  { --c: var(--green); }
+    .layer-band.hidden { display: none; }
+    .layer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .layer-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c, var(--fabric));
+    }
+    .layer-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .layer-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text3);
+    }
+    .entities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    /* ─── ENTITY CARDS ──────────────────────────────────────── */
+    .entity-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--c, var(--fabric));
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .entity-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .entity-head {
+      padding: 14px 18px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .entity-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .entity-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text3);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .entity-meta span { color: var(--text2); }
+    .entity-meta .grain { color: var(--c, var(--fabric)); }
+    .entity-cols {
+      list-style: none;
+      padding: 8px 0;
+      margin: 0;
+    }
+    .entity-cols li {
+      padding: 8px 18px;
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .entity-cols li:last-child { border-bottom: 0; }
+    .col-key {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      padding: 2px 4px;
+      border-radius: 3px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .key-pk { background: var(--fabric-light); color: var(--fabric); }
+    .key-fk { background: var(--silver-light); color: var(--silver); }
+    .key-nk { background: var(--gold-light); color: var(--gold); }
+    .key-none { color: transparent; }
+    .col-name { color: var(--text); }
+    .col-type {
+      color: var(--text3);
+      font-size: 11px;
+    }
+
+    /* ─── ER DIAGRAM ────────────────────────────────────────── */
+    .er-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .er-diagram svg {
+      width: 100%;
+      min-width: 800px;
+      height: auto;
+      display: block;
+    }
+    .er-entity rect {
+      fill: var(--surface);
+      stroke: var(--c, var(--fabric));
+      stroke-width: 2;
+      rx: 8;
+    }
+    .er-entity .er-band {
+      fill: var(--c, var(--fabric));
+      opacity: 0.12;
+    }
+    .er-entity text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      fill: var(--text);
+    }
+    .er-entity text.title {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .er-rel line { stroke: var(--text3); stroke-width: 1.5; }
+    .er-rel text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      fill: var(--text3);
+    }
+
+    /* ─── RELATIONSHIPS TABLE ───────────────────────────────── */
+    .rel-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .rel-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .rel-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+    .rel-table tr:last-child td { border-bottom: 0; }
+    .rel-table tr:hover td { background: var(--surface2); }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .pill-identifying     { background: var(--fabric-light); color: var(--fabric); }
+    .pill-non-identifying { background: var(--silver-light); color: var(--silver); }
+    .pill-bridge          { background: var(--gold-light);   color: var(--gold); }
+
+    /* ─── VALIDATION + NAMING CARDS ─────────────────────────── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .info-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .info-card li {
+      padding: 8px 0 8px 22px;
+      position: relative;
+      font-size: 13px;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      line-height: 1.55;
+    }
+    .info-card li:last-child { border-bottom: 0; }
+    .info-card li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .naming-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+    .naming-table th, .naming-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .naming-table th { color: var(--text3); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .naming-table td { color: var(--text); }
+    .naming-table tr:last-child td { border-bottom: 0; }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-gate">Gate 2 · Data Model</span>
+      <h1>Logical <em>Data Model</em></h1>
+      <p class="subtitle">
+        Canonical entity-relationship view of the wave's logical model across
+        Bronze, Silver and Gold layers. Source for DDL/ETL generation by Coda,
+        execution planning by Diego, governance binding by Gaia and the
+        semantic layer by Bianca.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">PROJECT</span> <span class="meta-val">{{PROJECT_NAME}}</span></div>
+      <div><span class="meta-key">WAVE</span> <span class="meta-val">{{WAVE_ID}}</span></div>
+      <div><span class="meta-key">PATTERN</span> <span class="meta-val">{{PATTERN}}</span></div>
+      <div><span class="meta-key">TARGET</span> <span class="meta-val">{{TARGET_PLATFORM}}</span></div>
+      <div><span class="meta-key">TRACE</span> <span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">DATE</span> <span class="meta-val">{{DATE}}</span></div>
+      <div><span class="meta-key">AGENT</span> <span class="meta-val">data-modeler</span></div>
+    </div>
+  </header>
+
+  <!-- ─── KPI ROW ─────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Model KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--fabric)">
+        <div class="kpi-value">{{KPI_ENTITIES_TOTAL}}</div>
+        <div class="kpi-label">Entities Total</div>
+        <div class="kpi-sub">all layers</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--gold)">
+        <div class="kpi-value">{{KPI_FACTS}}</div>
+        <div class="kpi-label">Fact Tables</div>
+        <div class="kpi-sub">business events</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--green)">
+        <div class="kpi-value">{{KPI_DIMS}}</div>
+        <div class="kpi-label">Dimensions</div>
+        <div class="kpi-sub">master entities</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--silver)">
+        <div class="kpi-value">{{KPI_SCD2}}</div>
+        <div class="kpi-label">SCD2 Dims</div>
+        <div class="kpi-sub">history tracked</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--bronze)">
+        <div class="kpi-value">{{KPI_RELATIONSHIPS}}</div>
+        <div class="kpi-label">Relationships</div>
+        <div class="kpi-sub">PK ↔ FK pairs</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ER DIAGRAM ──────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Entity-Relationship Diagram</div>
+    <div class="er-diagram">
+      {{ER_SVG_BLOCK}}
+      <!--
+        Render an inline <svg viewBox="0 0 1200 H"> sized to fit all entities.
+        For each entity in layers[*].entities[]:
+          - Choose a column position grouped by layer (Bronze | Silver | Gold-Facts | Gold-Dims).
+          - Draw a <g class="er-entity" style="--c: var(--{LAYER_COLOR})"> with:
+              <rect x.. y.. width=220 height={20 + 16*colsShown}>
+              <rect class="er-band" x.. y.. width=220 height=20>  (band header)
+              <text class="title" ...>{entity_name}</text>
+              one <text> per visible column (limit to PK/FK + 4 attributes).
+        For each relationship in relationships[]:
+          - Draw a <g class="er-rel"> with <line> connecting the two entities and
+            a <text> showing cardinality (e.g., "N:1").
+
+        Layer color names for --c: bronze | silver | gold | green
+      -->
+    </div>
+  </section>
+
+  <!-- ─── LAYER BANDS WITH ENTITY CARDS ───────────────────── -->
+  <section>
+    <div class="section-title">Entities by Layer</div>
+    <div class="filter-bar">
+      <button class="active" data-layer="all">All</button>
+      <button data-layer="bronze">Bronze</button>
+      <button data-layer="silver">Silver</button>
+      <button data-layer="gold_facts">Gold Facts</button>
+      <button data-layer="gold_dims">Gold Dims</button>
+    </div>
+
+    <div class="layer-band" data-layer="bronze">
+      <div class="layer-head">
+        <span class="layer-name">Bronze · Raw / Typed</span>
+        <span class="layer-count">{{BRONZE_COUNT}} entities</span>
+      </div>
+      <div class="layer-title">Bronze layer</div>
+      <div class="entities-grid">
+        {{LAYER_BRONZE_BLOCK}}
+        <!--
+          Repeat one .entity-card per layers.bronze[] entry:
+
+          <div class="entity-card" style="--c: var(--bronze)">
+            <div class="entity-head">
+              <div class="entity-name">{name}</div>
+              <div class="entity-meta">
+                <span>{type}</span>
+                <span class="grain">{grain}</span>
+                <span>SCD {scd_type ?? '—'}</span>
+              </div>
+            </div>
+            <ul class="entity-cols">
+              <li>
+                <span class="col-key key-{lower(pk_fk)}">{pk_fk}</span>
+                <span class="col-name">{name}</span>
+                <span class="col-type">{type}{nullable ? '' : ' NOT NULL'}</span>
+              </li>
+            </ul>
+          </div>
+
+          col-key class map: PK→key-pk · FK→key-fk · NK→key-nk · '-'→key-none
+        -->
+      </div>
+    </div>
+
+    <div class="layer-band" data-layer="silver">
+      <div class="layer-head">
+        <span class="layer-name">Silver · Cleansed / SCD</span>
+        <span class="layer-count">{{SILVER_COUNT}} entities</span>
+      </div>
+      <div class="layer-title">Silver layer</div>
+      <div class="entities-grid">
+        {{LAYER_SILVER_BLOCK}}
+      </div>
+    </div>
+
+    <div class="layer-band" data-layer="gold_facts">
+      <div class="layer-head">
+        <span class="layer-name">Gold · Facts</span>
+        <span class="layer-count">{{GOLD_FACTS_COUNT}} entities</span>
+      </div>
+      <div class="layer-title">Gold facts</div>
+      <div class="entities-grid">
+        {{LAYER_GOLD_FACTS_BLOCK}}
+      </div>
+    </div>
+
+    <div class="layer-band" data-layer="gold_dims">
+      <div class="layer-head">
+        <span class="layer-name">Gold · Dimensions</span>
+        <span class="layer-count">{{GOLD_DIMS_COUNT}} entities</span>
+      </div>
+      <div class="layer-title">Gold dimensions</div>
+      <div class="entities-grid">
+        {{LAYER_GOLD_DIMS_BLOCK}}
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RELATIONSHIPS TABLE ─────────────────────────────── -->
+  <section>
+    <div class="section-title">Relationships</div>
+    <table class="rel-table">
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>From Column</th>
+          <th>To Column</th>
+          <th>Cardinality</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{RELATIONSHIPS_ROWS_BLOCK}}
+        <!--
+          Repeat one <tr> per relationships[] entry. Type pill class:
+            IDENTIFYING     → pill-identifying
+            NON_IDENTIFYING → pill-non-identifying
+            BRIDGE          → pill-bridge
+
+          <tr>
+            <td>{from}</td>
+            <td>{to}</td>
+            <td>{from_column}</td>
+            <td>{to_column}</td>
+            <td>{cardinality}</td>
+            <td><span class="pill pill-identifying">{type}</span></td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── VALIDATION + NAMING ─────────────────────────────── -->
+  <section>
+    <div class="section-title">Validation Rules &amp; Naming Conventions</div>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Validation Rules</h3>
+        <ul>
+          {{VALIDATION_BLOCK}}
+          <!-- <li>{rule}</li> per validation_rules[] entry -->
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Naming Conventions</h3>
+        <table class="naming-table">
+          <thead>
+            <tr><th>Object</th><th>Prefix / Suffix</th></tr>
+          </thead>
+          <tbody>
+            {{NAMING_ROWS_BLOCK}}
+            <!--
+              Repeat one <tr> per naming_conventions key/value:
+              <tr><td>Bronze table</td><td>{bronze_prefix}</td></tr>
+            -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>data-modeler · Sofia 🧱</span>
+    <span>Generated {{DATE}} · Gate 2</span>
+    <span>DMF Fabric Agents</span>
+  </footer>
+
+  <script>
+    // Layer filter — switches visibility of layer-bands.
+    document.querySelectorAll('.filter-bar button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const layer = btn.dataset.layer;
+        document.querySelectorAll('.layer-band').forEach(band => {
+          band.classList.toggle('hidden', layer !== 'all' && band.dataset.layer !== layer);
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Sample Wave Configuration — Data Migration Factory v3
+# Validate from the repository root with:
+# .\.venv\Scripts\python.exe -m src.shared.scripts.validate_wave_config projects\orders-migration\wave-config.yaml
+#
+# Copy this file to projects/<project_name>/wave-config.yaml for each migration wave.
+
+# --- Wave Identification ---
+wave_id: "WAVE-001"
+wave_name: "Orders & Customers migration"
+project_name: "orders-migration"  # Must match the folder and both context YAMLs
+context_base_path: "projects/{project_name}/context"
+outputs_base_path: "projects/{project_name}/outputs"
+environment: "DEV"       # DEV | UAT | PROD
+dry_run: true            # Set to false for actual execution
+
+# --- Discovery Ownership (B-017: mandatory) ---
+# Each wave must have exactly one primary discovery owner.
+# Fallback is activated only by exception.
+discovery_owner_primary: "discovery-scout"
+discovery_owner_fallback: "inventory-scout"
+
+# --- Scope ---
+entities:
+  - name: "orders"
+    tier: "CRITICAL"           # CRITICAL | STANDARD | REFERENCE
+    source_system: "SQL Server"
+    source_schema: "dbo"
+    target_layer: "gold"
+    estimated_rows: 5000000
+
+  - name: "customers"
+    tier: "CRITICAL"
+    source_system: "SQL Server"
+    source_schema: "dbo"
+    target_layer: "gold"
+    estimated_rows: 250000
+
+  - name: "products"
+    tier: "STANDARD"
+    source_system: "SQL Server"
+    source_schema: "dbo"
+    target_layer: "silver"
+    estimated_rows: 10000
+
+# --- Target Platform ---
+target_platform: "(inform target platform)"   # e.g., "Azure Databricks", "Microsoft Fabric"
+target_catalog: "migration_prod"
+target_schema: "gold"
+
+# --- Execution Runbook (B-008: required for non-dry-run UAT/PROD) ---
+# Uncomment and set path when environment is UAT/PROD and dry_run is false:
+# runbook_path: "projects/{project_name}/outputs/downstream/documentation/execution-runbook.md"
+
+# --- Gate Score Thresholds ---
+gate_thresholds:
+  gate_1: 80.0
+  gate_2: 85.0
+  gate_3: 85.0
+
+# --- Approvers ---
+approvers:
+  gate_1: "data-strategist"
+  gate_2: "data-architect"
+  gate_3: "migration-coordinator"

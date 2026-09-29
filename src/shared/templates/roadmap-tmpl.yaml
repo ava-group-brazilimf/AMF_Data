@@ -1,0 +1,445 @@
+# Project Roadmap Template
+
+project_name: ""
+roadmap_owner: ""
+created_date: ""
+version: "1.0"
+
+executive_summary:
+  vision: |
+    High-level vision statement for the project
+
+  strategic_alignment: |
+    How this project aligns with business strategy
+
+  expected_outcomes:
+    - outcome_1: ""
+    - outcome_2: ""
+    - outcome_3: ""
+
+roadmap_overview:
+  timeline:
+    start_date: ""
+    target_completion: ""
+    total_duration_months: 0
+
+  phases:
+    - name: "Foundation"
+      duration_weeks: 0
+      objectives:
+        - objective_1: ""
+        - objective_2: ""
+
+    - name: "Core Development"
+      duration_weeks: 0
+      objectives:
+        - objective_1: ""
+        - objective_2: ""
+
+    - name: "Enhancement"
+      duration_weeks: 0
+      objectives:
+        - objective_1: ""
+        - objective_2: ""
+
+    - name: "Go-Live & Stabilization"
+      duration_weeks: 0
+      objectives:
+        - objective_1: ""
+        - objective_2: ""
+
+quarterly_plan:
+  q1:
+    quarter: "Q1 YYYY"
+    focus_areas:
+      - area_1: ""
+      - area_2: ""
+
+    sprints:
+      - sprint: "Sprint 1"
+        weeks: "Week 1-2"
+        goals:
+          - goal_1: ""
+          - goal_2: ""
+        deliverables:
+          - deliverable_1: ""
+          - deliverable_2: ""
+        resources:
+          data_engineer: 0
+          data_scientist: 0
+          other: 0
+
+      - sprint: "Sprint 2"
+        weeks: "Week 3-4"
+        goals:
+          - goal_1: ""
+        deliverables:
+          - deliverable_1: ""
+        resources:
+          data_engineer: 0
+          data_scientist: 0
+
+    milestones:
+      - milestone: ""
+        target_date: ""
+        success_criteria:
+          - criterion_1: ""
+          - criterion_2: ""
+
+  q2:
+    quarter: "Q2 YYYY"
+    focus_areas:
+      - area_1: ""
+      - area_2: ""
+
+    sprints:
+      - sprint: "Sprint 3"
+        weeks: "Week 5-6"
+        goals:
+          - goal_1: ""
+        deliverables:
+          - deliverable_1: ""
+        resources:
+          data_engineer: 0
+          data_scientist: 0
+
+    milestones:
+      - milestone: ""
+        target_date: ""
+        success_criteria:
+          - criterion_1: ""
+
+  q3:
+    quarter: "Q3 YYYY"
+    focus_areas:
+      - area_1: ""
+
+    sprints:
+      - sprint: "Sprint 5"
+        weeks: "Week 9-10"
+        goals:
+          - goal_1: ""
+        deliverables:
+          - deliverable_1: ""
+        resources:
+          data_engineer: 0
+
+    milestones:
+      - milestone: ""
+        target_date: ""
+        success_criteria:
+          - criterion_1: ""
+
+  q4:
+    quarter: "Q4 YYYY"
+    focus_areas:
+      - area_1: ""
+
+    sprints:
+      - sprint: "Sprint 7"
+        weeks: "Week 13-14"
+        goals:
+          - goal_1: ""
+        deliverables:
+          - deliverable_1: ""
+        resources:
+          data_engineer: 0
+
+    milestones:
+      - milestone: ""
+        target_date: ""
+        success_criteria:
+          - criterion_1: ""
+
+key_milestones:
+  - name: "Requirements Sign-Off"
+    target_date: ""
+    phase: "Foundation"
+    deliverables:
+      - "Requirements document"
+      - "Stakeholder approval"
+    dependencies:
+      - "Stakeholder interviews complete"
+    status: "Not Started"
+
+  - name: "Architecture Approved"
+    target_date: ""
+    phase: "Foundation"
+    deliverables:
+      - "Architecture design document"
+      - "Technical approval"
+    dependencies:
+      - "Requirements sign-off"
+    status: "Not Started"
+
+  - name: "MVP Delivery"
+    target_date: ""
+    phase: "Core Development"
+    deliverables:
+      - "Working prototype"
+      - "Basic features functional"
+    dependencies:
+      - "Architecture approved"
+      - "Core development complete"
+    status: "Not Started"
+
+  - name: "UAT Complete"
+    target_date: ""
+    phase: "Enhancement"
+    deliverables:
+      - "UAT test results"
+      - "Business sign-off"
+    dependencies:
+      - "Testing complete"
+      - "Defects resolved"
+    status: "Not Started"
+
+  - name: "Production Go-Live"
+    target_date: ""
+    phase: "Go-Live"
+    deliverables:
+      - "Production deployment"
+      - "Monitoring in place"
+    dependencies:
+      - "UAT complete"
+      - "Go-live checklist passed"
+    status: "Not Started"
+
+dependencies:
+  external:
+    - dependency: "Third-party API access"
+      owner: "External Vendor"
+      required_by: ""
+      status: "Pending"
+      risk: "Medium"
+
+    - dependency: "Cloud infrastructure provisioning"
+      owner: "Cloud Operations"
+      required_by: ""
+      status: "In Progress"
+      risk: "Low"
+
+  internal:
+    - dependency: "Data source access approval"
+      owner: "Data Governance"
+      required_by: ""
+      status: "Not Started"
+      risk: "High"
+
+    - dependency: "Security review"
+      owner: "Security Team"
+      required_by: ""
+      status: "Not Started"
+      risk: "Medium"
+
+  cross_team:
+    - dependency: "Integration with System A"
+      dependent_team: "Team Alpha"
+      required_by: ""
+      status: "Not Started"
+      impact: "Critical Path"
+
+resource_allocation:
+  team_composition_by_quarter:
+    q1:
+      data_engineer_senior: 2
+      data_engineer_mid: 1
+      data_scientist_senior: 1
+      devops_engineer: 1
+      solution_architect: 0.5
+      qa_engineer: 1
+      business_analyst: 0.5
+      project_manager: 0.5
+      total_fte: 0
+
+    q2:
+      data_engineer_senior: 2
+      data_engineer_mid: 2
+      data_scientist_senior: 1
+      devops_engineer: 1
+      solution_architect: 0.25
+      qa_engineer: 1
+      business_analyst: 0.25
+      project_manager: 0.5
+      total_fte: 0
+
+    q3:
+      data_engineer_senior: 2
+      data_engineer_mid: 2
+      data_scientist_senior: 1
+      data_scientist_mid: 1
+      devops_engineer: 1
+      qa_engineer: 2
+      project_manager: 0.5
+      total_fte: 0
+
+    q4:
+      data_engineer_senior: 1
+      data_engineer_mid: 1
+      devops_engineer: 1
+      qa_engineer: 1
+      project_manager: 0.5
+      total_fte: 0
+
+  resource_loading:
+    peak_quarter: "Q2"
+    peak_fte: 0
+    average_fte: 0
+    total_person_months: 0
+
+success_metrics:
+  kpis:
+    - metric: "On-Time Delivery"
+      target: "100% of milestones hit ±1 week"
+      measurement: "Weekly milestone tracking"
+
+    - metric: "Budget Adherence"
+      target: "Within ±5% of budget"
+      measurement: "Monthly cost tracking"
+
+    - metric: "Quality"
+      target: "<5 critical defects in production"
+      measurement: "Defect tracking system"
+
+    - metric: "Stakeholder Satisfaction"
+      target: "≥4.0/5.0 average score"
+      measurement: "Quarterly stakeholder survey"
+
+    - metric: "Team Velocity"
+      target: "35-45 story points/sprint"
+      measurement: "Sprint burndown"
+
+  business_outcomes:
+    - outcome: "Operational Efficiency"
+      baseline: ""
+      target: ""
+      measurement: ""
+
+    - outcome: "Cost Reduction"
+      baseline: ""
+      target: ""
+      measurement: ""
+
+    - outcome: "Revenue Impact"
+      baseline: ""
+      target: ""
+      measurement: ""
+
+risks_and_mitigation:
+  top_risks:
+    - risk: "Resource availability"
+      impact: "High"
+      probability: "Medium"
+      mitigation: "Early resource allocation, backup plan"
+      status: "Active"
+
+    - risk: "External dependency delays"
+      impact: "High"
+      probability: "Medium"
+      mitigation: "Early engagement, parallel work streams"
+      status: "Monitoring"
+
+    - risk: "Scope creep"
+      impact: "Medium"
+      probability: "High"
+      mitigation: "Formal change control, Phase 2 parking lot"
+      status: "Active"
+
+decision_log:
+  - decision: "Cloud platform selection"
+    date: ""
+    decision_maker: ""
+    rationale: ""
+    alternatives_considered:
+      - "Azure"
+      - "AWS"
+    selected: ""
+
+  - decision: "Architecture approach"
+    date: ""
+    decision_maker: ""
+    rationale: ""
+    alternatives_considered:
+      - "Batch processing"
+      - "Real-time streaming"
+    selected: ""
+
+change_log:
+  - change: "Extended UAT phase by 2 weeks"
+    date: ""
+    requested_by: ""
+    impact: "Schedule +2 weeks, Budget +$20K"
+    approved_by: ""
+    status: "Approved"
+
+communication_plan:
+  stakeholder_updates:
+    - audience: "Executive Sponsors"
+      frequency: "Monthly"
+      format: "Executive summary report"
+      owner: "Project Manager"
+
+    - audience: "Project Team"
+      frequency: "Daily"
+      format: "Stand-up meeting"
+      owner: "Scrum Master"
+
+    - audience: "Business Users"
+      frequency: "Bi-weekly"
+      format: "Demo & feedback session"
+      owner: "Product Owner"
+
+governance:
+  review_cadence:
+    - review_type: "Sprint Review"
+      frequency: "Every 2 weeks"
+      attendees:
+        - "Development team"
+        - "Product owner"
+        - "Key stakeholders"
+
+    - review_type: "Steering Committee"
+      frequency: "Monthly"
+      attendees:
+        - "Executive sponsor"
+        - "Project manager"
+        - "Technical lead"
+
+  approval_gates:
+    - gate: "Phase Gate 1: Foundation Complete"
+      criteria:
+        - "Requirements approved"
+        - "Architecture approved"
+        - "Team ramped up"
+      approver: "Steering Committee"
+
+    - gate: "Phase Gate 2: Development Complete"
+      criteria:
+        - "All features developed"
+        - "Unit tests passed"
+        - "Code review complete"
+      approver: "Technical Lead"
+
+    - gate: "Phase Gate 3: Go-Live Approval"
+      criteria:
+        - "UAT passed"
+        - "Security review complete"
+        - "Operations ready"
+      approver: "Executive Sponsor"
+
+appendix:
+  glossary:
+    - term: "MVP"
+      definition: "Minimum Viable Product"
+    - term: "UAT"
+      definition: "User Acceptance Testing"
+
+  references:
+    - "Project Estimation Document"
+    - "Technical Architecture Document"
+    - "Risk Register"
+
+# Template metadata
+template_version: "1.0"
+last_updated: "January 22, 2026"
+maintained_by: "Delivery Lead Practice"

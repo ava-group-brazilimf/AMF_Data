@@ -1,0 +1,338 @@
+---
+template: dax-library-tmpl
+version: 1.0
+description: Template for organizing and documenting DAX measures
+---
+
+# DAX Measure Library: {PROJECT_NAME}
+
+## Overview
+
+**Project:** {PROJECT_NAME}  
+**Last Updated:** {Date}  
+**Total Measures:** {Count}
+
+## Measure Organization
+
+```
+Measures/
+├── 📁 Base Measures
+│   ├── Total Sales
+│   ├── Total Quantity
+│   └── Total Cost
+├── 📁 Time Intelligence
+│   ├── Sales YTD
+│   ├── Sales MTD
+│   ├── Sales PY
+│   └── Sales YoY %
+├── 📁 Ratios & Percentages
+│   ├── Margin %
+│   └── Sales Mix %
+├── 📁 Rankings
+│   ├── Product Rank
+│   └── Customer Rank
+└── 📁 KPIs
+    ├── Revenue vs Target
+    └── Performance Status
+```
+
+---
+
+## Base Measures
+
+### Total Sales
+```dax
+Total Sales = 
+// Purpose: Calculate total sales revenue
+// Author: InsightForge Agent
+// Created: {Date}
+SUM(FACT_Sales[TotalAmount])
+```
+| Property | Value |
+|----------|-------|
+| Format | Currency ($#,##0) |
+| Folder | Base Measures |
+| Description | Sum of all sales transactions |
+
+### Total Quantity
+```dax
+Total Quantity = 
+// Purpose: Calculate total units sold
+SUM(FACT_Sales[Quantity])
+```
+| Property | Value |
+|----------|-------|
+| Format | Whole Number (#,##0) |
+| Folder | Base Measures |
+
+### Total Cost
+```dax
+Total Cost = 
+// Purpose: Calculate total cost of goods sold
+SUM(FACT_Sales[CostAmount])
+```
+
+### Gross Margin
+```dax
+Gross Margin = 
+// Purpose: Calculate gross profit
+[Total Sales] - [Total Cost]
+```
+
+---
+
+## Time Intelligence Measures
+
+### Sales YTD
+```dax
+Sales YTD = 
+// Purpose: Year-to-date sales calculation
+// Requires: Date table marked as date table
+CALCULATE(
+    [Total Sales],
+    DATESYTD('Date'[Date])
+)
+```
+
+### Sales MTD
+```dax
+Sales MTD = 
+// Purpose: Month-to-date sales calculation
+CALCULATE(
+    [Total Sales],
+    DATESMTD('Date'[Date])
+)
+```
+
+### Sales QTD
+```dax
+Sales QTD = 
+// Purpose: Quarter-to-date sales calculation
+CALCULATE(
+    [Total Sales],
+    DATESQTD('Date'[Date])
+)
+```
+
+### Sales Previous Year
+```dax
+Sales PY = 
+// Purpose: Same period last year
+CALCULATE(
+    [Total Sales],
+    SAMEPERIODLASTYEAR('Date'[Date])
+)
+```
+
+### Sales YoY Growth %
+```dax
+Sales YoY % = 
+// Purpose: Year-over-year growth percentage
+VAR _currentYear = [Total Sales]
+VAR _previousYear = [Sales PY]
+RETURN
+    DIVIDE(
+        _currentYear - _previousYear,
+        _previousYear,
+        BLANK()
+    )
+```
+| Property | Value |
+|----------|-------|
+| Format | Percentage (0.0%) |
+| Folder | Time Intelligence |
+
+### Sales Previous Month
+```dax
+Sales PM = 
+// Purpose: Previous month sales
+CALCULATE(
+    [Total Sales],
+    PREVIOUSMONTH('Date'[Date])
+)
+```
+
+### Sales MoM Growth %
+```dax
+Sales MoM % = 
+// Purpose: Month-over-month growth
+VAR _currentMonth = [Total Sales]
+VAR _previousMonth = [Sales PM]
+RETURN
+    DIVIDE(
+        _currentMonth - _previousMonth,
+        _previousMonth,
+        BLANK()
+    )
+```
+
+---
+
+## Comparison Measures
+
+### Sales vs Target
+```dax
+Sales vs Target = 
+// Purpose: Variance to sales target
+[Total Sales] - [Sales Target]
+```
+
+### Sales vs Target %
+```dax
+Sales vs Target % = 
+// Purpose: Variance percentage to target
+DIVIDE(
+    [Sales vs Target],
+    [Sales Target],
+    BLANK()
+)
+```
+
+### Target Achievement Status
+```dax
+Target Status = 
+// Purpose: Traffic light indicator
+VAR _achievement = [Sales vs Target %]
+RETURN
+    SWITCH(
+        TRUE(),
+        _achievement >= 0, "🟢 On Target",
+        _achievement >= -0.1, "🟡 At Risk",
+        "🔴 Below Target"
+    )
+```
+
+---
+
+## Ratio Measures
+
+### Margin %
+```dax
+Margin % = 
+// Purpose: Gross margin percentage
+DIVIDE(
+    [Gross Margin],
+    [Total Sales],
+    BLANK()
+)
+```
+
+### Sales Mix %
+```dax
+Sales Mix % = 
+// Purpose: Product/category contribution to total
+DIVIDE(
+    [Total Sales],
+    CALCULATE(
+        [Total Sales],
+        ALLSELECTED(DIM_Product)
+    ),
+    BLANK()
+)
+```
+
+### Average Order Value
+```dax
+Average Order Value = 
+// Purpose: Average revenue per order
+DIVIDE(
+    [Total Sales],
+    [Order Count],
+    BLANK()
+)
+```
+
+---
+
+## Ranking Measures
+
+### Product Rank
+```dax
+Product Rank = 
+// Purpose: Rank products by sales
+RANKX(
+    ALL(DIM_Product[ProductName]),
+    [Total Sales],
+    ,
+    DESC,
+    DENSE
+)
+```
+
+### Customer Rank
+```dax
+Customer Rank = 
+// Purpose: Rank customers by sales
+RANKX(
+    ALL(DIM_Customer[CustomerName]),
+    [Total Sales],
+    ,
+    DESC,
+    DENSE
+)
+```
+
+---
+
+## Running Totals
+
+### Running Total Sales
+```dax
+Running Total Sales = 
+// Purpose: Cumulative sales over time
+CALCULATE(
+    [Total Sales],
+    FILTER(
+        ALLSELECTED('Date'[Date]),
+        'Date'[Date] <= MAX('Date'[Date])
+    )
+)
+```
+
+### 3-Month Moving Average
+```dax
+Sales 3M Avg = 
+// Purpose: Rolling 3-month average
+AVERAGEX(
+    DATESINPERIOD(
+        'Date'[Date],
+        LASTDATE('Date'[Date]),
+        -3,
+        MONTH
+    ),
+    [Total Sales]
+)
+```
+
+---
+
+## Dynamic Measures
+
+### Selected Measure
+```dax
+Selected Measure = 
+// Purpose: Dynamic measure selection via slicer
+VAR _selection = SELECTEDVALUE(MeasureSlicer[MeasureName], "Sales")
+RETURN
+    SWITCH(
+        _selection,
+        "Sales", [Total Sales],
+        "Quantity", [Total Quantity],
+        "Margin", [Gross Margin],
+        [Total Sales]
+    )
+```
+
+---
+
+## Measure Dependencies
+
+```mermaid
+graph TD
+    A[Total Sales] --> B[Sales YTD]
+    A --> C[Sales PY]
+    A --> D[Margin %]
+    C --> E[Sales YoY %]
+    F[Total Cost] --> G[Gross Margin]
+    G --> D
+```

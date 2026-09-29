@@ -1,0 +1,218 @@
+# ============================================================
+# 🔒 Security & Compliance Agent — Core Configuration
+# AI-Agent Migration Factory™
+# ============================================================
+
+agent:
+  id: security-compliance
+  name: Shield
+  icon: "🔒"
+  version: "1.0.0"
+  description: >
+    Ensures generated code and migrated data comply with security policies
+    and regulations (LGPD, GDPR, SOX, HIPAA). Detects PII, applies data
+    masking, validates access controls, and maintains audit trails.
+
+# --- Phase & Autonomy ---
+phase: MIDSTREAM
+gate: 2
+autonomy:
+  level: 2
+  label: Supervised
+  description: >
+    Agent proposes compliance actions and masking strategies.
+    Human approval required before applying masking to production data
+    and before issuing compliance certifications.
+  yolo_eligible: false
+
+# --- Activation ---
+activation:
+  command: "@security-compliance"
+  triggers:
+    - "scan pii"
+    - "check compliance"
+    - "apply masking"
+    - "audit log"
+    - "validate access"
+
+# --- Engine ---
+engine:
+  primary: Policy Engine
+  components:
+    - name: PII Scanner
+      technology: Presidio
+      version: "2.2+"
+    - name: Audit Logger
+      format: structured-json
+      target: Elasticsearch
+    - name: Masking Engine
+      strategies:
+        - sha256-hash
+        - partial-mask
+        - tokenization
+        - redaction
+
+# --- Output ---
+output:
+  base_folder: ./compliance-outputs
+  subfolders:
+    - compliance-reports
+    - pii-findings
+    - audit-logs
+    - masking-reports
+  artifacts:
+    compliance_report:
+      path: "compliance-reports/{pipeline_id}.json"
+      format: json
+    pii_findings:
+      path: "pii-findings/pii-findings.json"
+      format: json
+    audit_trail:
+      path: "audit-logs/audit-trail.log"
+      format: jsonl
+    masking_report:
+      path: "masking-reports/{pipeline_id}.json"
+      format: json
+
+# --- Commands ---
+commands:
+  - name: scan-pii
+    description: "Detect PII in table schemas and data samples using Presidio analyzer"
+    task_file: tasks/scan-pii.md
+    requires_approval: false
+
+  - name: apply-masking
+    description: "Apply masking strategy to detected PII fields"
+    task_file: tasks/apply-masking.md
+    requires_approval: true
+
+  - name: check-compliance
+    description: "Validate against selected compliance frameworks (LGPD/GDPR/SOX/HIPAA)"
+    task_file: tasks/check-compliance.md
+    requires_approval: false
+
+  - name: audit-log
+    description: "Generate structured audit log entries for compliance activities"
+    task_file: tasks/generate-audit-log.md
+    requires_approval: false
+
+  - name: validate-access
+    description: "Validate Unity Catalog permissions and least privilege enforcement"
+    task_file: tasks/validate-access-control.md
+    requires_approval: false
+
+# --- Dependencies ---
+dependencies:
+  upstream:
+    - agent: code-generator
+      artifact: "generated-code/*.py"
+      purpose: "Scan generated code for PII exposure, hardcoded credentials, insecure patterns"
+
+    - agent: discovery-scout
+      artifact: "table-schemas.json"
+      purpose: "Analyze table schemas for columns likely to contain PII"
+
+    - agent: migration-coordinator
+      artifact: "compliance-requirements.yaml"
+      purpose: "Receive compliance framework selection and policy constraints"
+
+  downstream:
+    - agent: self-healing
+      artifact: "pii-findings.json"
+      condition: non-compliant
+      purpose: "Trigger remediation when PII exposure or compliance violations detected"
+
+    - agent: reconciliation
+      artifact: "compliance-report.json"
+      condition: compliant
+      purpose: "Advance pipeline to reconciliation when all compliance checks pass"
+
+# --- Compliance Frameworks ---
+compliance:
+  frameworks:
+    - id: LGPD
+      name: "Lei Geral de Proteção de Dados"
+      enabled: true
+      articles: ["art.7", "art.8", "art.9", "art.10", "art.11"]
+      focus: "Legal bases, sensitive data, consent"
+
+    - id: GDPR
+      name: "General Data Protection Regulation"
+      enabled: true
+      articles: ["art.5", "art.6", "art.7", "art.8", "art.9"]
+      focus: "Principles, lawfulness, special categories"
+
+    - id: SOX
+      name: "Sarbanes-Oxley Act"
+      enabled: true
+      sections: ["302", "404"]
+      focus: "Internal controls, financial data integrity"
+
+    - id: HIPAA
+      name: "Health Insurance Portability and Accountability Act"
+      enabled: false
+      rules: ["Privacy Rule", "Security Rule"]
+      focus: "Protected Health Information (PHI)"
+
+  configurable: true
+  default_frameworks: ["LGPD", "GDPR"]
+
+# --- PII Detection ---
+pii_detection:
+  types:
+    - EMAIL
+    - PHONE_NUMBER
+    - BR_CPF
+    - BR_CNPJ
+    - CREDIT_CARD
+    - IBAN
+    - PASSPORT
+    - ADDRESS
+
+  engines:
+    - presidio-analyzer
+    - regex-patterns
+    - nlp-ner
+
+  sampling:
+    rows_per_column: 100
+    confidence_threshold: 0.85
+
+  languages:
+    - pt
+    - en
+
+# --- Masking Strategies ---
+masking:
+  strategies:
+    - id: sha256-hash
+      name: "SHA-256 Hash"
+      description: "Irreversible one-way hash for pseudonymization"
+      reversible: false
+      use_case: "Cross-system joins where original value not needed"
+
+    - id: partial-mask
+      name: "Partial Mask"
+      description: "Show first/last N characters (e.g., ***456-00)"
+      reversible: false
+      use_case: "Display purposes, customer service"
+
+    - id: tokenization
+      name: "Tokenization"
+      description: "Replace with reversible token via secure vault"
+      reversible: true
+      use_case: "Operational needs requiring original value recovery"
+
+    - id: redaction
+      name: "Redaction"
+      description: "Complete removal/replacement with [REDACTED]"
+      reversible: false
+      use_case: "Logs, exports, non-essential displays"
+
+# --- Quality Thresholds ---
+thresholds:
+  pii_scan_coverage: 100          # % of columns scanned
+  max_unmasked_pii: 0             # Zero tolerance
+  min_confidence_to_flag: 0.85    # Presidio confidence threshold
+  audit_retention_days: 2555      # ~7 years (SOX requirement)
+  compliance_score_pass: 95       # Minimum % to pass compliance gate

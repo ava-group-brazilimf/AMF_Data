@@ -1,0 +1,52 @@
+markdownExploder: true
+projectContext:
+  contextFolder: context
+  semanticModelsPath: context/semantic-models
+  dashboardsPath: context/dashboards
+qa:
+  qaLocation: docs/qa
+documentation:
+  biDocFile: docs/bi-architecture.md
+  biVersion: v1
+  biSharded: true
+  biShardedLocation: docs/bi-specs
+  dashboardFilePattern: dashboard-{n}*.md
+semanticModel:
+  modelFile: docs/semantic-model.md
+  modelVersion: v1
+  modelSharded: true
+  modelShardedLocation: docs/models
+
+# OUTPUT STRUCTURE CONFIGURATION
+# This defines the standard folder structure for all generated artifacts
+outputStructure:
+  basePath: bi-outputs
+  namingConvention: "{type}_{name}_{YYYY-MM-DD_HHmm}.{ext}"
+  folders:
+    - name: semantic-models
+      purpose: Data model definitions, star schemas, relationship specs
+      fileTypes: [".md", ".tmdl", ".yaml"]
+    - name: dax-measures
+      purpose: DAX measure libraries, calculations, KPIs
+      fileTypes: [".dax", ".md"]
+    - name: dashboards
+      purpose: Dashboard specifications, wireframes, HTML previews
+      fileTypes: [".md", ".html", ".yaml"]
+    - name: reports
+      purpose: Report specifications and layouts
+      fileTypes: [".md", ".yaml"]
+    - name: documentation
+      purpose: Requirements docs, technical documentation
+      fileTypes: [".md"]
+    - name: security
+      purpose: RLS configurations and security specs
+      fileTypes: [".md", ".yaml"]
+    - name: optimization
+      purpose: Performance analysis reports
+      fileTypes: [".md"]
+    - name: validation
+      purpose: Checklist results and validation reports
+      fileTypes: [".md"]
+  setupTask: setup-output-structure.md
+  autoCreate: true
+

@@ -1,0 +1,35 @@
+# Downstream Executor Configuration
+# Avanade Core Framework
+
+project:
+  name: "Data Migration Project"
+  code: "migration-project"
+  version: "1.0.0"
+
+output:
+  base_folder: "./downstream-outputs"
+  subfolders:
+    - ddl
+    - etl
+    - tests
+    - documentation
+    - wave-reports
+
+agent:
+  id: downstream-executor
+  name: DownstreamExecutor
+  version: "1.0.0"
+
+gate_integration:
+  requires_gate_2: true
+  produces_for_gate_3:
+    - ddl/
+    - etl/
+    - tests/
+    - documentation/
+    - wave-report.md
+
+settings:
+  language: "pt-BR"
+  date_format: "YYYY-MM-DD"
+  require_human_approval_for_production_run: true

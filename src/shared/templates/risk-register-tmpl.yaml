@@ -1,0 +1,482 @@
+# Risk Register Template
+
+project_name: ""
+risk_owner: ""
+created_date: ""
+last_updated: ""
+version: "1.0"
+
+## RISK REGISTER
+
+### Risk Summary
+total_risks: 0
+critical_risks: 0 # P×I ≥ 16
+high_risks: 0 # P×I = 9-15
+medium_risks: 0 # P×I = 4-8
+low_risks: 0 # P×I = 1-3
+
+## RISK CATEGORIES
+
+### 1. Technical Risks
+technical_risks:
+  - risk_id: "TECH-001"
+    risk_title: ""
+    description: |
+      Detailed description of the risk
+
+    category: "Technical"
+    sub_category: "Architecture/Integration/Performance/Security/Data Quality"
+
+    identified_by: ""
+    identified_date: ""
+
+    probability: 3 # 1-5 scale (1=Very Low, 5=Very High)
+    impact: 4 # 1-5 scale (1=Very Low, 5=Very High)
+    risk_score: 12 # Probability × Impact
+    risk_level: "High" # Critical/High/Medium/Low
+
+    root_causes:
+      - cause_1: ""
+      - cause_2: ""
+
+    consequences:
+      timeline_impact: "+2 weeks delay"
+      cost_impact: "+$50K"
+      quality_impact: "Degraded performance"
+      business_impact: "Delayed benefits realization"
+
+    mitigation_strategy: "Avoidance/Transfer/Mitigation/Acceptance"
+    mitigation_actions:
+      - action: ""
+        owner: ""
+        target_date: ""
+        status: "Not Started/In Progress/Complete"
+
+    contingency_plan: |
+      What we'll do if the risk materializes
+
+    residual_probability: 2 # After mitigation
+    residual_impact: 3 # After mitigation
+    residual_score: 6
+    residual_level: "Medium"
+
+    triggers:
+      - trigger: "Event that signals risk is occurring"
+
+    status: "Active/Monitoring/Closed"
+    status_date: ""
+
+    notes: |
+      Additional context or updates
+
+### 2. Resource Risks
+resource_risks:
+  - risk_id: "RES-001"
+    risk_title: "Key resource unavailable"
+    description: |
+      Senior data engineer may leave during project
+
+    category: "Resource"
+    sub_category: "Availability/Skills/Turnover"
+
+    identified_by: ""
+    identified_date: ""
+
+    probability: 3
+    impact: 4
+    risk_score: 12
+    risk_level: "High"
+
+    root_causes:
+      - cause_1: "Competitive market for data engineers"
+      - cause_2: "Project duration uncertain"
+
+    consequences:
+      timeline_impact: "+4 weeks for knowledge transfer"
+      cost_impact: "+$80K for replacement + ramp-up"
+      quality_impact: "Loss of expertise"
+      business_impact: "Potential delays"
+
+    mitigation_strategy: "Mitigation"
+    mitigation_actions:
+      - action: "Cross-train team members"
+        owner: ""
+        target_date: ""
+        status: "In Progress"
+
+      - action: "Document key decisions and architecture"
+        owner: ""
+        target_date: ""
+        status: "Not Started"
+
+    contingency_plan: |
+      Have backup resource identified; engage recruitment early
+
+    residual_probability: 2
+    residual_impact: 3
+    residual_score: 6
+    residual_level: "Medium"
+
+    triggers:
+      - "Resource mentions job searching"
+      - "Performance or engagement drops"
+
+    status: "Active"
+    status_date: ""
+
+    notes: ""
+
+### 3. Process Risks
+process_risks:
+  - risk_id: "PROC-001"
+    risk_title: ""
+    description: |
+
+    category: "Process"
+    sub_category: "Change Control/Communication/Governance/Quality"
+
+    identified_by: ""
+    identified_date: ""
+
+    probability: 0
+    impact: 0
+    risk_score: 0
+    risk_level: ""
+
+    root_causes:
+      - cause_1: ""
+
+    consequences:
+      timeline_impact: ""
+      cost_impact: ""
+      quality_impact: ""
+      business_impact: ""
+
+    mitigation_strategy: ""
+    mitigation_actions:
+      - action: ""
+        owner: ""
+        target_date: ""
+        status: ""
+
+    contingency_plan: |
+
+    residual_probability: 0
+    residual_impact: 0
+    residual_score: 0
+    residual_level: ""
+
+    triggers:
+      - trigger: ""
+
+    status: ""
+    status_date: ""
+
+    notes: ""
+
+### 4. External Risks
+external_risks:
+  - risk_id: "EXT-001"
+    risk_title: ""
+    description: |
+
+    category: "External"
+    sub_category: "Vendor/Regulatory/Market/Third-Party"
+
+    identified_by: ""
+    identified_date: ""
+
+    probability: 0
+    impact: 0
+    risk_score: 0
+    risk_level: ""
+
+    root_causes:
+      - cause_1: ""
+
+    consequences:
+      timeline_impact: ""
+      cost_impact: ""
+      quality_impact: ""
+      business_impact: ""
+
+    mitigation_strategy: ""
+    mitigation_actions:
+      - action: ""
+        owner: ""
+        target_date: ""
+        status: ""
+
+    contingency_plan: |
+
+    residual_probability: 0
+    residual_impact: 0
+    residual_score: 0
+    residual_level: ""
+
+    triggers:
+      - trigger: ""
+
+    status: ""
+    status_date: ""
+
+    notes: ""
+
+### 5. Business Risks
+business_risks:
+  - risk_id: "BIZ-001"
+    risk_title: ""
+    description: |
+
+    category: "Business"
+    sub_category: "Requirements/Scope/Stakeholder/Benefits"
+
+    identified_by: ""
+    identified_date: ""
+
+    probability: 0
+    impact: 0
+    risk_score: 0
+    risk_level: ""
+
+    root_causes:
+      - cause_1: ""
+
+    consequences:
+      timeline_impact: ""
+      cost_impact: ""
+      quality_impact: ""
+      business_impact: ""
+
+    mitigation_strategy: ""
+    mitigation_actions:
+      - action: ""
+        owner: ""
+        target_date: ""
+        status: ""
+
+    contingency_plan: |
+
+    residual_probability: 0
+    residual_impact: 0
+    residual_score: 0
+    residual_level: ""
+
+    triggers:
+      - trigger: ""
+
+    status: ""
+    status_date: ""
+
+    notes: ""
+
+## RISK SCORING MATRIX
+
+### Probability Scale
+probability_scale:
+  1: "Very Low (0-10%)"
+  2: "Low (10-30%)"
+  3: "Medium (30-50%)"
+  4: "High (50-70%)"
+  5: "Very High (70-100%)"
+
+### Impact Scale
+impact_scale:
+  1: "Very Low (Negligible impact)"
+  2: "Low (Minor impact, manageable)"
+  3: "Medium (Moderate impact, workarounds exist)"
+  4: "High (Major impact, significant workarounds)"
+  5: "Very High (Critical impact, project in jeopardy)"
+
+### Risk Level Matrix
+risk_matrix: |
+
+  Impact →   1    2    3    4    5
+  Probability ↓
+      5      5   10   15   20   25  (Critical)
+      4      4    8   12   16   20  (High)
+      3      3    6    9   12   15  (Medium)
+      2      2    4    6    8   10  (Low)
+      1      1    2    3    4    5  (Low)
+
+  Risk Level:
+    Critical: Score ≥ 16 (Red)
+    High: Score 9-15 (Orange)
+    Medium: Score 4-8 (Yellow)
+    Low: Score 1-3 (Green)
+
+## RISK RESPONSE STRATEGIES
+
+strategies:
+  avoidance:
+    description: "Change the project plan to eliminate the risk"
+    when_to_use: "Critical risks that threaten project success"
+    example: "Use proven technology instead of unproven bleeding-edge"
+
+  transfer:
+    description: "Shift the risk to a third party"
+    when_to_use: "Risks where specialized expertise needed"
+    example: "Purchase insurance, outsource to vendor with warranty"
+
+  mitigation:
+    description: "Reduce the probability or impact of the risk"
+    when_to_use: "Most common strategy for medium/high risks"
+    example: "Add buffer time, cross-train team, implement quality gates"
+
+  acceptance:
+    description: "Acknowledge the risk and do nothing (or minimal action)"
+    when_to_use: "Low risks or when cost of mitigation > risk impact"
+    example: "Accept minor delays, have contingency budget ready"
+
+## RISK MONITORING
+
+### Review Cadence
+monitoring:
+  daily:
+    - "Review critical risks (score ≥ 16)"
+    - "Check for new risk triggers"
+
+  weekly:
+    - "Review all active risks"
+    - "Update risk status and mitigation progress"
+    - "Identify new risks"
+
+  monthly:
+    - "Deep dive risk review with stakeholders"
+    - "Update risk register"
+    - "Report to steering committee"
+
+### Key Risk Indicators (KRIs)
+kris:
+  - indicator: "Number of critical risks"
+    threshold: "≤2 critical risks"
+    action_if_exceeded: "Escalate to executive sponsor"
+
+  - indicator: "Trend in risk scores"
+    threshold: "Stable or decreasing"
+    action_if_exceeded: "Root cause analysis, additional mitigation"
+
+  - indicator: "% of mitigation actions on track"
+    threshold: "≥80%"
+    action_if_exceeded: "Reassign owners, provide support"
+
+## CLOSED RISKS
+
+closed_risks:
+  - risk_id: "TECH-002"
+    risk_title: "Database performance concerns"
+    closure_date: ""
+    closure_reason: "Risk did not materialize - Performance testing showed acceptable results"
+
+  - risk_id: "RES-002"
+    risk_title: "Data scientist availability"
+    closure_date: ""
+    closure_reason: "Risk mitigated - Resource confirmed availability"
+
+## ISSUES (MATERIALIZED RISKS)
+
+issues:
+  - issue_id: "ISS-001"
+    related_risk_id: "TECH-001" # If came from a risk
+    issue_title: ""
+    description: |
+
+    identified_date: ""
+    priority: "Critical/High/Medium/Low"
+
+    impact:
+      timeline_impact: ""
+      cost_impact: ""
+      quality_impact: ""
+      business_impact: ""
+
+    root_cause_analysis: |
+      5 Whys or Fishbone analysis results
+
+    corrective_actions:
+      - action: ""
+        owner: ""
+        target_date: ""
+        status: ""
+
+    status: "Open/In Progress/Resolved/Closed"
+    resolution_date: ""
+
+    lessons_learned: |
+      What we learned and will do differently
+
+## RISK TRENDS
+
+trends:
+  - period: "Month 1"
+    total_risks: 0
+    critical: 0
+    high: 0
+    medium: 0
+    low: 0
+
+  - period: "Month 2"
+    total_risks: 0
+    critical: 0
+    high: 0
+    medium: 0
+    low: 0
+
+trend_analysis: |
+  Are risks increasing or decreasing? Why?
+
+## ACTION ITEMS
+
+actions:
+  - action_id: "ACT-001"
+    action: ""
+    related_risk_id: ""
+    owner: ""
+    target_date: ""
+    status: "Not Started/In Progress/Complete"
+    completion_date: ""
+
+## ESCALATION
+
+escalation_criteria:
+  - "Any critical risk (score ≥ 16)"
+  - "Any risk that becomes an issue"
+  - "Any risk that cannot be mitigated within project authority"
+  - "≥3 high risks related to same root cause"
+
+escalation_path:
+  level_1: "Project Manager → Technical Lead"
+  level_2: "Project Manager → Program Manager"
+  level_3: "Program Manager → Executive Sponsor"
+
+## APPROVAL
+
+approvals:
+  - role: "Risk Owner"
+    name: ""
+    signature: ""
+    date: ""
+
+  - role: "Project Manager"
+    name: ""
+    signature: ""
+    date: ""
+
+  - role: "Executive Sponsor"
+    name: ""
+    signature: ""
+    date: ""
+
+# Template metadata
+template_version: "1.0"
+template_last_updated: "January 22, 2026"
+maintained_by: "Delivery Lead Practice"
+
+# Usage notes
+usage_notes:
+  - "Review and update weekly minimum"
+  - "Every risk needs a clear owner"
+  - "Mitigation actions must have target dates"
+  - "Escalate critical risks immediately"
+  - "Close risks that are no longer relevant"
+  - "Learn from materialized risks (issues)"

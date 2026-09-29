@@ -1,0 +1,43 @@
+name: downstream-execution
+display_name: "Execution DOWNSTREAM"
+version: "3.0.0"
+description: "Agentes de execução DDL/ETL, reconciliação, self-healing, documentação e BI"
+agents:
+  - id: downstream-executor
+    file: agents/downstream-executor/downstream-executor.md
+    skill: ava-dmf-data-pipeline
+  - id: reconciliation
+    file: agents/reconciliation/reconciliation.md
+    skill: ava-dmf-data-quality
+  - id: self-healing
+    file: agents/self-healing/self-healing.md
+    skill: ava-dmf-autonomous-agents
+  - id: documentation
+    file: agents/documentation/documentation.md
+    skill: ava-dmf-agents-md
+  - id: bi-semantic
+    file: agents/bi-semantic/bi-semantic.md
+    skill: ava-dmf-sql-optimization
+outputs:
+  base_path: "projects/{project_name}/outputs/downstream"
+  artifacts:
+    - wave-report.json
+    - wave-report.md
+    - wave-execution-report.html
+    - reconciliation-report.json
+    - reconciliation-report.md
+    - reconciliation-dashboard.html
+    - ddl/*.sql
+    - etl/*.sql
+    - tests/*
+    - documentation/migration-reports/migration-report.md
+    - documentation/migration-reports/migration-report-executive.md
+    - documentation/migration-reports/migration-report-technical.md
+    - documentation/runbooks/*.md
+    - documentation/changelogs/changelog.md
+    - documentation/lineage-diagrams/*.md
+    - documentation/documentation-index.md
+    - documentation/documentation-statistics.json
+    - healing-report.md
+    - bi/dashboards/*.html
+    - bi/semantic-model.yaml

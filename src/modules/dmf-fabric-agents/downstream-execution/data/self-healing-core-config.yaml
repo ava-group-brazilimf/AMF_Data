@@ -1,0 +1,178 @@
+# Self-Healing Agent Configuration
+# AI-Agent Migration Factory™
+
+project:
+  name: "AI-Agent Migration Factory"
+  code: "migration-factory"
+  version: "4.0.0"
+
+agent:
+  id: self-healing
+  name: Phoenix
+  title: "Automatic Error Recovery & Self-Healing Specialist"
+  icon: "🔧"
+  version: "4.0"
+  phase: "DOWNSTREAM"
+  gate: 2  # support
+  language: "pt-BR"
+  framework: "AI-Agent Migration Factory - Avanade-Enhanced Edition"
+
+output:
+  base_folder: "./healing-outputs"
+  subfolders:
+    - fixed-code
+    - healing-logs
+    - error-analysis
+    - learned-patterns
+
+autonomy:
+  default_level: 3  # Monitored — agent acts, human reviews
+  yolo_eligible: true
+  yolo_scope: "known error patterns only"
+  escalation_required:
+    - novel_error_after_3_attempts
+    - regression_detected
+    - security_violation_fix
+    - schema_breaking_change
+
+known_error_patterns:
+  - id: type_mismatch
+    description: "Data type incompatibility (e.g., DATE vs STRING)"
+    severity: medium
+    auto_fix_rate: 0.95
+    fix_template: "cast_conversion"
+
+  - id: null_handling
+    description: "Missing null/None handling in transformations"
+    severity: medium
+    auto_fix_rate: 0.90
+    fix_template: "add_null_check"
+
+  - id: sql_syntax
+    description: "SQL dialect translation errors (BODS SQL → Spark SQL)"
+    severity: high
+    auto_fix_rate: 0.85
+    fix_template: "sql_dialect_rewrite"
+
+  - id: import_missing
+    description: "Missing Python/PySpark import statements"
+    severity: low
+    auto_fix_rate: 0.98
+    fix_template: "add_import"
+
+  - id: column_not_found
+    description: "Column name mismatch between source and target"
+    severity: high
+    auto_fix_rate: 0.88
+    fix_template: "column_mapping_fix"
+
+  - id: partition_error
+    description: "Partitioning strategy issues (repartition/coalesce)"
+    severity: medium
+    auto_fix_rate: 0.80
+    fix_template: "partition_reconfig"
+
+  - id: schema_evolution
+    description: "Schema drift handling (added/removed/renamed columns)"
+    severity: high
+    auto_fix_rate: 0.75
+    fix_template: "schema_merge"
+
+  - id: encoding_error
+    description: "Character encoding issues (UTF-8, Latin-1, etc.)"
+    severity: low
+    auto_fix_rate: 0.92
+    fix_template: "encoding_fix"
+
+  - id: date_format
+    description: "Date/timestamp format mismatch"
+    severity: medium
+    auto_fix_rate: 0.93
+    fix_template: "date_format_conversion"
+
+  - id: join_condition
+    description: "Join key mismatch or type difference"
+    severity: high
+    auto_fix_rate: 0.85
+    fix_template: "join_key_fix"
+
+fix_strategies:
+  max_retry_attempts: 3
+  strategies:
+    - attempt: 1
+      name: "rule_based"
+      description: "Deterministic fix from known pattern registry"
+      risk: low
+      timeout_seconds: 30
+      fallback: 2
+
+    - attempt: 2
+      name: "llm_alternative_prompt"
+      description: "LLM with focused repair prompt and full error context"
+      risk: medium
+      timeout_seconds: 120
+      fallback: 3
+
+    - attempt: 3
+      name: "llm_different_model"
+      description: "Stronger/different LLM model for creative fix"
+      risk: higher
+      timeout_seconds: 180
+      fallback: escalate
+
+circuit_breaker:
+  consecutive_failures_threshold: 5
+  cooldown_minutes: 15
+  alert_on_trigger: true
+
+learning:
+  engine: "MLflow"
+  experiment_name: "self-healing-patterns"
+  metrics_tracked:
+    - fix_success_rate
+    - time_to_fix
+    - regression_rate
+    - pattern_match_accuracy
+  auto_promote_threshold: 0.90  # pattern promoted to rule-based after 90% success
+
+dependencies:
+  upstream:
+    - agent: quality-gate
+      artifact: "validation-report/{pipeline_id}.json"
+      condition: "rejected"
+      description: "Validation errors and rejection details from Vera"
+
+    - agent: security-compliance
+      artifact: "compliance-report/{pipeline_id}.json"
+      condition: "non-compliant"
+      description: "PII and compliance findings from Shield"
+
+    - agent: code-generator
+      artifact: "generated-code/{pipeline_id}.py"
+      condition: "original"
+      description: "Original generated code for patching"
+
+  downstream:
+    - agent: quality-gate
+      artifact: "fixed-code/{pipeline_id}.py"
+      condition: "re-validate"
+      description: "Fixed code sent back to Vera for re-validation"
+
+    - agent: migration-coordinator
+      artifact: "healing-log/{pipeline_id}.json"
+      condition: "escalation"
+      description: "Escalation after 3 failed fix attempts"
+
+commands:
+  - diagnose
+  - fix
+  - verify
+  - learn-pattern
+  - healing-report
+
+settings:
+  language: "pt-BR"
+  date_format: "YYYY-MM-DD"
+  timezone: "America/Sao_Paulo"
+  minimal_diff: true  # always apply smallest possible change
+  verify_before_declare: true  # always re-validate before declaring success

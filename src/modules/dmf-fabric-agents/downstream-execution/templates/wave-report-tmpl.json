@@ -1,0 +1,143 @@
+{
+  "_template_metadata": {
+    "name": "wave-report-tmpl.json",
+    "owner_agent": "downstream-executor",
+    "phase": "DOWNSTREAM",
+    "gate": 3,
+    "version": "1.0",
+    "purpose": "Canonical machine-readable wave execution report. SINGLE SOURCE OF TRUTH read by Orion (migration-coordinator) for Gate 3 promotion, by Scribe (documentation) for the migration-report, and by validate_gate3_artifacts.py in CI. Both wave-report.md and wave-execution-report.html are derived from this file.",
+    "instructions_for_llm": [
+      "Replace EVERY {{...}} placeholder with project data. Do NOT leave placeholders in the final file.",
+      "Remove this _template_metadata block from the produced wave-report.json.",
+      "status MUST be one of: COMPLETED | PARTIAL | FAILED.",
+      "Each step in execution_summary MUST report status ∈ { PASS, FAIL, SKIPPED, NOT_RUN } and a duration_seconds.",
+      "GateScore formula: gate_score = (tests_passed_rate * 0.40) + (dq_score_pct * 0.30) + (parity_pct * 0.30). Recompute before persisting; do not trust template defaults.",
+      "kpis MUST be recomputed from ddl_results[], etl_results[] and tests_results[].",
+      "issues[] entries: severity ∈ { CRITICAL, HIGH, MEDIUM, LOW }; resolved is boolean.",
+      "discovery_owner.primary and discovery_owner.fallback must both be declared (B-017).",
+      "If status = COMPLETED then issues[] MUST contain zero entries with severity = CRITICAL and resolved = false.",
+      "Persist this file at: projects/{project_name}/outputs/downstream/execution/wave-report.json"
+    ]
+  },
+  "metadata": {
+    "agent": "downstream-executor",
+    "agent_persona": "Diego",
+    "wave_id": "{{WAVE_ID}}",
+    "wave_name": "{{WAVE_NAME}}",
+    "project": "{{PROJECT_NAME}}",
+    "environment": "DEV",
+    "executor": "{{EXECUTOR_NAME}}",
+    "execution_date": "{{DATE_ISO8601}}",
+    "trace_id": "{{TRACE_ID}}",
+    "version": "{{VERSION}}",
+    "gate": 3
+  },
+  "discovery_owner": {
+    "primary": "discovery-scout",
+    "primary_status": "ACTIVE",
+    "fallback": "inventory-scout",
+    "fallback_status": "STANDBY",
+    "primary_unavailable_reason": null
+  },
+  "status": "COMPLETED",
+  "gate_score": 0.0,
+  "gate_threshold": 85.0,
+  "gate_decision": {
+    "outcome": "PASS",
+    "decided_by": "{{APPROVER_NAME}}",
+    "decided_at": "{{DATE_ISO8601}}",
+    "notes": "{{DECISION_NOTES}}"
+  },
+  "summary": {
+    "objects_total": 0,
+    "ddl_success": 0,
+    "ddl_failed": 0,
+    "etl_success": 0,
+    "etl_failed": 0,
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "tests_passed_rate": 0.0,
+    "dq_score_pct": 0.0,
+    "parity_pct": 0.0,
+    "total_duration_seconds": 0
+  },
+  "execution_summary": [
+    { "step": "DDL Execution",      "status": "PASS", "duration_seconds": 0, "notes": "" },
+    { "step": "ETL Execution",      "status": "PASS", "duration_seconds": 0, "notes": "" },
+    { "step": "Quality Gate",       "status": "PASS", "duration_seconds": 0, "notes": "" },
+    { "step": "Reconciliation",     "status": "PASS", "duration_seconds": 0, "notes": "" },
+    { "step": "Documentation",      "status": "PASS", "duration_seconds": 0, "notes": "" }
+  ],
+  "ddl_results": [
+    {
+      "id": "DDL-0001",
+      "script": "ddl/{{SCRIPT_NAME}}.sql",
+      "object": "{{SCHEMA}}.{{TABLE}}",
+      "object_type": "TABLE",
+      "status": "PASS",
+      "duration_seconds": 0,
+      "rows_affected": 0,
+      "error": null
+    }
+  ],
+  "etl_results": [
+    {
+      "id": "ETL-0001",
+      "pipeline": "{{PIPELINE_NAME}}",
+      "source_object": "{{SRC_SCHEMA}}.{{SRC_TABLE}}",
+      "target_object": "{{TGT_SCHEMA}}.{{TGT_TABLE}}",
+      "rows_read": 0,
+      "rows_loaded": 0,
+      "rows_rejected": 0,
+      "status": "PASS",
+      "duration_seconds": 0,
+      "error": null
+    }
+  ],
+  "tests_results": [
+    {
+      "id": "TST-0001",
+      "test_name": "{{TEST_NAME}}",
+      "target_object": "{{TGT_TABLE}}",
+      "status": "PASS",
+      "duration_seconds": 0,
+      "assertion": "{{ASSERTION}}",
+      "actual": "{{ACTUAL}}",
+      "expected": "{{EXPECTED}}"
+    }
+  ],
+  "rollback": {
+    "scripts_tested": false,
+    "estimated_duration_minutes": 0,
+    "owner": "{{ROLLBACK_OWNER}}"
+  },
+  "issues": [
+    {
+      "id": "ISS-0001",
+      "type": "DDL_FAILURE",
+      "object": "{{SCHEMA}}.{{TABLE}}",
+      "severity": "MEDIUM",
+      "description": "{{DESCRIPTION}}",
+      "resolved": false,
+      "resolution_notes": null
+    }
+  ],
+  "linked_artifacts": [
+    "ddl/",
+    "etl/",
+    "tests/",
+    "documentation/execution-runbook.md",
+    "documentation/quality-gate-evidence.md",
+    "documentation/reconciliation-evidence.md",
+    "reconciliation-report.md"
+  ],
+  "kpis": {
+    "ddl_success_pct": 0.0,
+    "etl_success_pct": 0.0,
+    "tests_pass_pct": 0.0,
+    "parity_pct": 0.0,
+    "open_issues_count": 0,
+    "critical_issues_count": 0
+  }
+}

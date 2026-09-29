@@ -1,0 +1,794 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  Wave Execution Report — Reference Template
+  Owner: downstream-executor (Diego 🚀) — DMF Fabric Agents
+  Phase: DOWNSTREAM | Gate: 3 | Version: 1.0
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Stakeholder-facing execution dashboard for the Gate 3 wave decision.
+  Derived from wave-report.json (canonical source of truth).
+  The LLM MUST read this file BEFORE generating the project HTML output
+  and reproduce the structure, fonts, CSS variables, gradient header
+  border, KPI/timeline patterns and section ordering exactly. Visual
+  style is INTENTIONALLY identical to tobe-target-architecture-tmpl.html
+  (light theme).
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-3-2026-05-01)
+    {{WAVE_ID}}                 Wave identifier
+    {{WAVE_NAME}}               Wave display name
+    {{ENVIRONMENT}}             DEV / UAT / PROD
+    {{EXECUTOR}}                Executor name
+    {{EXECUTION_DATE}}          ISO8601
+    {{STATUS}}                  COMPLETED | PARTIAL | FAILED
+    {{STATUS_CLASS}}            status-completed | status-partial | status-failed
+    {{GATE_SCORE}}              GateScore numeric value (0-100)
+    {{GATE_THRESHOLD}}          Promotion threshold (default 85)
+    {{GATE_DECISION}}           PASS / FAIL / HOLD
+    {{GATE_DECISION_CLASS}}     decision-pass | decision-fail | decision-hold
+    {{KPI_OBJECTS_TOTAL}}       Numeric KPI
+    {{KPI_DDL_PCT}}             Percentage
+    {{KPI_ETL_PCT}}             Percentage
+    {{KPI_TESTS_PCT}}           Percentage
+    {{KPI_PARITY_PCT}}          Percentage
+    {{TIMELINE_BLOCK}}          Repeated step-card markup (5 cards)
+    {{DDL_ROWS_BLOCK}}          Repeated <tr> rows
+    {{ETL_ROWS_BLOCK}}          Repeated <tr> rows
+    {{TESTS_ROWS_BLOCK}}        Repeated <tr> rows
+    {{ISSUES_BLOCK}}            Repeated issue-card markup OR empty-state
+    {{ROLLBACK_TESTED}}         "Yes" or "No"
+    {{ROLLBACK_DURATION}}       Minutes
+    {{ROLLBACK_OWNER}}          Owner name
+
+  FONTS (Google Fonts CDN; include local fallback)
+    Playfair Display   — headings (elegant serif)
+    JetBrains Mono     — labels, tags, metadata, table values
+    Plus Jakarta Sans  — body copy
+
+  COLOR SCHEME (light theme — identical to TO-BE target architecture)
+    --bg #F7F8FA         --surface #FFFFFF
+    --fabric #0078D4     (primary / informational)
+    --green  #1A7A4A     (PASS / COMPLETED / promote)
+    --amber  #B45309     (PARTIAL / WARN / HOLD)
+    --red    #B91C1C     (FAIL / blocker)
+    --bronze #C0782A     (DDL accent)
+    --silver #5B7FA6     (ETL accent)
+    --gold   #A8860C     (Tests accent)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wave Execution Report — {{PROJECT_NAME}} · {{WAVE_ID}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES (mirror TO-BE light theme) ──────────── */
+    :root {
+      --bg: #F7F8FA;
+      --surface: #FFFFFF;
+      --surface2: #F2F4F7;
+      --surface3: #E8ECF2;
+      --border: rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.12);
+      --text: #0F1117;
+      --text2: #4A5168;
+      --text3: #8892A4;
+      --fabric: #0078D4;       --fabric-light: #EBF3FC;   --fabric-mid: #B3D4F0;
+      --bronze: #C0782A;       --bronze-light: #FDF3E7;   --bronze-mid: #F0C898;
+      --silver: #5B7FA6;       --silver-light: #EDF2F8;   --silver-mid: #B8CFDF;
+      --gold: #A8860C;         --gold-light: #FDF7E3;     --gold-mid: #E8D080;
+      --green: #1A7A4A;        --green-light: #EDFBF3;    --green-mid: #A6E0BF;
+      --amber: #B45309;        --amber-light: #FEF3E2;    --amber-mid: #F5C57A;
+      --red: #B91C1C;          --red-light: #FEECEC;      --red-mid: #F0B0B0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER (white card with gradient top border) ──────── */
+    .header {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 44px;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--bronze) 0%, var(--silver) 35%, var(--gold) 65%, var(--green) 100%);
+    }
+    .header-left { max-width: 720px; }
+    .badge-gate {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--fabric-light);
+      color: var(--fabric);
+      border: 1px solid var(--fabric-mid);
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48px;
+      font-weight: 600;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+    h1 em { font-style: italic; color: var(--fabric); }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+    .status-completed { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+    .status-partial   { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-mid); }
+    .status-failed    { background: var(--red-light);   color: var(--red);   border: 1px solid var(--red-mid); }
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── GATE SCORE HERO ───────────────────────────────────── */
+    .gate-hero {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 36px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .score-gauge {
+      position: relative;
+      width: 220px; height: 220px;
+      margin: 0 auto;
+    }
+    .score-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .gauge-track { fill: none; stroke: var(--surface3); stroke-width: 14; }
+    .gauge-arc {
+      fill: none;
+      stroke: var(--c, var(--green));
+      stroke-width: 14;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1);
+    }
+    .gauge-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .gauge-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 60px;
+      line-height: 1;
+      color: var(--c, var(--green));
+    }
+    .gauge-of {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+    .gate-info { display: flex; flex-direction: column; gap: 14px; }
+    .gate-info .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    .gate-formula {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text2);
+      background: var(--surface2);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--fabric);
+    }
+    .decision-pill {
+      display: inline-flex;
+      align-self: flex-start;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .decision-pill .dot { width: 8px; height: 8px; border-radius: 999px; background: currentColor; }
+    .decision-pass { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+    .decision-hold { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-mid); }
+    .decision-fail { background: var(--red-light);   color: var(--red);   border: 1px solid var(--red-mid); }
+    .decision-meta { font-size: 13px; color: var(--text2); }
+    .decision-meta span { color: var(--text); }
+
+    /* ─── KPI ROW ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 22px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--c, var(--fabric));
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .kpi-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--c, var(--fabric));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text3); }
+
+    /* ─── EXECUTION TIMELINE ────────────────────────────────── */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 18px;
+      position: relative;
+    }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--c, var(--fabric));
+    }
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+    .step-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .step-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    .step-status {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .step-pass    { background: var(--green-light); color: var(--green); }
+    .step-fail    { background: var(--red-light);   color: var(--red); }
+    .step-skipped { background: var(--surface3);    color: var(--text2); }
+    .step-notrun  { background: var(--surface2);    color: var(--text3); }
+
+    /* ─── RESULTS TABLES ────────────────────────────────────── */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .results-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .results-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+    .results-table tr:last-child td { border-bottom: 0; }
+    .results-table tr:hover td { background: var(--surface2); }
+    .results-table tr.row-pass    td:first-child { border-left: 3px solid var(--green); }
+    .results-table tr.row-fail    td:first-child { border-left: 3px solid var(--red); }
+    .results-table tr.row-skipped td:first-child { border-left: 3px solid var(--text3); }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .pill-pass    { background: var(--green-light); color: var(--green); }
+    .pill-fail    { background: var(--red-light);   color: var(--red); }
+    .pill-skipped { background: var(--surface3);    color: var(--text2); }
+    .pill-notrun  { background: var(--surface2);    color: var(--text3); }
+
+    /* ─── ISSUES ────────────────────────────────────────────── */
+    .issues-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .issue-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--c, var(--amber));
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .issue-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .issue-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--c, var(--amber));
+      letter-spacing: 0.12em;
+    }
+    .issue-object {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .issue-object .k { color: var(--text3); }
+    .issue-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.55;
+    }
+    .sev-critical { --c: var(--red); }
+    .sev-high     { --c: var(--red); }
+    .sev-medium   { --c: var(--amber); }
+    .sev-low      { --c: var(--silver); }
+
+    /* ─── ROLLBACK ──────────────────────────────────────────── */
+    .rollback-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .rollback-cell .k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .rollback-cell .v {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--text);
+    }
+
+    /* ─── EMPTY STATE ───────────────────────────────────────── */
+    .empty-state {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      color: var(--text2);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-gate">Gate 3 · Wave Execution</span>
+      <h1>Wave <em>Execution</em> Report</h1>
+      <p class="subtitle">
+        Consolidated execution status of DDL, ETL, quality and reconciliation
+        for the wave. Sole source of the Gate 3 promotion decision and input
+        for the executive migration-report delivered to stakeholders.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">PROJECT</span> <span class="meta-val">{{PROJECT_NAME}}</span></div>
+      <div><span class="meta-key">WAVE</span> <span class="meta-val">{{WAVE_ID}} · {{WAVE_NAME}}</span></div>
+      <div><span class="meta-key">ENV</span> <span class="meta-val">{{ENVIRONMENT}}</span></div>
+      <div><span class="meta-key">EXECUTOR</span> <span class="meta-val">{{EXECUTOR}}</span></div>
+      <div><span class="meta-key">TRACE</span> <span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">DATE</span> <span class="meta-val">{{EXECUTION_DATE}}</span></div>
+      <div style="margin-top:10px"><span class="status-pill {{STATUS_CLASS}}">{{STATUS}}</span></div>
+    </div>
+  </header>
+
+  <!-- ─── GATE SCORE HERO ─────────────────────────────────── -->
+  <section>
+    <div class="section-title">Gate 3 Verdict</div>
+    <div class="gate-hero">
+      <!--
+        Gauge: circumference ≈ 691 (radius 110).
+        Set stroke-dasharray="691" and stroke-dashoffset = 691 * (1 - gate_score/100).
+        Set --c on .score-gauge based on outcome:
+          PASS → var(--green) · HOLD → var(--amber) · FAIL → var(--red)
+      -->
+      <div class="score-gauge" style="--c: var(--{{DECISION_COLOR_VAR}})">
+        <svg viewBox="0 0 240 240">
+          <circle class="gauge-track" cx="120" cy="120" r="110"></circle>
+          <circle class="gauge-arc" cx="120" cy="120" r="110"
+                  stroke-dasharray="691"
+                  stroke-dashoffset="{{GAUGE_DASHOFFSET}}"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-value">{{GATE_SCORE}}</div>
+          <div class="gauge-of">of 100 · min {{GATE_THRESHOLD}}</div>
+        </div>
+      </div>
+      <div class="gate-info">
+        <div class="label">GateScore Formula</div>
+        <div class="gate-formula">
+          GateScore = (tests_pass_rate × 0.40) + (dq_score_pct × 0.30) + (parity_pct × 0.30)
+        </div>
+        <span class="decision-pill {{GATE_DECISION_CLASS}}">
+          <span class="dot"></span>{{GATE_DECISION}}
+        </span>
+        <div class="decision-meta">
+          Decided by <span>{{APPROVER_NAME}}</span> · <span>{{DECIDED_AT}}</span>
+        </div>
+        <div class="decision-meta">{{DECISION_NOTES}}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── KPI ROW ─────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Wave KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--fabric)">
+        <div class="kpi-value">{{KPI_OBJECTS_TOTAL}}</div>
+        <div class="kpi-label">Objects Total</div>
+        <div class="kpi-sub">in scope</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--bronze)">
+        <div class="kpi-value">{{KPI_DDL_PCT}}%</div>
+        <div class="kpi-label">DDL Success</div>
+        <div class="kpi-sub">scripts applied</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--silver)">
+        <div class="kpi-value">{{KPI_ETL_PCT}}%</div>
+        <div class="kpi-label">ETL Success</div>
+        <div class="kpi-sub">pipelines executed</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--gold)">
+        <div class="kpi-value">{{KPI_TESTS_PCT}}%</div>
+        <div class="kpi-label">Tests Passed</div>
+        <div class="kpi-sub">DQ + integrity</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--green)">
+        <div class="kpi-value">{{KPI_PARITY_PCT}}%</div>
+        <div class="kpi-label">Parity</div>
+        <div class="kpi-sub">vs source</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── EXECUTION TIMELINE ──────────────────────────────── -->
+  <section>
+    <div class="section-title">Execution Timeline</div>
+    <div class="timeline">
+      {{TIMELINE_BLOCK}}
+      <!--
+        Render one .step-card per execution_summary[] entry (5 expected).
+        Set --c per step:
+          DDL Execution    → var(--bronze)
+          ETL Execution    → var(--silver)
+          Quality Gate     → var(--gold)
+          Reconciliation   → var(--green)
+          Documentation    → var(--fabric)
+        Status pill class:
+          PASS    → step-pass
+          FAIL    → step-fail
+          SKIPPED → step-skipped
+          NOT_RUN → step-notrun
+
+        <div class="step-card" style="--c: var(--bronze)">
+          <div class="step-num">01 · DDL</div>
+          <div class="step-name">{step}</div>
+          <div class="step-meta">{duration_seconds}s</div>
+          <div class="step-meta">{notes}</div>
+          <span class="step-status step-pass">{status}</span>
+        </div>
+      -->
+    </div>
+  </section>
+
+  <!-- ─── DDL RESULTS ─────────────────────────────────────── -->
+  <section>
+    <div class="section-title">DDL Results</div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Script</th>
+          <th>Object</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Duration</th>
+          <th>Rows</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{DDL_ROWS_BLOCK}}
+        <!--
+          Render one <tr> per ddl_results[] entry. Row class:
+            PASS → row-pass · FAIL → row-fail · SKIPPED → row-skipped
+
+          <tr class="row-pass">
+            <td>{id}</td>
+            <td>{script}</td>
+            <td>{object}</td>
+            <td>{object_type}</td>
+            <td><span class="pill pill-pass">{status}</span></td>
+            <td>{duration_seconds}s</td>
+            <td>{rows_affected}</td>
+            <td>{error}</td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── ETL RESULTS ─────────────────────────────────────── -->
+  <section>
+    <div class="section-title">ETL Results</div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pipeline</th>
+          <th>Source</th>
+          <th>Target</th>
+          <th>Read</th>
+          <th>Loaded</th>
+          <th>Rejected</th>
+          <th>Status</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ETL_ROWS_BLOCK}}
+        <!--
+          <tr class="row-pass">
+            <td>{id}</td>
+            <td>{pipeline}</td>
+            <td>{source_object}</td>
+            <td>{target_object}</td>
+            <td>{rows_read}</td>
+            <td>{rows_loaded}</td>
+            <td>{rows_rejected}</td>
+            <td><span class="pill pill-pass">{status}</span></td>
+            <td>{duration_seconds}s</td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── TEST RESULTS ────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Test Results</div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Test</th>
+          <th>Target</th>
+          <th>Status</th>
+          <th>Assertion</th>
+          <th>Actual</th>
+          <th>Expected</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{TESTS_ROWS_BLOCK}}
+        <!--
+          <tr class="row-pass">
+            <td>{id}</td>
+            <td>{test_name}</td>
+            <td>{target_object}</td>
+            <td><span class="pill pill-pass">{status}</span></td>
+            <td>{assertion}</td>
+            <td>{actual}</td>
+            <td>{expected}</td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── ISSUES ──────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Issues</div>
+    {{ISSUES_BLOCK}}
+    <!--
+      If issues[] is empty, render literally:
+        <div class="empty-state">No issues recorded — wave executed cleanly.</div>
+
+      Otherwise render inside <div class="issues-grid"> one .issue-card per item.
+      Use severity class on the card root: sev-critical | sev-high | sev-medium | sev-low
+
+      <div class="issues-grid">
+        <div class="issue-card sev-medium">
+          <div class="issue-head">
+            <span class="issue-id">{id} · {type}</span>
+            <span class="pill pill-fail">{severity}</span>
+          </div>
+          <div class="issue-object"><span class="k">OBJECT</span> {object} · resolved: {resolved}</div>
+          <div class="issue-desc">{description}</div>
+        </div>
+      </div>
+    -->
+  </section>
+
+  <!-- ─── ROLLBACK READINESS ──────────────────────────────── -->
+  <section>
+    <div class="section-title">Rollback Readiness</div>
+    <div class="rollback-card">
+      <div class="rollback-cell">
+        <span class="k">Scripts Tested</span>
+        <span class="v">{{ROLLBACK_TESTED}}</span>
+      </div>
+      <div class="rollback-cell">
+        <span class="k">Estimated Duration</span>
+        <span class="v">{{ROLLBACK_DURATION}} min</span>
+      </div>
+      <div class="rollback-cell">
+        <span class="k">Owner</span>
+        <span class="v">{{ROLLBACK_OWNER}}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>downstream-executor · Diego 🚀</span>
+    <span>Generated {{EXECUTION_DATE}} · Gate 3</span>
+    <span>DMF Fabric Agents</span>
+  </footer>
+
+</body>
+</html>

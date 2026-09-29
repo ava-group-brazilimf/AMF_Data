@@ -1,0 +1,102 @@
+# Policy-as-Code Schema
+# B-001 — Governance and Control Plane
+# Version: 1.0.0   Status: approved
+#
+# This file is the canonical definition of the governance policy model.
+# All agents MUST reference their policy class (see agent-classes.yaml).
+# Actions that are REVIEW-required BLOCK execution until a human approves.
+
+schema_version: "1.0.0"
+
+# ---------------------------------------------------------------------------
+# Actions
+# ---------------------------------------------------------------------------
+# allow   — execute immediately, log entry created.
+# review  — block execution; create approval request; log entry created.
+# deny    — reject immediately; log error; execution aborted.
+
+policy_actions:
+  - allow
+  - review
+  - deny
+
+# ---------------------------------------------------------------------------
+# Policy classes — each agent belongs to exactly one class.
+# ---------------------------------------------------------------------------
+
+policy_classes:
+  coordination:
+    description: "Agents that coordinate, plan, or orchestrate other agents. No direct data writes."
+    default_tool_action: allow
+    require_human_approval_for:
+      - gate-pass
+      - gate-override
+      - production-promotion
+    audit: true
+
+  design:
+    description: "Agents that produce artifacts (models, architecture, DDL templates). Read-heavy, limited writes."
+    default_tool_action: allow
+    require_human_approval_for:
+      - publish-artifact
+      - gate-pass
+    audit: true
+
+  execution:
+    description: "Agents that mutate state: DDL/ETL runs, data loads, reconciliation writes."
+    default_tool_action: review
+    require_human_approval_for:
+      - ddl-execute
+      - etl-execute
+      - wave-run
+      - rollback
+      - production-promotion
+      - gate-pass
+    blocked_tools:
+      - drop-database
+      - truncate-table
+    audit: true
+
+  control:
+    description: "Agents that enforce policy, scan PII, apply masking, and manage compliance."
+    default_tool_action: allow
+    require_human_approval_for:
+      - policy-override
+      - pii-exposure-override
+      - audit-delete
+    blocked_tools:
+      - audit-delete
+    audit: true
+
+# ---------------------------------------------------------------------------
+# Global blocked patterns (applied to ALL agents regardless of class).
+# Regex patterns matched case-insensitively against tool inputs.
+# ---------------------------------------------------------------------------
+
+global_blocked_patterns:
+  - "drop\\s+database"
+  - "drop\\s+table"
+  - "truncate\\s+table"
+  - "delete\\s+from.*where\\s+1=1"
+  - "rm\\s+-rf"
+  - "format\\s+[a-z]:"
+
+# ---------------------------------------------------------------------------
+# Audit log configuration
+# ---------------------------------------------------------------------------
+
+audit:
+  destination: "./projects/{project_name}/outputs/summary/audit-logs"
+  format: "jsonl"
+  fields:
+    - timestamp
+    - agent_id
+    - agent_class
+    - action
+    - tool
+    - policy_action
+    - approved_by
+    - gate
+    - wave_id
+  retention_days: 365
+  immutable: true   # log entries must not be modified after write

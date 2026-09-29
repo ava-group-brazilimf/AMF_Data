@@ -1,0 +1,134 @@
+# IterationImprovement Configuration
+
+# Agent: IterationImprovement (Kai)
+# Phase: DOWNSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "iteration-improvement"
+  name: "Kai"
+  title: "IterationImprovement"
+  version: "1.0"
+  phase: "DOWNSTREAM"
+  icon: "🔁"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/improvement"
+  formats:
+    - markdown
+    - yaml
+
+# Artifact Definitions
+artifacts:
+  improvement-backlog:
+    name: "Improvement Backlog"
+    filename: "improvement-backlog.md"
+    required_for_gate: 3
+    required_sections:
+      - "Backlog Overview"
+      - "Issues Identified"
+      - "Improvement Opportunities"
+      - "Priority Matrix"
+      - "Action Items"
+    quality_criteria:
+      - "All issues categorized"
+      - "Priorities assigned"
+      - "Owners identified"
+
+  retrospective:
+    name: "Retrospective"
+    filename: "retrospective.md"
+    required_for_gate: 3
+    required_sections:
+      - "Summary"
+      - "What Went Well"
+      - "What Didn't Go Well"
+      - "Action Items"
+      - "Lessons Learned"
+    quality_criteria:
+      - "Balanced feedback"
+      - "Actionable items"
+      - "Concrete improvements"
+
+  metrics-analysis:
+    name: "Metrics Analysis"
+    filename: "metrics-analysis.md"
+    required_for_gate: 3
+    required_sections:
+      - "Executive Summary"
+      - "Pipeline Metrics"
+      - "Quality Metrics"
+      - "Trend Analysis"
+      - "Recommendations"
+    quality_criteria:
+      - "Data-backed insights"
+      - "Clear visualizations"
+      - "Actionable recommendations"
+
+# Dependencies
+dependencies:
+  upstream:
+    - agent: "data-engineer-exec"
+      artifacts: ["execution-log.md"]
+    - agent: "data-steward"
+      artifacts: ["dq-validation.md"]
+    - agent: "bi-semantic"
+      artifacts: ["semantic-model.md"]
+    - agent: "orchestrator"
+      artifacts: ["orchestration-log.md"]
+  downstream:
+    - agent: "orchestrator"
+      artifacts: ["improvement-backlog.md"]
+    - agent: "data-strategist"
+      artifacts: ["retrospective.md", "metrics-analysis.md"]
+
+# Commands
+commands:
+  - name: "*help"
+    description: "Show available commands"
+    
+  - name: "*status"
+    alias: "*WS"
+    description: "Show progress on artifacts"
+    
+  - name: "*backlog"
+    alias: "*IB"
+    description: "Create/update improvement backlog"
+    task: "create-improvement-backlog"
+    output: "improvement-backlog.md"
+    
+  - name: "*retrospective"
+    alias: "*RT"
+    description: "Run retrospective analysis"
+    task: "run-retrospective"
+    output: "retrospective.md"
+    
+  - name: "*metrics"
+    alias: "*MA"
+    description: "Analyze process metrics"
+    task: "analyze-metrics"
+    output: "metrics-analysis.md"
+    
+  - name: "*lessons"
+    description: "Document lessons learned"
+    task: "document-lessons"
+    
+  - name: "*action-items"
+    description: "Generate action items"
+    task: "generate-actions"
+    
+  - name: "*dismiss"
+    alias: "*DA"
+    description: "End session"
+
+# Checklist
+checklists:
+  - "iteration-improvement-checklist.md"
+
+# Templates
+templates:
+  - "improvement-backlog-tmpl.md"
+  - "retrospective-tmpl.md"
+  - "metrics-analysis-tmpl.md"

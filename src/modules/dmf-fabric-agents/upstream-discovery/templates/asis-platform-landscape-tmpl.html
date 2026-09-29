@@ -1,0 +1,616 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  AS-IS Platform Landscape — Reference Template
+  Owner: inventory-scout (Scout 🔍) — DMF Fabric Agents
+  Phase: UPSTREAM | Gate: 1
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  This file is the visual reference template the LLM must read BEFORE
+  generating the project HTML output. Reproduce the structure, fonts,
+  CSS variables, hover patterns, section ordering and section-title
+  ::after-line pattern exactly as defined here.
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-1-2026-05-01)
+    {{AGENTS}}                  Comma-separated participating agents
+    {{SOURCE_PLATFORM}}         Source platform label
+    {{TARGET_PLATFORM}}         Target platform label
+    {{SCAN_DATE}}               YYYY-MM-DD
+    {{TOTAL_OBJECTS}}           Numeric KPI
+    {{PHYSICAL_COVERAGE}}       Percentage (e.g., 92%)
+    {{SEMANTIC_ENRICHMENT}}     Percentage
+    {{GAPS_COUNT}}              Numeric KPI
+    {{TARGET_READINESS}}        Percentage
+    {{PLATFORMS_BLOCK}}         Repeated platform-card markup
+    {{LINEAGE_BLOCK}}           Horizontal node→arrow→node chain
+    {{CRITICAL_OBJECTS_BLOCK}}  Repeated <tr> rows
+    {{GAPS_RISKS_BLOCK}}        Repeated risk-card markup
+  
+  FONTS (Google Fonts CDN; include local monospace fallback)
+    DM Serif Display — headings + italic accent
+    DM Mono          — labels, tags, metadata, table values
+    Outfit           — body copy
+
+  COLOR SCHEME (dark theme — declare via :root CSS variables)
+    --bg #0D0F14   --amber #F59E0B (AS-IS / primary)
+    --teal #14B8A6 (coverage)   --blue #60A5FA (semantic)
+    --coral #FB923C (gaps)      --purple #A78BFA (readiness)
+    --red #EF4444 (high risk)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AS IS — {{PROJECT_NAME}} Platform Landscape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES ─────────────────────────────────────── */
+    :root {
+      --bg: #0D0F14;
+      --surface: #13161D;
+      --surface2: #1A1E28;
+      --surface3: #222736;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.10);
+      --text: #E8EBF2;
+      --text2: #8B919F;
+      --text3: #5A6070;
+      --amber: #F59E0B;     --amber-dim: rgba(245,158,11,0.12);
+      --red: #EF4444;       --red-dim: rgba(239,68,68,0.12);
+      --teal: #14B8A6;      --teal-dim: rgba(20,184,166,0.10);
+      --blue: #60A5FA;      --blue-dim: rgba(96,165,250,0.10);
+      --purple: #A78BFA;    --purple-dim: rgba(167,139,250,0.10);
+      --coral: #FB923C;     --coral-dim: rgba(251,146,60,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 56px;
+      gap: 40px;
+    }
+    .header-left { max-width: 720px; }
+    .badge-asis {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--amber-dim);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      border-radius: 999px;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── 2. KPI ROW ────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 20px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--c, var(--amber));
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .kpi-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--c, var(--amber));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    /* ─── 3. SOURCE PLATFORMS GRID ──────────────────────────── */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .platform-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+    .platform-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .platform-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .platform-icon {
+      width: 48px; height: 48px;
+      background: var(--surface3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      color: var(--amber);
+    }
+    .platform-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+    }
+    .platform-version {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+    }
+    .platform-attrs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .platform-attrs div { font-size: 13px; }
+    .platform-attrs .k {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: block;
+    }
+    .platform-attrs .v { color: var(--text); }
+    .risk-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .risk-high   { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red); }
+    .risk-medium { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+    .risk-low    { background: var(--teal-dim);  color: var(--teal);  border: 1px solid var(--teal); }
+
+    /* ─── 4. DATA LINEAGE FLOW ──────────────────────────────── */
+    .lineage {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .lineage-node {
+      flex: 0 0 auto;
+      min-width: 160px;
+      text-align: center;
+      padding: 16px 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .lineage-node .name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .lineage-node .tech {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .lineage-arrow {
+      flex: 1 1 60px;
+      min-width: 60px;
+      position: relative;
+      text-align: center;
+      color: var(--text3);
+    }
+    .lineage-arrow::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px;
+      background: var(--border2);
+    }
+    .lineage-arrow::after {
+      content: '▶';
+      position: absolute;
+      right: -2px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 10px;
+    }
+    .lineage-arrow .label {
+      position: relative;
+      display: inline-block;
+      background: var(--surface);
+      padding: 0 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    /* ─── 5. CRITICAL OBJECTS TABLE ─────────────────────────── */
+    .objects-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .objects-table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .objects-table td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .objects-table tr:last-child td { border-bottom: 0; }
+    .objects-table tr:hover td { background: var(--surface3); }
+    .obj-num {
+      font-family: 'DM Mono', monospace;
+      color: var(--text3);
+      width: 40px;
+    }
+    .type-tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .type-table     { background: var(--blue-dim);   color: var(--blue); }
+    .type-pipeline  { background: var(--purple-dim); color: var(--purple); }
+    .type-procedure { background: var(--coral-dim);  color: var(--coral); }
+    .type-view      { background: var(--teal-dim);   color: var(--teal); }
+    .complexity-bar {
+      display: inline-block;
+      width: 80px;
+      height: 6px;
+      background: var(--surface3);
+      border-radius: 3px;
+      overflow: hidden;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .complexity-bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--amber), var(--red));
+    }
+    .strategy-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .strategy-lift     { background: var(--teal-dim);  color: var(--teal); }
+    .strategy-refactor { background: var(--amber-dim); color: var(--amber); }
+    .strategy-rebuild  { background: var(--red-dim);   color: var(--red); }
+
+    /* ─── 6. GAPS & RISKS GRID ──────────────────────────────── */
+    .gaps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .gap-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--c, var(--amber));
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .gap-card:hover { transform: translateY(-2px); border-color: var(--border2); border-left-color: var(--c, var(--amber)); }
+    .gap-impact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c, var(--amber));
+    }
+    .gap-impact::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--c, var(--amber));
+      border-radius: 50%;
+    }
+    .gap-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .gap-desc {
+      font-size: 13px;
+      color: var(--text2);
+    }
+    .impact-high   { --c: var(--red); }
+    .impact-medium { --c: var(--amber); }
+    .impact-low    { --c: var(--teal); }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ──────────────────────────────────────────────
+       INVENTORY SCOUT — AS-IS Platform Landscape
+       Generated by: inventory-scout (Scout)
+       Project: {{PROJECT_NAME}}
+       Gate: 1 | Date: {{SCAN_DATE}}
+       ────────────────────────────────────────────── -->
+
+  <!-- 1. HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-asis">AS-IS Assessment</span>
+      <h1>{{PROJECT_NAME}}<br><em>Platform Landscape</em></h1>
+      <p class="subtitle">Consolidated discovery of legacy platforms, lineage and migration risks compiled by the InventoryScout agent.</p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">Trace ID&nbsp;&nbsp;</span><span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">Agents&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{AGENTS}}</span></div>
+      <div><span class="meta-key">Source&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{SOURCE_PLATFORM}}</span></div>
+      <div><span class="meta-key">Target&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{TARGET_PLATFORM}}</span></div>
+      <div><span class="meta-key">Scan&nbsp;Date</span><span class="meta-val">{{SCAN_DATE}}</span></div>
+    </div>
+  </header>
+
+  <!-- 2. KPI ROW -->
+  <section>
+    <div class="section-title">Discovery KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--amber);">
+        <div class="kpi-value">{{TOTAL_OBJECTS}}</div>
+        <div class="kpi-label">Total Objects</div>
+        <div class="kpi-sub">discovered in scope</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--teal);">
+        <div class="kpi-value">{{PHYSICAL_COVERAGE}}</div>
+        <div class="kpi-label">Physical Coverage</div>
+        <div class="kpi-sub">of declared scope</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--blue);">
+        <div class="kpi-value">{{SEMANTIC_ENRICHMENT}}</div>
+        <div class="kpi-label">Semantic Enrichment</div>
+        <div class="kpi-sub">classified + lineage</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--coral);">
+        <div class="kpi-value">{{GAPS_COUNT}}</div>
+        <div class="kpi-label">Gaps Identified</div>
+        <div class="kpi-sub">requiring attention</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--purple);">
+        <div class="kpi-value">{{TARGET_READINESS}}</div>
+        <div class="kpi-label">Target Readiness</div>
+        <div class="kpi-sub">migration confidence</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SOURCE PLATFORMS GRID -->
+  <section>
+    <div class="section-title">Source Platforms</div>
+    <div class="platforms-grid">
+      {{PLATFORMS_BLOCK}}
+      <!-- Repeat per discovered platform:
+      <div class="platform-card">
+        <div class="platform-head">
+          <div class="platform-icon">{{ICON}}</div>
+          <div>
+            <div class="platform-name">{{PLATFORM_NAME}}</div>
+            <div class="platform-version">v{{VERSION}}</div>
+          </div>
+        </div>
+        <div class="platform-attrs">
+          <div><span class="k">Objects</span><span class="v">{{OBJECTS}}</span></div>
+          <div><span class="k">Volume</span><span class="v">{{VOLUME}}</span></div>
+          <div><span class="k">Owners</span><span class="v">{{OWNERS}}</span></div>
+          <div><span class="k">Last Run</span><span class="v">{{LAST_RUN}}</span></div>
+        </div>
+        <span class="risk-tag risk-{{RISK_LEVEL}}">{{RISK_LEVEL}} Risk</span>
+      </div>
+      -->
+    </div>
+  </section>
+
+  <!-- 4. DATA LINEAGE FLOW -->
+  <section>
+    <div class="section-title">Data Lineage Flow</div>
+    <div class="lineage">
+      {{LINEAGE_BLOCK}}
+      <!-- Repeat node + arrow:
+      <div class="lineage-node">
+        <div class="name">{{SYSTEM_NAME}}</div>
+        <div class="tech">{{TECH}}</div>
+      </div>
+      <div class="lineage-arrow"><span class="label">{{TOOL_LABEL}}</span></div>
+      -->
+    </div>
+  </section>
+
+  <!-- 5. CRITICAL OBJECTS TABLE -->
+  <section>
+    <div class="section-title">Critical Objects (Top by Complexity)</div>
+    <table class="objects-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Name</th><th>Type</th><th>Platform</th><th>Deps</th><th>Complexity</th><th>Strategy</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{CRITICAL_OBJECTS_BLOCK}}
+        <!-- Repeat per object:
+        <tr>
+          <td class="obj-num">01</td>
+          <td>{{NAME}}</td>
+          <td><span class="type-tag type-{{TYPE}}">{{TYPE}}</span></td>
+          <td>{{PLATFORM}}</td>
+          <td>{{DEPS_COUNT}}</td>
+          <td><span class="complexity-bar"><span style="width: {{COMPLEXITY_PCT}};"></span></span>{{COMPLEXITY_LABEL}}</td>
+          <td><span class="strategy-badge strategy-{{STRATEGY}}">{{STRATEGY}}</span></td>
+        </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6. GAPS & RISKS GRID -->
+  <section>
+    <div class="section-title">Gaps &amp; Risks</div>
+    <div class="gaps-grid">
+      {{GAPS_RISKS_BLOCK}}
+      <!-- Repeat per gap:
+      <div class="gap-card impact-{{IMPACT}}">
+        <div class="gap-impact">{{IMPACT}} impact</div>
+        <div class="gap-title">{{TITLE}}</div>
+        <div class="gap-desc">{{DESCRIPTION}}</div>
+      </div>
+      -->
+    </div>
+  </section>
+
+  <!-- 7. FOOTER -->
+  <footer>
+    <div>Avanade · DMF Fabric Agents · InventoryScout</div>
+    <div>AS-IS Assessment · {{SCAN_DATE}}</div>
+  </footer>
+
+</body>
+</html>

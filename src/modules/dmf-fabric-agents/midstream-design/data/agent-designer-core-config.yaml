@@ -1,0 +1,132 @@
+# AgentDesigner Configuration
+
+# Agent: AgentDesigner (Nova)
+# Phase: MIDSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "agent-designer"
+  name: "Nova"
+  title: "AgentDesigner"
+  version: "1.0"
+  phase: "MIDSTREAM"
+  icon: "🧠"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/agents"
+  formats:
+    - markdown
+    - yaml
+    - mermaid
+
+# Artifact Definitions
+artifacts:
+  agent-blueprint:
+    name: "Agent Blueprint"
+    filename: "agent-blueprint.md"
+    required_for_gate: 2
+    required_sections:
+      - "Agent Overview"
+      - "Agent Definitions"
+      - "Responsibilities"
+      - "Capabilities"
+      - "Activation"
+    quality_criteria:
+      - "All agents defined"
+      - "Responsibilities clear"
+      - "Capabilities documented"
+
+  agent-contracts:
+    name: "Agent Contracts"
+    filename: "agent-contracts.md"
+    required_for_gate: 2
+    required_sections:
+      - "Contract Overview"
+      - "Input Contracts"
+      - "Output Contracts"
+      - "Handoff Protocols"
+      - "Error Handling"
+    quality_criteria:
+      - "All I/O defined"
+      - "Dependencies mapped"
+      - "Error handling specified"
+
+  orchestration-flow:
+    name: "Orchestration Flow"
+    filename: "orchestration-flow.md"
+    required_for_gate: 2
+    required_sections:
+      - "Flow Overview"
+      - "Execution Sequence"
+      - "Gates"
+      - "Decision Points"
+      - "Escalation Paths"
+    quality_criteria:
+      - "Complete flow documented"
+      - "Gates defined"
+      - "Human-in-loop specified"
+
+# Dependencies
+dependencies:
+  upstream:
+    - agent: "data-strategist"
+      artifacts: ["problem-statement.md"]
+    - agent: "business-analyst"
+      artifacts: ["requirements.md"]
+    - agent: "data-architect"
+      artifacts: ["architecture.md"]
+  downstream:
+    - agent: "orchestrator"
+      artifacts: ["agent-blueprint.md", "orchestration-flow.md"]
+    - agent: "data-engineer-exec"
+      artifacts: ["agent-contracts.md"]
+
+# Commands
+commands:
+  - name: "*help"
+    description: "Show available commands"
+    
+  - name: "*status"
+    alias: "*WS"
+    description: "Show progress on artifacts"
+    
+  - name: "*agent-blueprint"
+    alias: "*AD"
+    description: "Create agent blueprint"
+    task: "create-agent-blueprint"
+    output: "agent-blueprint.md"
+    
+  - name: "*agent-contracts"
+    alias: "*AC"
+    description: "Define contracts between agents"
+    task: "create-agent-contracts"
+    output: "agent-contracts.md"
+    
+  - name: "*guardrails"
+    description: "Design guardrails and gates"
+    task: "design-guardrails"
+    
+  - name: "*orchestration"
+    description: "Design orchestration flow"
+    task: "create-orchestration-flow"
+    output: "orchestration-flow.md"
+    
+  - name: "*autonomy-matrix"
+    description: "Define autonomy levels matrix"
+    task: "create-autonomy-matrix"
+    
+  - name: "*dismiss"
+    alias: "*DA"
+    description: "End session"
+
+# Checklist
+checklists:
+  - "agent-designer-checklist.md"
+
+# Templates
+templates:
+  - "agent-blueprint-tmpl.md"
+  - "agent-contract-tmpl.yaml"
+  - "orchestration-flow-tmpl.md"

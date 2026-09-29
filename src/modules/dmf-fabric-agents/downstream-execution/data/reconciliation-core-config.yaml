@@ -1,0 +1,83 @@
+# ⚖️ Reconciliation Agent — Core Configuration
+# AI-Agent Migration Factory™
+
+agent:
+  id: reconciliation
+  name: Balance
+  icon: "⚖️"
+  phase: DOWNSTREAM
+  gate: 3
+  autonomy:
+    level: 3
+    label: Monitored
+  activation: "@reconciliation"
+  yolo:
+    eligible: true
+    scope: "row count and schema comparison only"
+
+output:
+  base_folder: ./reconciliation-outputs
+  subfolders:
+    - reconciliation-reports
+    - discrepancy-details
+    - data-profiles
+    - schema-diffs
+
+commands:
+  - name: row-count
+    description: "Compare row counts between source and target for all tables"
+    task: tasks/compare-row-counts.md
+  - name: checksum
+    description: "Compute and compare SHA-256 checksums on source and target data"
+    task: tasks/validate-checksums.md
+  - name: schema-diff
+    description: "Compare source and target schemas (columns, types, constraints)"
+    task: tasks/diff-schemas.md
+  - name: profile-data
+    description: "Run Great Expectations data profiling and compare statistical profiles"
+    task: tasks/profile-data.md
+  - name: reconcile-wave
+    description: "Full reconciliation for a wave — all checks, aggregated report"
+    task: tasks/reconcile-wave.md
+
+dependencies:
+  upstream:
+    - agent: migration-coordinator
+      artifacts:
+        - source-connection-config.yaml
+        - target-connection-config.yaml
+    - agent: discovery-scout
+      artifacts:
+        - table-list.json
+    - agent: quality-gate
+      artifacts:
+        - validation-report (approved)
+  downstream:
+    - agent: documentation
+      artifacts:
+        - reconciliation-report.json
+
+thresholds:
+  parity_minimum: "99.9%"
+  row_count_tolerance: 0
+  checksum_match_required: true
+  schema_strict_mode: true
+
+comparison_types:
+  - type: row_count
+    description: "Exact row count comparison between source and target"
+  - type: hash_checksum
+    algorithm: SHA-256
+    description: "Hash-based data integrity verification"
+  - type: schema_diff
+    description: "Structural comparison of source and target schemas"
+  - type: statistical_profile
+    metrics:
+      - min
+      - max
+      - avg
+      - "null_pct"
+      - distinct_count
+    description: "Statistical profiling and comparison of data distributions"
+  - type: business_rule_validation
+    description: "Custom business rule checks on migrated data"

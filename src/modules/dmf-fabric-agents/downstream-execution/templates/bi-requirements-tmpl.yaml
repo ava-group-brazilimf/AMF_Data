@@ -1,0 +1,218 @@
+---
+template: bi-requirements-tmpl
+version: 1.0
+description: Template for documenting BI solution requirements
+---
+
+# BI Requirements Document: {PROJECT_NAME}
+
+## Document Control
+
+| Property | Value |
+|----------|-------|
+| Project Name | {PROJECT_NAME} |
+| Version | 1.0 |
+| Author | InsightForge Agent |
+| Date | {Date} |
+| Status | Draft / In Review / Approved |
+
+---
+
+## 1. Executive Summary
+
+### Project Overview
+{Brief description of the BI initiative and expected outcomes}
+
+### Business Value
+- {Value proposition 1}
+- {Value proposition 2}
+- {Value proposition 3}
+
+### Success Metrics
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| User Adoption | 80% | Monthly active users |
+| Report Generation Time | -70% | Compared to current |
+| Decision Speed | +50% | Time to insight |
+
+---
+
+## 2. Stakeholders
+
+### Project Team
+| Role | Name | Department | Responsibility |
+|------|------|------------|----------------|
+| Executive Sponsor | | | Final approval |
+| Business Owner | | | Requirements sign-off |
+| Technical Lead | | | Architecture |
+| Power BI Developer | | | Implementation |
+
+### Key Users
+| User Group | Count | Access Type | Frequency |
+|------------|-------|-------------|-----------|
+| Executives | 5 | Viewer | Weekly |
+| Managers | 25 | Viewer | Daily |
+| Analysts | 10 | Builder | Daily |
+
+---
+
+## 3. User Personas
+
+### Persona 1: {ROLE_NAME}
+
+**Profile:**
+```yaml
+name: "{Name}"
+title: "{Job Title}"
+department: "{Department}"
+technical_level: Low / Medium / High
+primary_device: Desktop / Mobile / Both
+```
+
+**Goals:**
+- {Goal 1}
+- {Goal 2}
+
+**Key Questions:**
+1. {Question they need answered}
+2. {Question they need answered}
+
+**Metrics Needed:**
+- {Metric 1}
+- {Metric 2}
+
+**Pain Points with Current Process:**
+- {Pain point 1}
+- {Pain point 2}
+
+---
+
+## 4. Functional Requirements
+
+### Dashboard Requirements
+
+| ID | Requirement | Priority | Persona | Acceptance Criteria |
+|----|-------------|----------|---------|-------------------|
+| FR-001 | Sales overview dashboard showing revenue, units, and margin | Must Have | All | All KPIs visible in <2 sec |
+| FR-002 | Ability to filter by date range | Must Have | All | Date slicer functional |
+| FR-003 | Drill-down from region to store | Should Have | Manager | Drill path works |
+| FR-004 | Export to PDF | Could Have | Executive | Export button available |
+
+### Report Requirements
+
+| ID | Requirement | Priority | Format | Frequency |
+|----|-------------|----------|--------|-----------|
+| RR-001 | Monthly sales summary | Must Have | PDF | Monthly |
+| RR-002 | Customer detail report | Should Have | Excel | On-demand |
+
+### Data Requirements
+
+| ID | Requirement | Priority | Source | Notes |
+|----|-------------|----------|--------|-------|
+| DR-001 | Sales transactions last 3 years | Must Have | ERP | Historical analysis |
+| DR-002 | Customer master data | Must Have | CRM | Segmentation |
+| DR-003 | Product hierarchy | Must Have | MDM | Drill-down |
+| DR-004 | Budget data | Should Have | Finance | Comparison |
+
+---
+
+## 5. Non-Functional Requirements
+
+### Performance
+| Requirement | Target |
+|-------------|--------|
+| Dashboard Load Time | < 5 seconds |
+| Report Generation | < 30 seconds |
+| Data Refresh Duration | < 1 hour |
+| Concurrent Users | 100 |
+
+### Availability
+| Requirement | Target |
+|-------------|--------|
+| Uptime | 99.5% |
+| Maintenance Window | Sunday 2-6 AM |
+
+### Security
+| Requirement | Details |
+|-------------|---------|
+| Authentication | Azure AD SSO |
+| Authorization | Row-Level Security |
+| Data Classification | Internal/Confidential |
+| Audit Requirements | Access logging |
+
+### Compliance
+- [ ] GDPR compliant (PII handling)
+- [ ] Data retention policy aligned
+- [ ] Audit trail requirements met
+
+---
+
+## 6. Data Sources
+
+### Source Systems
+
+| Source | Type | Owner | Refresh | Volume |
+|--------|------|-------|---------|--------|
+| {Source 1} | SQL Server | {Team} | Daily | 1M rows |
+| {Source 2} | REST API | {Team} | Hourly | 10K rows |
+| {Source 3} | Excel | {Team} | Manual | 1K rows |
+
+### Data Quality Assessment
+
+| Source | Quality | Issues | Mitigation |
+|--------|---------|--------|------------|
+| {Source 1} | High | None | N/A |
+| {Source 2} | Medium | Missing values | Default handling |
+
+---
+
+## 7. Technical Constraints
+
+### Environment
+- Power BI Service: {Capacity type}
+- Gateway Required: Yes / No
+- Workspace: {Name}
+
+### Integration Points
+- {System 1} - {Integration type}
+- {System 2} - {Integration type}
+
+### Limitations
+- {Known limitation 1}
+- {Known limitation 2}
+
+---
+
+## 8. Timeline & Milestones
+
+| Milestone | Date | Deliverable |
+|-----------|------|-------------|
+| Requirements Sign-off | {Date} | This document |
+| Data Model Complete | {Date} | Semantic model |
+| Dashboard MVP | {Date} | Core dashboard |
+| UAT Complete | {Date} | Test sign-off |
+| Go-Live | {Date} | Production deployment |
+
+---
+
+## 9. Risks & Assumptions
+
+### Assumptions
+1. {Assumption 1}
+2. {Assumption 2}
+
+### Risks
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| Data quality issues | Medium | High | Data profiling |
+| User adoption | Low | Medium | Training plan |
+
+---
+
+## 10. Sign-Off
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Business Owner | | | |
+| Technical Lead | | | |
+| Executive Sponsor | | | |

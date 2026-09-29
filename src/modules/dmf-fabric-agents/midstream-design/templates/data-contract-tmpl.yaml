@@ -1,0 +1,159 @@
+# Data Contract Template
+# Use this template for defining input and output contracts
+
+---
+# INPUT CONTRACT TEMPLATE
+input_contract:
+  metadata:
+    name: "{source_system}_to_{target_layer}"
+    version: "1.0.0"
+    created_date: "{YYYY-MM-DD}"
+    owner: "{team_name}"
+    contact: "{email}"
+    
+  source:
+    system: "{source_system_name}"
+    type: "file|api|database|stream"
+    location: "{path_or_endpoint}"
+    format: "csv|json|parquet|avro|delta"
+    encoding: "UTF-8"
+    delimiter: ","  # for CSV
+    
+  schedule:
+    frequency: "daily|hourly|real-time"
+    expected_time: "06:00 UTC"
+    max_delay: "2 hours"
+    
+  schema:
+    - name: "{column_name}"
+      type: "string|int|bigint|decimal|date|timestamp|boolean"
+      precision: 18  # for decimal
+      scale: 2       # for decimal
+      nullable: true|false
+      description: "{business_description}"
+      example: "{sample_value}"
+      validation:
+        - rule: "not_null"
+          message: "Column cannot be null"
+        - rule: "unique"
+          message: "Values must be unique"
+        - rule: "range"
+          min: 0
+          max: 1000000
+        - rule: "regex"
+          pattern: "^[A-Z]{2}[0-9]{4}$"
+        - rule: "enum"
+          values: ["A", "B", "C"]
+          
+  quality:
+    completeness:
+      threshold: 99%
+      critical_columns: ["id", "date"]
+    validity:
+      threshold: 99%
+    uniqueness:
+      key_columns: ["id"]
+    freshness:
+      max_age: "24 hours"
+      
+  volume:
+    expected_rows:
+      min: 1000
+      max: 1000000
+      typical: 50000
+    expected_size: "100 MB"
+    
+  dependencies:
+    upstream:
+      - system: "{upstream_system}"
+        must_complete: true
+
+---
+# OUTPUT CONTRACT TEMPLATE
+output_contract:
+  metadata:
+    name: "{source_layer}_to_{consumer}"
+    version: "1.0.0"
+    created_date: "{YYYY-MM-DD}"
+    owner: "{data_team}"
+    contact: "{email}"
+    
+  target:
+    system: "{target_system}"
+    type: "table|view|api|file"
+    location: "{schema.table_name}"
+    format: "delta|parquet|json"
+    
+  schema:
+    - name: "{column_name}"
+      type: "string|int|bigint|decimal|date|timestamp|boolean"
+      nullable: true|false
+      description: "{business_description}"
+      pii: false
+      classification: "public|internal|confidential|restricted"
+      
+  sla:
+    availability:
+      target: 99.9%
+      measurement_window: "monthly"
+    freshness:
+      target: "Daily by 06:00 UTC"
+      max_delay: "2 hours"
+    latency:
+      p50: "5 seconds"
+      p95: "30 seconds"
+      p99: "60 seconds"
+      
+  consumers:
+    - name: "{consumer_name}"
+      type: "bi_tool|ml_model|report|api"
+      contact: "{email}"
+      access_level: "read"
+      
+  breaking_changes:
+    notification_period: "30 days"
+    communication_channel: "email|slack"
+    approval_required: true
+    
+  deprecation:
+    notice_period: "90 days"
+    migration_support: true
+
+---
+# SCHEMA EVOLUTION POLICY
+evolution_policy:
+  non_breaking_changes:
+    - type: "add_nullable_column"
+      notification: "informational"
+      
+    - type: "add_column_with_default"
+      notification: "informational"
+      
+    - type: "widen_type"
+      example: "INT to BIGINT"
+      notification: "informational"
+      
+  breaking_changes:
+    - type: "remove_column"
+      notification_period: "30 days"
+      approval_required: true
+      
+    - type: "change_type"
+      notification_period: "30 days"
+      approval_required: true
+      
+    - type: "rename_column"
+      notification_period: "30 days"
+      approval_required: true
+      
+    - type: "change_key"
+      notification_period: "60 days"
+      approval_required: true
+      
+  versioning:
+    strategy: "semantic"
+    format: "major.minor.patch"
+    rules:
+      - "major: breaking changes"
+      - "minor: new features, non-breaking"
+      - "patch: bug fixes"

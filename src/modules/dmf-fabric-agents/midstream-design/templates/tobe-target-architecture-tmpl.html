@@ -1,0 +1,574 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  TO-BE Target Architecture — Reference Template
+  Owner: data-architect (Winston 🏗️) — DMF Fabric Agents
+  Phase: MIDSTREAM | Gate: 2
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Visual reference template the LLM must read BEFORE generating the
+  project HTML output. Reproduce structure, fonts, CSS variables,
+  gradient header border, medallion flow, hover patterns and section
+  ordering exactly.
+
+  PLACEHOLDERS (replace with project decisions — never leave {{...}})
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-2-2026-05-01)
+    {{AGENTS}}                  Comma-separated participating agents
+    {{TARGET_PLATFORM}}         Microsoft Fabric / Databricks / Snowflake / etc
+    {{PATTERN}}                 Lakehouse / Data Warehouse / Hybrid
+    {{GATE_STATUS}}             PASSED / IN REVIEW / BLOCKED
+    {{GATE_DATE}}               YYYY-MM-DD
+    {{PRINCIPLES_BLOCK}}        Repeated principle-card markup (4 cards)
+    {{MEDALLION_BLOCK}}         Source → Bronze → Silver → Gold → Serving
+    {{TECH_STACK_BLOCK}}        Repeated tech-card markup
+    {{SLA_ROWS_BLOCK}}          Repeated <tr> rows
+    {{ADR_BLOCK}}               Repeated ADR-card markup (6 cards)
+
+  FONTS (Google Fonts CDN; include local fallback)
+    Playfair Display   — headings (elegant serif)
+    JetBrains Mono     — labels, tags, metadata, table values
+    Plus Jakarta Sans  — body copy
+
+  COLOR SCHEME (light theme — declare via :root CSS variables)
+    --bg #F7F8FA         --surface #FFFFFF
+    --fabric #0078D4     (primary / Microsoft Fabric blue)
+    --bronze #C0782A     --silver #5B7FA6     --gold #A8860C
+    Each layer color has *-light bg and *-mid border variant.
+    --green #1A7A4A      (TO-BE target / improvement)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TO BE — {{PROJECT_NAME}} Target Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES ─────────────────────────────────────── */
+    :root {
+      --bg: #F7F8FA;
+      --surface: #FFFFFF;
+      --surface2: #F2F4F7;
+      --border: rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.12);
+      --text: #0F1117;
+      --text2: #4A5168;
+      --text3: #8892A4;
+      --fabric: #0078D4;       --fabric-light: #EBF3FC;   --fabric-mid: #B3D4F0;
+      --bronze: #C0782A;       --bronze-light: #FDF3E7;   --bronze-mid: #F0C898;
+      --silver: #5B7FA6;       --silver-light: #EDF2F8;   --silver-mid: #B8CFDF;
+      --gold: #A8860C;         --gold-light: #FDF7E3;     --gold-mid: #E8D080;
+      --green: #1A7A4A;        --green-light: #EDFBF3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER (white card with gradient top border) ──────── */
+    .header {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 44px;
+      margin-bottom: 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--fabric) 0%, var(--silver) 40%, var(--gold) 70%, #2ECC71 100%);
+    }
+    .header-left { max-width: 720px; }
+    .badge-tobe {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--fabric-light);
+      color: var(--fabric);
+      border: 1px solid var(--fabric-mid);
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48px;
+      font-weight: 600;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+    .gate-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── 2. ARCHITECTURE PRINCIPLES (4-col grid) ───────────── */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .principle-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+    .principle-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .principle-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      color: var(--text3);
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    .principle-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .principle-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    /* ─── 3. MEDALLION ARCHITECTURE ─────────────────────────── */
+    .medallion-flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .layer-card {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--c, var(--fabric));
+      border-radius: 12px;
+      padding: 24px 20px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .layer-card[data-bg]   { background: var(--bg-c, var(--surface)); }
+    .layer-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+    .layer-bronze  { --c: var(--bronze); --bg-c: var(--bronze-light); }
+    .layer-silver  { --c: var(--silver); --bg-c: var(--silver-light); }
+    .layer-gold    { --c: var(--gold);   --bg-c: var(--gold-light); }
+    .layer-fabric  { --c: var(--fabric); --bg-c: var(--fabric-light); }
+    .layer-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--c, var(--fabric));
+      margin-bottom: 8px;
+    }
+    .layer-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .layer-desc {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 16px;
+    }
+    .layer-detail {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      padding: 4px 0;
+      border-top: 1px solid var(--border);
+    }
+    .layer-detail:first-of-type { border-top: 0; }
+    .layer-detail b { color: var(--text); font-weight: 500; }
+    .layer-badges { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .layer-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.04);
+      color: var(--c, var(--fabric));
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .chevron {
+      flex: 0 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text3);
+      opacity: 0.3;
+    }
+    .cross-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .cross-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      transition: all 0.2s;
+    }
+    .cross-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .cross-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .cross-desc { font-size: 13px; color: var(--text2); }
+
+    /* ─── 4. TECHNOLOGY STACK ───────────────────────────────── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .tech-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .tech-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .tech-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .tech-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--c, var(--fabric));
+    }
+    .tech-layer {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    .tech-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .tech-desc {
+      font-size: 13px;
+      color: var(--text2);
+    }
+    .tech-replaces {
+      display: block;
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text3);
+    }
+    .tech-replaces b { color: var(--text2); font-weight: 500; }
+
+    /* ─── 5. SLA TABLE ──────────────────────────────────────── */
+    .sla-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .sla-table th {
+      text-align: left;
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .sla-table td {
+      padding: 14px 18px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .sla-table tr:last-child td { border-bottom: 0; }
+    .sla-table tr:hover td { background: var(--surface2); }
+    .sla-target,
+    .sla-improvement {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+      font-weight: 500;
+    }
+    .sla-asis {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text3);
+    }
+
+    /* ─── 6. ADRs ───────────────────────────────────────────── */
+    .adr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .adr-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .adr-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .adr-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--text3);
+      margin-bottom: 6px;
+    }
+    .adr-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .adr-decision {
+      color: var(--fabric);
+      font-weight: 500;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .adr-rationale {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ──────────────────────────────────────────────
+       DATA ARCHITECT — TO-BE Target Architecture
+       Generated by: data-architect (Winston)
+       Project: {{PROJECT_NAME}}
+       Gate: 2 | Date: {{GATE_DATE}}
+       ────────────────────────────────────────────── -->
+
+  <!-- 1. HEADER (white card with gradient top border) -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-tobe">TO-BE Architecture</span>
+      <h1>{{PROJECT_NAME}}<br>Target Architecture</h1>
+      <p class="subtitle">End-state architecture designed by the DataArchitect for the {{TARGET_PLATFORM}} platform — pattern, layers, technology choices and SLAs.</p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">Trace ID&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">Agents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{AGENTS}}</span></div>
+      <div><span class="meta-key">Target&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{TARGET_PLATFORM}}</span></div>
+      <div><span class="meta-key">Pattern&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta-val">{{PATTERN}}</span></div>
+      <div><span class="meta-key">Gate&nbsp;Status</span><span class="meta-val"><span class="gate-pill">{{GATE_STATUS}}</span></span></div>
+      <div><span class="meta-key">Gate&nbsp;Date&nbsp;&nbsp;</span><span class="meta-val">{{GATE_DATE}}</span></div>
+    </div>
+  </header>
+
+  <!-- 2. ARCHITECTURE PRINCIPLES -->
+  <section>
+    <div class="section-title">Architecture Principles</div>
+    <div class="principles-grid">
+      {{PRINCIPLES_BLOCK}}
+      <!-- Repeat 4 cards:
+      <div class="principle-card">
+        <div class="principle-num">01</div>
+        <div class="principle-title">{{TITLE}}</div>
+        <div class="principle-desc">{{DESCRIPTION}}</div>
+      </div>
+      -->
+    </div>
+  </section>
+
+  <!-- 3. MEDALLION ARCHITECTURE -->
+  <section>
+    <div class="section-title">Medallion Architecture</div>
+    <div class="medallion-flow">
+      {{MEDALLION_BLOCK}}
+      <!-- Repeat layer + chevron between each:
+      <div class="layer-card layer-bronze" data-bg>
+        <div class="layer-label">Bronze</div>
+        <div class="layer-name">{{LAYER_NAME}}</div>
+        <div class="layer-desc">{{DESCRIPTION}}</div>
+        <div class="layer-detail"><b>Format:</b> {{FORMAT}}</div>
+        <div class="layer-detail"><b>Naming:</b> {{NAMING}}</div>
+        <div class="layer-detail"><b>Retention:</b> {{RETENTION}}</div>
+        <div class="layer-detail"><b>Access:</b> {{ACCESS}}</div>
+        <div class="layer-badges"><span class="layer-badge">delta</span><span class="layer-badge">cdc</span></div>
+      </div>
+      <div class="chevron"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></div>
+      -->
+    </div>
+
+    <div class="cross-grid">
+      <div class="cross-card">
+        <div class="cross-title">Governance</div>
+        <div class="cross-desc">{{GOVERNANCE_DESC}}</div>
+      </div>
+      <div class="cross-card">
+        <div class="cross-title">Observability</div>
+        <div class="cross-desc">{{OBSERVABILITY_DESC}}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. TECHNOLOGY STACK -->
+  <section>
+    <div class="section-title">Technology Stack</div>
+    <div class="tech-grid">
+      {{TECH_STACK_BLOCK}}
+      <!-- Repeat per tech:
+      <div class="tech-card">
+        <div class="tech-head">
+          <span class="tech-dot" style="--c: var(--bronze);"></span>
+          <span class="tech-layer">{{LAYER}}</span>
+        </div>
+        <div class="tech-name">{{TECH_NAME}}</div>
+        <div class="tech-desc">{{DESCRIPTION}}</div>
+        <span class="tech-replaces"><b>replaces</b> {{AS_IS_TECH}}</span>
+      </div>
+      -->
+    </div>
+  </section>
+
+  <!-- 5. SLA TABLE -->
+  <section>
+    <div class="section-title">SLA Targets</div>
+    <table class="sla-table">
+      <thead>
+        <tr>
+          <th>Layer</th><th>Metric</th><th>Target (TO-BE)</th><th>Current (AS-IS)</th><th>Improvement</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{SLA_ROWS_BLOCK}}
+        <!-- Repeat per SLA:
+        <tr>
+          <td>{{LAYER}}</td>
+          <td>{{METRIC}}</td>
+          <td class="sla-target">{{TARGET}}</td>
+          <td class="sla-asis">{{CURRENT}}</td>
+          <td class="sla-improvement">+{{DELTA}}</td>
+        </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6. ADRs -->
+  <section>
+    <div class="section-title">Architecture Decisions (ADRs)</div>
+    <div class="adr-grid">
+      {{ADR_BLOCK}}
+      <!-- Repeat 6 cards:
+      <div class="adr-card">
+        <div class="adr-num">ADR-001</div>
+        <div class="adr-title">{{TITLE}}</div>
+        <div class="adr-decision">{{DECISION_STATEMENT}}</div>
+        <div class="adr-rationale">{{RATIONALE}}</div>
+      </div>
+      -->
+    </div>
+  </section>
+
+  <!-- 7. FOOTER -->
+  <footer>
+    <div>Avanade · DMF Fabric Agents · DataArchitect</div>
+    <div>TO-BE Architecture · Gate 2 · {{GATE_DATE}}</div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+# Agent Class Mapping
+# B-002 — Governance and Control Plane
+# Version: 1.0.0   Status: approved
+#
+# Each agent is assigned to exactly one policy class defined in
+# governance-policy-schema.yaml.
+# discovery_owner: primary agent responsible for source system inventory.
+#   Only one primary per deployment; fallback is explicitly listed.
+#
+# B-017: Every wave execution MUST declare discovery_owner_primary and
+#         discovery_owner_fallback (enforced by validate_wave_config).
+
+schema_version: "1.0.0"
+policy_schema_ref: "governance-policy-schema.yaml"
+
+# B-017 — Discovery ownership (workspace-level default; override per wave)
+discovery_ownership:
+  primary: "discovery-scout"
+  fallback: "inventory-scout"
+  rule: "primary executes discovery by default; fallback activates only if primary is unavailable or explicitly overridden"
+
+agents:
+
+  # ------------------------------------------------------------------
+  # COORDINATION class
+  # ------------------------------------------------------------------
+  - id: master-agent
+    name: "Master Agent"
+    class: coordination
+    phase: all
+    notes: "Top-level coordinator; no direct data mutations."
+
+  - id: orchestrator
+    name: "Orchestrator"
+    class: coordination
+    phase: all
+    notes: "Pipeline orchestrator; gate pass/fail decisions require human approval."
+
+  - id: migration-coordinator
+    name: "Migration Coordinator (Orion)"
+    class: coordination
+    phase: core
+    notes: "Wave scheduling and dependency resolution."
+
+  # ------------------------------------------------------------------
+  # DESIGN class
+  # ------------------------------------------------------------------
+  - id: data-strategist
+    name: "DataStrategist"
+    class: design
+    phase: upstream
+    notes: "Problem definition, KPI, success criteria — read/produce artifacts only."
+
+  - id: business-analyst
+    name: "BusinessAnalyst"
+    class: design
+    phase: upstream
+    notes: "STTM, DQ rules, business mapping — artifact production."
+
+  - id: data-architect
+    name: "DataArchitect (Winston)"
+    class: design
+    phase: midstream
+    notes: "Architecture and data model artifacts."
+
+  - id: data-modeler
+    name: "DataModeler (Sofia)"
+    class: design
+    phase: midstream
+    notes: "Logical model, granularity, metadata."
+
+  - id: data-steward
+    name: "DataSteward (Gaia)"
+    class: design
+    phase: midstream
+    notes: "DQ rules, monitoring spec, compliance artifacts."
+
+  - id: discovery-scout
+    name: "Discovery Scout (Scout)"
+    class: design
+    phase: upstream
+    is_discovery_primary: true
+    notes: "Primary discovery agent; inventory and dependency mapping."
+
+  - id: inventory-scout
+    name: "Inventory Scout"
+    class: design
+    phase: upstream
+    is_discovery_fallback: true
+    notes: "Fallback discovery agent; activated when discovery-scout is unavailable."
+
+  - id: logic-extractor
+    name: "Logic Extractor (Logan)"
+    class: design
+    phase: upstream
+    notes: "Business logic extraction from legacy code."
+
+  - id: documentation
+    name: "Documentation (Scribe)"
+    class: design
+    phase: downstream
+    notes: "Report, lineage, runbook, changelog generation — read/write docs only."
+
+  - id: bi-semantic
+    name: "BI Semantic (Bianca)"
+    class: design
+    phase: downstream
+    notes: "Semantic models, DAX, dashboards."
+
+  # ------------------------------------------------------------------
+  # EXECUTION class (highest governance level)
+  # ------------------------------------------------------------------
+  - id: downstream-executor
+    name: "Downstream Executor (Diego)"
+    class: execution
+    phase: downstream
+    notes: "DDL/ETL execution, wave runs, rollback. All mutations require review."
+
+  - id: self-healing
+    name: "Self-Healing (Phoenix)"
+    class: execution
+    phase: downstream
+    notes: "Automated fixes; requires human approval before applying to production."
+
+  - id: reconciliation
+    name: "Reconciliation (Balance)"
+    class: execution
+    phase: downstream
+    notes: "Data parity writes and checksum validation."
+
+  # ------------------------------------------------------------------
+  # CONTROL class
+  # ------------------------------------------------------------------
+  - id: quality-gate
+    name: "Quality Gate (Vera)"
+    class: control
+    phase: midstream
+    notes: "Code validation, semantic equivalence, quality scoring."
+
+  - id: security-compliance
+    name: "Security & Compliance (Shield)"
+    class: control
+    phase: midstream
+    notes: "PII detection, masking, regulatory compliance."
+
+  - id: agent-designer
+    name: "Agent Designer"
+    class: control
+    phase: all
+    notes: "Agent lifecycle and metadata governance."

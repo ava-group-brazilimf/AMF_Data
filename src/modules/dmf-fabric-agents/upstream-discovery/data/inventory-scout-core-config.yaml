@@ -1,0 +1,187 @@
+# Avanade™ Core Configuration - InventoryScout Agent
+# Version: 1.0
+# Last Updated: 2026-02-12
+
+project:
+  name: "inventory-scout-agent"
+  version: "1.0.0"
+  phase: "UPSTREAM"
+  gate: "Gate 1"
+  description: "Technical inventory and dependency mapping for legacy data platforms"
+
+agent:
+  id: "inventory-scout"
+  name: "Scout"
+  icon: "🔍"
+  persona: "Technical Archaeologist & Knowledge Graph Specialist"
+  role: "Legacy Repository Analysis & Asset Discovery"
+  
+outputs:
+  base_path: "./inventory-outputs"
+
+  formats:
+    - json
+    - markdown
+    - html
+
+  required_artifacts:
+    - name: "inventory-map.md"
+      description: "Complete repository structure and statistics"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      
+    - name: "dependency-graph.json"
+      description: "Structured dependency graph (nodes + edges)"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      
+    - name: "asset-catalog.md"
+      description: "Catalog of all data assets"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      
+    - name: "tech-stack-detected.md"
+      description: "Technologies and versions identified"
+      priority: "RECOMMENDED"
+      gate: "Gate 1"
+      
+    - name: "lineage-map.md"
+      description: "Data lineage and transformation chains"
+      priority: "RECOMMENDED"
+      gate: "Gate 1"
+      
+    - name: "knowledge-graph.json"
+      description: "Export for Neo4j/Gephi (GraphML/JSON)"
+      priority: "OPTIONAL"
+      gate: "Gate 1"
+
+    - name: "inventory-enriched.json"
+      description: "Enriched inventory with classifications, waves and volumes (canonical data source)"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      generated_by: "generate-inventory"
+      path: "outputs/upstream/inventory/"
+
+    - name: "inventory-report.md"
+      description: "Human-readable consolidated inventory report"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      generated_by: "generate-inventory"
+      path: "outputs/upstream/inventory/"
+      template: "inventory-tmpl.md"
+
+    - name: "asis-platform-landscape.html"
+      description: "Executive HTML report for Gate 1 stakeholder review"
+      priority: "MANDATORY"
+      gate: "Gate 1"
+      generated_by: "generate-inventory"
+      path: "outputs/upstream/"
+      template: "asis-platform-landscape-tmpl.html"
+
+dependencies:
+  upstream_agents:
+    - id: "data-strategist"
+      name: "Alex"
+      reason: "Problem statement must exist before inventory"
+      
+  downstream_agents:
+    - id: "business-analyst"
+      name: "Mary"
+      receives: ["inventory-map.md", "asset-catalog.md"]
+      reason: "Uses inventory for STTM creation"
+      
+    - id: "data-architect"
+      name: "Winston"
+      receives: ["tech-stack-detected.md", "dependency-graph.json"]
+      reason: "Uses tech stack for target architecture"
+      
+    - id: "data-steward"
+      name: "Gaia"
+      receives: ["lineage-map.md", "asset-catalog.md"]
+      reason: "Uses lineage for governance planning"
+
+supported_technologies:
+  orchestration:
+    - "Azure Data Factory"
+    - "Databricks"
+    - "Apache Airflow"
+    - "SAP BODS"
+    - "Informatica PowerCenter"
+    - "SSIS"
+    - "dbt"
+    
+  file_types:
+    pipelines:
+      - ".json"  # ADF, configs
+      - ".py"    # Python scripts, Databricks
+      - ".sql"   # SQL scripts
+      - ".yaml"  # Airflow DAGs, configs
+      - ".xml"   # Legacy BODS, SSIS
+      - ".scala" # Spark jobs
+      - ".ipynb" # Notebooks
+      
+    configs:
+      - ".properties"
+      - ".config"
+      - ".ini"
+      - ".env"
+      - ".tf"    # Terraform
+      - ".tfvars"
+      
+  graph_formats:
+    - "JSON"
+    - "GraphML"
+    - "GEXF"
+    - "CSV"
+
+capabilities:
+  - name: "Repository Scanning"
+    commands: ["*scan-repo"]
+    
+  - name: "Configuration Analysis"
+    commands: ["*analyze-configs"]
+    
+  - name: "Dependency Mapping"
+    commands: ["*map-dependencies"]
+    
+  - name: "Technology Detection"
+    commands: ["*detect-tech-stack"]
+    
+  - name: "Lineage Building"
+    commands: ["*build-lineage"]
+    
+  - name: "Asset Cataloging"
+    commands: ["*catalog-assets"]
+    
+  - name: "Knowledge Graph Generation"
+    commands: ["*generate-knowledge-graph"]
+    
+  - name: "Inventory Export"
+    commands: ["*export-inventory"]
+
+security:
+  anonymize_credentials: true
+  redact_connection_strings: true
+  flag_hardcoded_secrets: true
+  use_vault_references: true
+
+best_practices:
+  - "Always run *scan-repo first"
+  - "Anonymize all credentials and secrets"
+  - "Parse files properly (not just regex)"
+  - "Generate knowledge graphs for complex dependencies"
+  - "Export to Neo4j/Gephi for visualization"
+  - "Handoff inventory-map.md to BusinessAnalyst"
+  - "Use AFTER *define-problem and BEFORE *create-sttm"
+
+limitations:
+  - "Static analysis only (no runtime behavior)"
+  - "Cannot validate connection strings"
+  - "No data profiling (use DataEngineerExec for that)"
+  - "Focus on technical structure, not business logic"
+
+metadata:
+  created: "2026-02-12"
+  author: "Avanade Method Team"
+  framework: "Avanade™ Core for Data Engineering"
+  license: "Internal Use Only"

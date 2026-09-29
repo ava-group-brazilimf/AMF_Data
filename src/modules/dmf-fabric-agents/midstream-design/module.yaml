@@ -1,0 +1,40 @@
+name: midstream-design
+display_name: "Design MIDSTREAM"
+version: "3.0.0"
+description: "Agentes de arquitetura, modelagem de dados, governança e geração de código"
+agents:
+  - id: data-architect
+    file: agents/data-architect/data-architect.md
+    skill: ava-dmf-data-pipeline
+  - id: data-modeler
+    file: agents/data-modeler/data-modeler.md
+    skill: ava-dmf-data-quality
+  - id: data-steward
+    file: agents/data-steward/data-steward.md
+    skill: ava-dmf-agent-governance
+  - id: agent-designer
+    file: agents/agent-designer/agent-designer.md
+    skill: ava-dmf-ai-agents-architect
+  - id: code-generator
+    file: agents/code-generator/code-generator.md
+    skill: ava-dmf-data-pipeline
+outputs:
+  base_path: "projects/{project_name}/outputs/midstream"
+  artifacts:
+    - architecture-spec.json
+    - architecture.md
+    - tobe-target-architecture.html
+    - data-model.json
+    - data-model.md
+    - data-model-er.html
+    - data-contracts.md
+    - decisions.md
+    - dq-rules.md
+    - governance.md
+    - monitoring-spec.md
+    - metrics-catalog.md
+    - orchestration-flow.md
+    - generated-code/*.py
+    - generated-code/*.sql
+    - generated-tests/*_test.py
+    - job-definition.yaml

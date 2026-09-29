@@ -1,0 +1,149 @@
+# Logic Extractor Agent Configuration
+# AI-Agent Migration Factory™
+
+project:
+  name: "AI-Agent Migration Factory"
+  code: "migration-factory"
+  version: "4.0.0"
+
+agent:
+  id: logic-extractor
+  name: Logan
+  title: "Business Logic Extraction & Semantic Analysis"
+  icon: "🧠"
+  version: "4.0"
+  phase: "UPSTREAM"
+  language: "pt-BR"
+  framework: "AI-Agent Migration Factory - Avanade-Enhanced Edition"
+
+output:
+  base_folder: "./logic-outputs"
+  subfolders:
+    - pseudocode
+    - digital-twin
+    - reports
+    - udf-analysis
+
+autonomy:
+  default_level: 2  # Supervised — agent proposes, human approves
+  yolo_eligible: false
+  escalation_required:
+    - low_confidence_extraction
+    - unrecognized_language_construct
+    - ambiguous_business_rule
+    - udf_decompilation_failure
+
+commands:
+  extract-logic:
+    description: "Parse source code and extract business logic"
+    task: "extract-logic"
+    output: "pseudocode/{pipeline_id}.json"
+  generate-pseudocode:
+    description: "Convert extracted logic to platform-agnostic pseudocode"
+    task: "generate-pseudocode"
+    output: "pseudocode/{pipeline_id}.json"
+  create-digital-twin:
+    description: "Create semantic blueprint mapping physical→semantic→target"
+    task: "create-digital-twin"
+    output: "digital-twin.json"
+  parse-udf:
+    description: "Decompile and document User Defined Functions"
+    task: "parse-udf"
+    output: "udf-analysis/{udf_name}.json"
+  confidence-report:
+    description: "Generate confidence scores per pipeline"
+    task: "generate-confidence-report"
+    output: "logic-extraction-report.md"
+
+dependencies:
+  upstream:
+    - agent: "discovery-scout"
+      artifacts: ["inventory.json", "dependency-graph.json"]
+  downstream:
+    - agent: "code-generator"
+      artifacts: ["pseudocode/*.json", "digital-twin.json"]
+    - agent: "migration-coordinator"
+      artifacts: ["logic-extraction-report.md"]
+
+supported_languages:
+  - name: "HiveQL"
+    parser: "hive-ast-parser"
+    confidence: "high"
+  - name: "PySpark"
+    parser: "python-ast + spark-analyzer"
+    confidence: "high"
+  - name: "SQL"
+    parser: "sqlglot + sqlparse"
+    confidence: "high"
+  - name: "Scala"
+    parser: "scala-ast-parser"
+    confidence: "medium"
+  - name: "Java"
+    parser: "java-ast-parser"
+    confidence: "medium"
+  - name: "Python"
+    parser: "python-ast"
+    confidence: "high"
+  - name: "Shell/Bash"
+    parser: "bash-parser + regex"
+    confidence: "low"
+  - name: "Informatica PowerCenter XML"
+    parser: "powercenter-xml-parser"
+    confidence: "medium"
+    notes: >
+      Confidence sobe para HIGH em Mappings sem SQL Override e sem Java Transformations.
+      Java Transformations e External Procedures requerem revisão manual e reduzem
+      confidence para LOW.
+    transformation_coverage:
+      high:   [Aggregator, Expression, Filter, Joiner, Lookup, Router, Sorter,
+               Union, UpdateStrategy, SequenceGenerator, Normalizer, Rank]
+      medium: [XMLParser, XMLGenerator, StoredProcedure]
+      low:    [JavaTransformation, ExternalProcedure, PowerExchange]
+  - name: "Synapse Pipeline JSON"
+    parser: "adf-json-parser"
+    confidence: "medium"
+    notes: >
+      Cobre pipeline/*.json e dataflow/*.json do export Git do workspace.
+      Confidence HIGH para Copy activities e Data Flows padrão;
+      LOW para WebActivity, custom activities e expressions ADF complexas
+      (@concat, @activity chains) que requerem revisão manual.
+    activity_coverage:
+      high:   [Copy, ExecuteDataFlow, SqlPoolStoredProcedure, Lookup,
+               SetVariable, ExecutePipeline, SynapseNotebook]
+      medium: [ForEach, IfCondition, Until, Filter, GetMetadata]
+      low:    [WebActivity, WebHook, Custom, AzureFunctionActivity]
+  - name: "T-SQL Synapse Dialect"
+    parser: "sqlglot + sqlparse (dialect=tsql)"
+    confidence: "high"
+    notes: >
+      Extensões específicas a capturar: CTAS, DISTRIBUTION hints,
+      CLUSTERED COLUMNSTORE INDEX, EXTERNAL TABLE, OPENROWSET,
+      PARTITION. Registrar cada hint no pseudocode — informam decisões
+      de particionamento/clustering no Databricks.
+
+llm_config:
+  primary:
+    model: "GPT-4-Turbo"
+    provider: "Azure OpenAI"
+    use_for: ["intent-extraction", "business-rule-identification", "pseudocode-generation"]
+    max_tokens: 8192
+    temperature: 0.1
+  secondary:
+    model: "Claude-3.5-Sonnet"
+    provider: "Anthropic"
+    use_for: ["code-analysis", "udf-decompilation", "confidence-scoring"]
+    max_tokens: 8192
+    temperature: 0.0
+  fallback:
+    model: "CodeLlama-70B"
+    provider: "Local/HuggingFace"
+    use_for: ["offline-extraction", "high-volume-batch"]
+    max_tokens: 4096
+    temperature: 0.0
+
+settings:
+  language: "pt-BR"
+  date_format: "YYYY-MM-DD"
+  confidence_threshold: 0.75
+  min_confidence_for_auto_approve: 0.90
+  max_retries_per_pipeline: 3

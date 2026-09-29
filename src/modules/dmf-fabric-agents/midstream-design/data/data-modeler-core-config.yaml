@@ -1,0 +1,134 @@
+# DataModeler Configuration
+
+# Agent: DataModeler (Sofia)
+# Phase: MIDSTREAM
+# Version: 1.0
+
+agent_settings:
+  id: "data-modeler"
+  name: "Sofia"
+  title: "DataModeler"
+  version: "1.0"
+  phase: "MIDSTREAM"
+  icon: "🧩"
+  language: "pt-BR"
+
+# Output Configuration
+outputs:
+  folder: "docs/model"
+  formats:
+    - markdown
+    - yaml
+    - mermaid
+
+# Artifact Definitions
+artifacts:
+  data-model:
+    name: "Data Model"
+    filename: "data-model.md"
+    required_for_gate: 2
+    required_sections:
+      - "Model Overview"
+      - "Entity Definitions"
+      - "Facts"
+      - "Dimensions"
+      - "Relationships"
+      - "Granularity"
+      - "SCD Types"
+    quality_criteria:
+      - "All entities clearly defined"
+      - "Granularity specified per table"
+      - "Relationships documented"
+      - "SCD types defined for dimensions"
+
+  data-contracts:
+    name: "Data Contracts"
+    filename: "data-contracts.md"
+    required_for_gate: 2
+    required_sections:
+      - "Input Contracts"
+      - "Output Contracts"
+      - "Schema Evolution"
+      - "Versioning Strategy"
+      - "SLAs"
+    quality_criteria:
+      - "All sources have contracts"
+      - "All consumers documented"
+      - "Evolution rules defined"
+
+  metrics-catalog:
+    name: "Metrics Catalog"
+    filename: "metrics-catalog.md"
+    required_for_gate: 2
+    required_sections:
+      - "Metrics Overview"
+      - "Business Metrics"
+      - "Formulas"
+      - "Aggregation Rules"
+      - "Owners"
+    quality_criteria:
+      - "All metrics documented"
+      - "Formulas clearly defined"
+      - "Owners assigned"
+
+# Dependencies
+dependencies:
+  upstream:
+    - agent: "data-strategist"
+      artifacts: ["problem-statement.md", "kpis.md"]
+    - agent: "business-analyst"
+      artifacts: ["sttm.md", "analytical-questions.md"]
+    - agent: "data-architect"
+      artifacts: ["architecture.md"]
+  downstream:
+    - agent: "data-engineer-exec"
+      artifacts: ["data-model.md", "data-contracts.md"]
+    - agent: "data-steward"
+      artifacts: ["data-model.md", "metrics-catalog.md"]
+
+# Commands
+commands:
+  - name: "*help"
+    description: "Show available commands"
+    
+  - name: "*status"
+    description: "Show Gate 2 progress"
+    
+  - name: "*data-model"
+    alias: "*DM"
+    description: "Create logical data model"
+    task: "create-data-model"
+    output: "data-model.md"
+    
+  - name: "*data-contracts"
+    alias: "*DC"
+    description: "Define data contracts"
+    task: "create-data-contracts"
+    output: "data-contracts.md"
+    
+  - name: "*granularity"
+    description: "Define table granularity"
+    task: "define-granularity"
+    
+  - name: "*metrics"
+    description: "Document metrics and KPIs"
+    task: "create-metrics-catalog"
+    output: "metrics-catalog.md"
+    
+  - name: "*metadata"
+    description: "Create metadata catalog"
+    task: "create-metadata"
+    
+  - name: "*validate"
+    description: "Validate model against requirements"
+    task: "validate-model"
+
+# Checklist
+checklists:
+  - "data-modeler-checklist.md"
+
+# Templates
+templates:
+  - "data-model-tmpl.md"
+  - "data-contract-tmpl.yaml"
+  - "metrics-catalog-tmpl.md"

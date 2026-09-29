@@ -1,0 +1,106 @@
+{
+  "_template_metadata": {
+    "name": "sttm-tmpl.json",
+    "owner_agent": "business-analyst",
+    "phase": "UPSTREAM",
+    "gate": 1,
+    "version": "1.0",
+    "purpose": "Canonical machine-readable Source-to-Target Mapping. This JSON is the SINGLE SOURCE OF TRUTH consumed by data-architect (Winston), data-modeler (Sofia), data-steward (Gaia) and code-generator (Coda). The .md and -visual.html outputs are derived from this JSON.",
+    "instructions_for_llm": [
+      "Replace EVERY {{...}} placeholder with project data. Do NOT leave placeholders in the final file.",
+      "Remove this _template_metadata block from the produced sttm.json.",
+      "All mappings[].id values must be unique (M-0001, M-0002, ...).",
+      "All transformation_rules[].id values must follow TR-NNN and be referenced by at least one mapping.",
+      "transformation_type ∈ { DIRECT, CAST, DERIVED, LOOKUP, AGG }.",
+      "status ∈ { MAPPED, UNRESOLVED, DEFERRED }.",
+      "pk_fk ∈ { PK, FK, '-' }.",
+      "Recompute kpis from arrays before persisting.",
+      "Every column listed under unresolved_mappings[] must also appear in mappings[] with status='UNRESOLVED'."
+    ]
+  },
+  "metadata": {
+    "project": "{{PROJECT_NAME}}",
+    "agent": "business-analyst",
+    "agent_persona": "Mary",
+    "date": "{{DATE_ISO8601}}",
+    "version": "{{VERSION}}",
+    "gate": 1,
+    "trace_id": "{{TRACE_ID}}",
+    "wave": "{{WAVE_ID}}"
+  },
+  "source_systems": [
+    {
+      "id": "SRC-001",
+      "name": "{{SOURCE_SYSTEM_NAME}}",
+      "type": "DATABASE",
+      "technology": "{{TECHNOLOGY}}",
+      "version": "{{TECH_VERSION}}",
+      "owner": "{{OWNER_NAME}}",
+      "owner_contact": "{{OWNER_CONTACT}}",
+      "refresh_frequency": "DAILY",
+      "connection_pattern": "{{CONNECTION_PATTERN}}"
+    }
+  ],
+  "target_layers": [
+    { "name": "landing", "prefix": "lnd_", "purpose": "Raw ingestion" },
+    { "name": "bronze",  "prefix": "brz_", "purpose": "Cleaned, typed" },
+    { "name": "silver",  "prefix": "slv_", "purpose": "Business logic applied" },
+    { "name": "gold",    "prefix": "gld_", "purpose": "Aggregated for consumption" }
+  ],
+  "mappings": [
+    {
+      "id": "M-0001",
+      "source": {
+        "system": "SRC-001",
+        "schema": "{{SRC_SCHEMA}}",
+        "table": "{{SRC_TABLE}}",
+        "column": "{{SRC_COLUMN}}",
+        "data_type": "{{SRC_TYPE}}"
+      },
+      "target": {
+        "layer": "bronze",
+        "schema": "{{TGT_SCHEMA}}",
+        "table": "{{TGT_TABLE}}",
+        "column": "{{TGT_COLUMN}}",
+        "data_type": "{{TGT_TYPE}}"
+      },
+      "transformation_rule_id": "TR-001",
+      "transformation_type": "DIRECT",
+      "dq_rule_ids": [],
+      "pk_fk": "-",
+      "owner": "{{OWNER_NAME}}",
+      "status": "MAPPED",
+      "notes": ""
+    }
+  ],
+  "transformation_rules": [
+    {
+      "id": "TR-001",
+      "name": "{{RULE_NAME}}",
+      "target": "{{TGT_TABLE}}.{{TGT_COLUMN}}",
+      "type": "DIRECT",
+      "sql_or_pseudocode": "SELECT {{SRC_COLUMN}} AS {{TGT_COLUMN}} FROM {{SRC_TABLE}}",
+      "example": { "input": "{{EXAMPLE_INPUT}}", "output": "{{EXAMPLE_OUTPUT}}" },
+      "business_justification": "{{JUSTIFICATION}}"
+    }
+  ],
+  "unresolved_mappings": [
+    {
+      "mapping_id": "M-XXXX",
+      "reason": "{{REASON}}",
+      "blocks_agents": ["data-architect", "data-steward"],
+      "follow_up_owner": "{{OWNER_NAME}}",
+      "due_date": "{{DUE_DATE}}"
+    }
+  ],
+  "kpis": {
+    "total_mappings": 0,
+    "direct_pct": 0.0,
+    "derived_pct": 0.0,
+    "lookup_pct": 0.0,
+    "agg_pct": 0.0,
+    "unresolved_count": 0,
+    "source_systems_count": 0,
+    "target_tables_count": 0
+  }
+}

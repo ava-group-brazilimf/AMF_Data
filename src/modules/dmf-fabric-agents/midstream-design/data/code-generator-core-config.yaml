@@ -1,0 +1,213 @@
+# ============================================================
+# ⚙️ Code Generator Agent — Core Configuration
+# AI-Agent Migration Factory™
+# ============================================================
+
+agent:
+  id: code-generator
+  name: Coda
+  icon: "⚙️"
+  version: "1.0.0"
+  description: "Multi-Platform Code Generation & Optimization"
+  activation: "@code-generator"
+
+phase:
+  name: MIDSTREAM
+  gate: 2
+  order: 6
+
+autonomy:
+  level: 2
+  label: "Supervised"
+  yolo_eligible: true
+  yolo_scope: "low complexity pipelines only"
+  approval_required: true
+  human_review: "Code review before deployment"
+
+engine:
+  primary: "GPT-4"
+  secondary: "CodeLlama fine-tuned"
+  template_engine: true
+  strategy: "Template First, LLM Second"
+
+output:
+  base_folder: "./codegen-outputs"
+  subfolders:
+    - generated-code
+    - generated-tests
+    - job-definitions
+    - optimization-reports
+  naming_convention: "{pipeline_id}.{ext}"
+
+commands:
+  - name: generate-code
+    description: "Generate target platform code from pseudocode"
+    task_file: tasks/generate-code.md
+    autonomy_override: null
+
+  - name: generate-tests
+    description: "Generate unit tests (pytest) for generated code"
+    task_file: tasks/generate-tests.md
+    autonomy_override: null
+
+  - name: generate-job
+    description: "Create Databricks job JSON definition"
+    task_file: tasks/generate-job-definition.md
+    autonomy_override: null
+
+  - name: optimize
+    description: "Apply performance optimizations to generated code"
+    task_file: tasks/optimize-code.md
+    autonomy_override: null
+
+  - name: batch-generate
+    description: "Generate code for multiple pipelines in batch"
+    task_file: tasks/batch-generate.md
+    autonomy_override: null
+
+dependencies:
+  upstream:
+    - agent: logic-extractor
+      artifact: "pseudocode/*.json"
+      required: true
+      description: "Platform-agnostic pseudocode from Logan"
+
+    - agent: migration-coordinator
+      artifact: "target-config.yaml"
+      required: true
+      description: "Target platform and environment configuration"
+
+  downstream:
+    - agent: quality-gate
+      artifact: "generated-code/"
+      description: "Generated code for validation by Vera"
+
+    - agent: quality-gate
+      artifact: "generated-tests/"
+      description: "Unit tests for validation by Vera"
+
+target_platforms:
+  - name: Databricks
+    languages:
+      - PySpark
+      - Spark SQL
+      - Delta Lake
+      - Scala
+    default: true
+
+  - name: Microsoft Fabric
+    languages:
+      - Spark
+      - T-SQL
+    default: false
+
+  - name: Snowflake
+    languages:
+      - Snowpark
+      - SQL
+    default: false
+
+code_templates:
+  - id: simple-etl
+    name: "Simple ETL"
+    description: "Source → Transform → Target (single source)"
+    complexity: low
+    yolo_eligible: true
+
+  - id: complex-join
+    name: "Complex Join"
+    description: "Multi-source joins with business logic"
+    complexity: medium
+    yolo_eligible: false
+
+  - id: aggregation
+    name: "Aggregation"
+    description: "Group-by with window functions"
+    complexity: medium
+    yolo_eligible: false
+
+  - id: scd-type-2
+    name: "SCD Type 2"
+    description: "Slowly Changing Dimension with history tracking"
+    complexity: high
+    yolo_eligible: false
+
+  - id: incremental-load
+    name: "Incremental Load"
+    description: "Change-based / watermark incremental loads"
+    complexity: medium
+    yolo_eligible: true
+
+  - id: full-load
+    name: "Full Load"
+    description: "Truncate-and-reload patterns"
+    complexity: low
+    yolo_eligible: true
+
+  - id: delta-merge
+    name: "Delta Merge"
+    description: "MERGE INTO with upsert logic"
+    complexity: medium
+    yolo_eligible: false
+
+  - id: pc-mapping-to-pyspark
+    name: "PowerCenter Mapping → PySpark Notebook"
+    description: "Converte Mapping PowerCenter (pseudocode) em notebook PySpark estruturado"
+    complexity: varies
+    yolo_eligible: false
+    source_platform: "PowerCenter"
+    skill_required: "ava-dmf-powercenter-patterns"
+
+  - id: pc-workflow-to-databricks-workflow
+    name: "PowerCenter Workflow → Databricks Workflow"
+    description: "Converte Workflow PowerCenter em Databricks Workflow JSON com tasks sequenciais"
+    complexity: medium
+    yolo_eligible: false
+    source_platform: "Informatica PowerCenter"
+    skill_required: "ava-dmf-powercenter-patterns"
+
+  - id: pc-session-to-job-task
+    name: "PowerCenter Session → Databricks Job Task"
+    description: "Converte Session PowerCenter em task de Databricks Job"
+    complexity: low
+    yolo_eligible: true
+    source_platform: "Informatica PowerCenter"
+
+  - id: syn-pipeline-to-databricks-workflow
+    name: "Synapse Pipeline → Databricks Workflow"
+    description: "Converte pipeline Synapse (JSON) em Databricks Workflow com tasks e dependências"
+    complexity: medium
+    yolo_eligible: false
+    source_platform: "Azure Synapse"
+    skill_required: "ava-dmf-synapse-patterns"
+
+  - id: syn-dataflow-to-pyspark
+    name: "Mapping Data Flow → PySpark Notebook"
+    description: "Converte Mapping Data Flow em notebook PySpark com transformações equivalentes"
+    complexity: varies
+    yolo_eligible: false
+    source_platform: "Azure Synapse"
+    skill_required: "ava-dmf-synapse-patterns"
+
+  - id: syn-sqlpool-to-delta
+    name: "Dedicated SQL Pool DDL/CTAS → Delta"
+    description: "Converte tabelas, CTAS e hints de distribuição em DDL Delta com clustering equivalente"
+    complexity: low
+    yolo_eligible: true
+    source_platform: "Azure Synapse"
+
+  - id: implicit-orchestration-to-workflow
+    name: "Orquestração Implícita → Databricks Workflow"
+    description: "Converte cadeia acoplada por filesystem (flags, CSVs, sleeps) em Workflow com dependências declarativas — elimina os artefatos intermediários"
+    complexity: medium
+    yolo_eligible: false
+    source_platform: "Generic Spark / Mixed Code"
+    notes: "Consome o implicit_pipeline_chain[] do inventário; cada mechanism do grafo tem conversão própria (FLAG_FILE→task dependency, DATA_FILE→Delta/DataFrame, TEMPORAL→trigger real)"
+
+quality_standards:
+  min_test_coverage: 80
+  require_logging: true
+  require_error_handling: true
+  require_docstrings: true
+  max_function_lines: 50
+  enforce_pep8: true

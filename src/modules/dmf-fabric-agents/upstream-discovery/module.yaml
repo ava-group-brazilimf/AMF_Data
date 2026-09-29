@@ -1,0 +1,39 @@
+name: upstream-discovery
+display_name: "Discovery UPSTREAM"
+version: "3.0.0"
+description: "Agentes de descoberta, inventário e extração de lógica do ambiente legado"
+agents:
+  - id: discovery-scout
+    file: agents/discovery-scout/discovery-scout.md
+    skill: ava-dmf-data-pipeline
+  - id: inventory-scout
+    file: agents/inventory-scout/inventory-scout.md
+    skill: ava-dmf-data-quality
+  - id: data-strategist
+    file: agents/data-strategist/data-strategist.md
+    skill: ava-dmf-agentic-principles
+  - id: business-analyst
+    file: agents/business-analyst/business-analyst.md
+    skill: ava-dmf-agentic-principles
+  - id: logic-extractor
+    file: agents/logic-extractor/logic-extractor.md
+    skill: ava-dmf-data-pipeline
+outputs:
+  base_path: "projects/{project_name}/outputs/upstream"
+  artifacts:
+    - inventory-enriched.json
+    - inventory-report.md
+    - asis-platform-landscape.html
+    - all-objects-inventory.csv
+    - sttm.json
+    - sttm.md
+    - sttm-visual.html
+    - problem-statement.md
+    - kpis.md
+    - digital-twin.json
+    - pseudocode/*.json
+    - logic-report.md
+    - inventory.json
+    - classification.json
+    - dependency-graph.json
+    - dead-code-report.md

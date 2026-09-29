@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentResult",
+  "description": "Contrato de saída padrão para todos os agentes da Migration Factory",
+  "type": "object",
+  "required": ["trace_id", "agent_id", "success", "output"],
+  "properties": {
+    "trace_id": { "type": "string", "format": "uuid" },
+    "agent_id": { "type": "string" },
+    "success": { "type": "boolean" },
+    "output": { "type": "string" },
+    "artifacts": { "type": "array", "items": { "type": "string" } },
+    "next_agent": { "type": "string" },
+    "human_gate_required": { "type": "boolean" },
+    "gate_score": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "number", "minimum": 0, "maximum": 100 },
+        "decision": { "type": "string", "enum": ["APPROVED", "APPROVED_WITH_CONDITIONS", "BLOCKED"] },
+        "dimensions": { "type": "object" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "duration_seconds": { "type": "integer" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "model_used": { "type": "string" }
+      }
+    }
+  }
+}

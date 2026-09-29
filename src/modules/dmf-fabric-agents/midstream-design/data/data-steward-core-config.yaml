@@ -1,0 +1,151 @@
+# DataSteward Agent Configuration
+
+agent_settings:
+  id: "data-steward"
+  name: "DataSteward"
+  version: "1.0"
+  phase: "MIDSTREAM"
+  gate: 2
+  icon: "🛡️"
+  description: "Data governance, quality rules, and compliance specialist"
+
+# Artifact definitions
+artifacts:
+  dq-rules:
+    filename: "dq-rules.md"
+    description: "Comprehensive data quality rule specifications"
+    required_for_gate: 2
+    template: "dq-rules-tmpl.yaml"
+  
+  governance:
+    filename: "governance.md"
+    description: "Governance framework and policies"
+    required_for_gate: 2
+    template: "governance-tmpl.yaml"
+  
+  classification:
+    filename: "classification.md"
+    description: "Data sensitivity classification"
+    required_for_gate: 2
+    template: "classification-tmpl.yaml"
+  
+  compliance:
+    filename: "compliance.md"
+    description: "Regulatory compliance mapping"
+    required_for_gate: 2
+    optional: true
+  
+  lineage:
+    filename: "lineage.md"
+    description: "Data lineage documentation"
+    required_for_gate: 2
+    optional: true
+
+# Command configurations
+commands:
+  help:
+    description: "Show available commands"
+    output: "Command list with descriptions"
+  
+  status:
+    description: "Show current artifact progress"
+    output: "Progress report for Gate 2 governance artifacts"
+  
+  create-dq-rules:
+    description: "Define comprehensive data quality rules"
+    task: "create-dq-rules.md"
+    output: "dq-rules.md"
+    dependencies:
+      - "data-model.md"
+      - "dq-initial.md"
+  
+  create-governance:
+    description: "Create governance framework document"
+    task: "create-governance.md"
+    output: "governance.md"
+    dependencies:
+      - "architecture.md"
+  
+  classify-data:
+    description: "Classify data by sensitivity level"
+    task: "classify-data.md"
+    output: "classification.md"
+    dependencies:
+      - "data-model.md"
+  
+  map-compliance:
+    description: "Map regulatory compliance requirements"
+    task: "map-compliance.md"
+    output: "compliance.md"
+    dependencies:
+      - "classification.md"
+  
+  document-lineage:
+    description: "Document data lineage"
+    task: "document-lineage.md"
+    output: "lineage.md"
+    dependencies:
+      - "data-model.md"
+      - "architecture.md"
+
+# DQ Rule severity levels
+severity_levels:
+  - name: "critical"
+    action: "reject"
+    description: "Fails pipeline, record rejected"
+  - name: "high"
+    action: "quarantine"
+    description: "Record quarantined for review"
+  - name: "medium"
+    action: "flag"
+    description: "Record flagged but processed"
+  - name: "low"
+    action: "log"
+    description: "Issue logged only"
+
+# Classification levels
+classification_levels:
+  - name: "public"
+    description: "Non-sensitive, freely shareable"
+    controls: []
+  - name: "internal"
+    description: "Business use only"
+    controls: ["access_control"]
+  - name: "confidential"
+    description: "Sensitive business data"
+    controls: ["access_control", "encryption"]
+  - name: "restricted"
+    description: "PII/PHI/PCI data"
+    controls: ["access_control", "encryption", "audit", "masking"]
+
+# Integration settings
+integrations:
+  upstream:
+    - agent: "business-analyst"
+      artifact: "dq-initial.md"
+      purpose: "Initial DQ requirements"
+    - agent: "data-architect"
+      artifact: "data-model.md"
+      purpose: "Data model for rule application"
+    - agent: "data-architect"
+      artifact: "architecture.md"
+      purpose: "Architecture context"
+  
+  downstream:
+    - agent: "dataflow"
+      artifact: "dq-rules.md"
+      purpose: "DQ implementation in ETL"
+    - agent: "insightforge"
+      artifact: "governance.md"
+      purpose: "BI governance rules"
+    - agent: "orchestrator"
+      artifact: "all"
+      purpose: "Gate 2 validation"
+
+# Output paths
+output_paths:
+  artifacts: "bmb-creations/"
+  documentation: "docs/"
+
+# Checklist
+checklist: "checklists/data-steward-checklist.md"

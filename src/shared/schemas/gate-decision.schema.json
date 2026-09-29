@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GateDecision",
+  "description": "Contrato do gate-decision.md gerado pelo migration-coordinator (Orion)",
+  "type": "object",
+  "required": ["gate", "trace_id", "decision", "score"],
+  "properties": {
+    "gate": { "type": "integer", "enum": [1, 2, 3] },
+    "trace_id": { "type": "string", "format": "uuid" },
+    "decision": { "type": "string", "enum": ["APPROVED", "APPROVED_WITH_CONDITIONS", "BLOCKED"] },
+    "score": {
+      "type": "object",
+      "required": ["total"],
+      "properties": {
+        "total": { "type": "number", "minimum": 0, "maximum": 100 },
+        "completude": { "type": "number" },
+        "qualidade": { "type": "number" },
+        "risco_residual": { "type": "number" },
+        "reconciliacao": { "type": "number" }
+      }
+    },
+    "approvers": { "type": "array", "items": { "type": "string" } },
+    "open_items": { "type": "array", "items": { "type": "string" } },
+    "decided_at": { "type": "string", "format": "date-time" }
+  }
+}

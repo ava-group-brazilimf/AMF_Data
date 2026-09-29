@@ -1,0 +1,187 @@
+---
+template: dashboard-spec-tmpl
+version: 1.0
+description: Template for specifying Power BI dashboard design
+---
+
+# Dashboard Specification: {DASHBOARD_NAME}
+
+## Overview
+
+**Dashboard Name:** {DASHBOARD_NAME}  
+**Purpose:** {What business decisions this supports}  
+**Owner:** {Team/Person responsible}  
+**Target Users:** {Personas}  
+**Created:** {Date}  
+**Status:** Draft / In Review / Approved
+
+## Business Context
+
+### Key Questions Answered
+1. {Question 1 this dashboard answers}
+2. {Question 2}
+3. {Question 3}
+4. {Question 4}
+5. {Question 5}
+
+### Success Criteria
+- [ ] Users can identify {metric} within 5 seconds
+- [ ] {Criteria 2}
+- [ ] {Criteria 3}
+
+## Design Specifications
+
+### Page Layout: {PAGE_NAME}
+
+**Canvas Size:** 1280 x 720 (16:9)  
+**Theme:** {Corporate Theme Name}
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│ HEADER: Logo + Title + Last Refresh                               │
+├──────────────┬──────────────┬──────────────┬──────────────────────┤
+│   KPI Card   │   KPI Card   │   KPI Card   │      KPI Card        │
+│   Revenue    │    Units     │   Margin %   │       YoY %          │
+│   $1.2M      │    45,230    │    32.5%     │       +12.4%         │
+│   ▲ +5.2%    │   ▼ -2.1%    │   ▲ +1.2pp   │       ● On Target    │
+├──────────────┴──────────────┴──────────────┼──────────────────────┤
+│                                            │                      │
+│     Revenue Trend - Line Chart             │   Top 10 Products    │
+│     (12 months with YoY comparison)        │   Horizontal Bar     │
+│                                            │                      │
+├────────────────────────────────────────────┴──────────────────────┤
+│                                                                    │
+│              Sales by Region - Map or Treemap                      │
+│                                                                    │
+├───────────────────────────────────────────────────────────────────┤
+│  Slicers: Date Range | Region | Product Category | Customer Seg   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+## Visual Specifications
+
+### Visual 1: Revenue KPI Card
+| Property | Value |
+|----------|-------|
+| Type | Card |
+| Value | [Total Revenue] |
+| Subtitle | vs Previous Period |
+| Conditional Formatting | Green > 0%, Red < 0% |
+| Position | Row 1, Col 1 |
+| Size | 200 x 100 |
+
+### Visual 2: Revenue Trend
+| Property | Value |
+|----------|-------|
+| Type | Line Chart |
+| X-Axis | Date (Month) |
+| Y-Axis | [Total Revenue] |
+| Legend | Current Year, Previous Year |
+| Position | Row 2, Col 1-3 |
+| Size | 600 x 300 |
+| Data Labels | On (values) |
+| Trend Line | No |
+
+### Visual 3: Top 10 Products
+| Property | Value |
+|----------|-------|
+| Type | Bar Chart (Horizontal) |
+| Y-Axis | Product Name |
+| X-Axis | [Total Revenue] |
+| Top N Filter | Top 10 by [Total Revenue] |
+| Position | Row 2, Col 4 |
+| Size | 300 x 300 |
+| Data Labels | On |
+
+## Slicer Configuration
+
+### Date Slicer
+| Property | Value |
+|----------|-------|
+| Type | Date Range (Between) |
+| Default | Last 12 Months |
+| Table | DIM_Date |
+| Column | Date |
+| Sync | All pages |
+
+### Region Slicer
+| Property | Value |
+|----------|-------|
+| Type | Dropdown |
+| Multi-select | Yes |
+| Select All | Yes |
+| Default | All |
+| Table | DIM_Geography |
+| Column | Region |
+
+## Interactivity Design
+
+### Cross-Filtering Behavior
+| Visual | Affects | Behavior |
+|--------|---------|----------|
+| Region Map | All visuals | Highlight |
+| Product Bar | All visuals | Filter |
+| Trend Line | None | Disabled |
+
+### Drill-Through Pages
+| Source Visual | Target Page | Fields Passed |
+|---------------|-------------|---------------|
+| Product Bar | Product Detail | Product Key |
+| Customer Table | Customer Detail | Customer Key |
+
+### Bookmarks
+| Bookmark Name | Purpose | Visuals Shown/Hidden |
+|---------------|---------|---------------------|
+| Executive View | High-level only | Hide details table |
+| Detailed View | Full analysis | Show all |
+
+## Color Palette
+
+### Primary Colors
+| Usage | Color | Hex |
+|-------|-------|-----|
+| Primary | Blue | #0078D4 |
+| Positive | Green | #107C10 |
+| Negative | Red | #D13438 |
+| Neutral | Gray | #605E5C |
+
+### Conditional Formatting Rules
+| Visual | Condition | Color |
+|--------|-----------|-------|
+| YoY % | > 0% | Green |
+| YoY % | < 0% | Red |
+| Target Status | >= 100% | Green |
+| Target Status | 80-99% | Yellow |
+| Target Status | < 80% | Red |
+
+## Mobile Layout
+
+```
+┌─────────────────────┐
+│ KPI: Revenue        │
+├─────────────────────┤
+│ KPI: Units          │
+├─────────────────────┤
+│                     │
+│ Revenue Trend       │
+│ (Simplified)        │
+│                     │
+├─────────────────────┤
+│ Top 5 Products      │
+├─────────────────────┤
+│ Date Slicer         │
+└─────────────────────┘
+```
+
+## Performance Considerations
+
+- Maximum visuals per page: 8
+- Use aggregation tables for: {tables}
+- Avoid: {patterns to avoid}
+
+## Accessibility Requirements
+
+- [ ] All visuals have alt text
+- [ ] Color is not only differentiator
+- [ ] Tab order is logical
+- [ ] Sufficient color contrast

@@ -1,0 +1,195 @@
+# ⚙️ Task: Generate Unit Tests
+
+> **Command:** `*generate-tests`
+> **Agent:** Coda (Code Generator)
+> **Phase:** MIDSTREAM | **Gate:** 2
+
+---
+
+## Objective
+
+Generate comprehensive unit tests (pytest) for generated pipeline code. Tests must cover positive, negative, and edge cases with a minimum of **80% code coverage**.
+
+---
+
+## Prerequisites
+
+- [ ] Generated code exists: `projects/{project_name}/outputs/midstream/generated-code/{pipeline_id}.py`
+- [ ] Pseudocode available for expected behavior reference
+- [ ] Target schema definitions available
+
+---
+
+## Steps
+
+### Step 1: Analyze Code Structure
+
+Parse the generated code to identify testable units.
+
+```
+Scan: functions, classes, methods
+Identify:
+  - Input parameters and types
+  - Return types and structures
+  - External dependencies (Spark session, Delta tables)
+  - Side effects (writes, API calls)
+  - Error paths (try/except blocks)
+```
+
+**Output:** Test map with list of testable units and their signatures.
+
+---
+
+### Step 2: Create Test Fixtures
+
+Generate pytest fixtures for reusable test components.
+
+```python
+@pytest.fixture(scope="session")
+def spark():
+    """Create a SparkSession for testing."""
+    return (SparkSession.builder
+            .master("local[2]")
+            .appName("test_{pipeline_id}")
+            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+            .getOrCreate())
+
+@pytest.fixture
+def sample_source_data(spark):
+    """Create sample source DataFrame matching source schema."""
+    data = [...]  # Generated from schema
+    schema = StructType([...])  # From pseudocode
+    return spark.createDataFrame(data, schema)
+
+@pytest.fixture
+def expected_output_data(spark):
+    """Create expected output DataFrame for validation."""
+    data = [...]  # Derived from transformation rules
+    schema = StructType([...])  # From target schema
+    return spark.createDataFrame(data, schema)
+```
+
+---
+
+### Step 3: Generate Positive Test Cases
+
+Create tests that validate correct behavior with valid inputs.
+
+| Test Category        | Description                                      |
+|---------------------|--------------------------------------------------|
+| Schema validation   | Output matches expected schema                    |
+| Row count           | Output row count matches expectation              |
+| Transformation logic| Each mapping rule produces correct output         |
+| Data types          | All columns have correct types after transform    |
+| Business rules      | Domain-specific rules are correctly applied       |
+| Join correctness    | Joins produce expected results                    |
+| Aggregation results | Aggregations compute correct values               |
+
+---
+
+### Step 4: Generate Negative Test Cases
+
+Create tests that validate error handling and rejection logic.
+
+| Test Category        | Description                                      |
+|---------------------|--------------------------------------------------|
+| Null handling       | Nulls in required fields are handled correctly    |
+| Invalid data types  | Type mismatches are caught and handled            |
+| Missing sources     | Missing source tables raise appropriate errors    |
+| Schema mismatch     | Schema drift is detected and reported             |
+| Duplicate keys      | Duplicate business keys are handled per rules     |
+| Invalid values      | Out-of-range values are rejected or defaulted     |
+
+---
+
+### Step 5: Generate Edge Case Tests
+
+Create tests for boundary conditions and unusual scenarios.
+
+| Test Category        | Description                                      |
+|---------------------|--------------------------------------------------|
+| Empty DataFrame     | Pipeline handles empty input gracefully           |
+| Single row          | Pipeline works with minimal data                  |
+| Large values        | String truncation, numeric overflow               |
+| Special characters  | Unicode, control chars in string fields           |
+| Date boundaries     | Min/max dates, leap years, timezone handling      |
+| Concurrent writes   | Delta Lake concurrent write scenarios             |
+
+---
+
+### Step 6: Ensure Coverage Target
+
+Verify test coverage meets the minimum threshold.
+
+```python
+# pytest.ini or pyproject.toml
+[tool.pytest.ini_options]
+addopts = "--cov=codegen_outputs.generated_code --cov-report=term-missing --cov-fail-under=80"
+```
+
+**Coverage Requirements:**
+- Overall: ≥ 80%
+- Critical paths (transforms, writes): ≥ 90%
+- Error handling: ≥ 75%
+
+---
+
+## Output
+
+| Artifact                                                | Description                    |
+|---------------------------------------------------------|--------------------------------|
+| `projects/{project_name}/outputs/midstream/generated-tests/{pipeline_id}_test.py` | pytest test file              |
+
+---
+
+## Test File Structure
+
+```python
+"""
+Tests for pipeline: {pipeline_id}
+Generated by Coda ⚙️ — AI-Agent Migration Factory™
+"""
+import pytest
+from pyspark.sql import SparkSession
+from pyspark.sql.types import *
+
+# --- Fixtures ---
+# ... fixtures ...
+
+# --- Positive Tests ---
+class TestTransformations:
+    def test_schema_output(self, spark, sample_source_data): ...
+    def test_row_count(self, spark, sample_source_data): ...
+    def test_mapping_rules(self, spark, sample_source_data): ...
+
+# --- Negative Tests ---
+class TestErrorHandling:
+    def test_null_required_fields(self, spark): ...
+    def test_schema_mismatch(self, spark): ...
+    def test_missing_source(self, spark): ...
+
+# --- Edge Cases ---
+class TestEdgeCases:
+    def test_empty_dataframe(self, spark): ...
+    def test_single_row(self, spark): ...
+    def test_special_characters(self, spark): ...
+```
+
+---
+
+## Quality Gates
+
+- [ ] All tests pass (`pytest` exit code 0)
+- [ ] Coverage ≥ 80%
+- [ ] Positive, negative, and edge cases covered
+- [ ] Fixtures are reusable and well-documented
+- [ ] No hardcoded Spark session paths
+- [ ] Tests run in < 60 seconds
+
+---
+
+## Next Steps
+
+After test generation:
+1. `*generate-job` — Create job definition for the pipeline
+2. `*optimize` — Apply optimizations if not yet done

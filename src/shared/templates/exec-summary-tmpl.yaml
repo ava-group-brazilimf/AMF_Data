@@ -1,0 +1,578 @@
+# Executive Summary Template
+
+project_name: ""
+reporting_period: ""
+report_date: ""
+prepared_by: ""
+version: "1.0"
+
+## EXECUTIVE SUMMARY
+
+### Overall Status
+overall_rag: "🟢 Green / 🟠 Amber / 🔴 Red"
+overall_health_score: "0/10"
+
+summary_statement: |
+  One-paragraph executive summary of project status and key messages
+
+### RAG Status by Dimension
+
+#### Budget
+budget_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+budget_summary: |
+  Brief explanation of budget status
+
+#### Timeline
+timeline_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+timeline_summary: |
+  Brief explanation of schedule status
+
+#### Scope
+scope_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+scope_summary: |
+  Brief explanation of scope status
+
+#### Quality
+quality_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+quality_summary: |
+  Brief explanation of quality status
+
+#### Resources
+resources_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+resources_summary: |
+  Brief explanation of resource status
+
+#### Risks
+risks_status: "🟢 Green / 🟠 Amber / 🔴 Red"
+risks_summary: |
+  Brief explanation of risk status
+
+### RAG Definitions
+rag_definitions:
+  green: "On track - No issues or concerns"
+  amber: "At risk - Issues exist but can be resolved with current plan"
+  red: "Off track - Significant issues requiring intervention"
+
+---
+## KEY METRICS
+
+### Financial Performance
+financial:
+  approved_budget: "$0"
+  spent_to_date: "$0"
+  percent_spent: "0%"
+  forecast_at_completion: "$0"
+  variance: "$0 (under/over)"
+  variance_percentage: "0%"
+
+  cost_performance_index: "1.00" # CPI = EV / AC (>1.0 = under budget)
+  burn_rate_monthly: "$0/month"
+  months_of_runway: "0 months"
+
+### Schedule Performance
+schedule:
+  planned_completion: ""
+  current_forecast: ""
+  variance_days: "0 days (ahead/behind)"
+  percent_complete: "0%"
+
+  schedule_performance_index: "1.00" # SPI = EV / PV (>1.0 = ahead of schedule)
+
+  milestones_total: 0
+  milestones_completed: 0
+  milestones_on_track: 0
+  milestones_at_risk: 0
+  milestones_delayed: 0
+
+### Quality Metrics
+quality:
+  defects_found: 0
+  defects_critical: 0
+  defects_high: 0
+  defects_resolved: 0
+  defect_resolution_rate: "0%"
+
+  test_coverage: "0%"
+  code_review_compliance: "0%"
+  technical_debt_items: 0
+
+### Team Metrics
+team:
+  team_size: 0
+  utilization: "0%"
+  velocity_current_sprint: "0 story points"
+  velocity_average: "0 story points"
+
+  team_satisfaction: "0/5"
+  turnover_rate: "0%"
+
+---
+## TOP 3 ACHIEVEMENTS THIS PERIOD
+
+achievements:
+  - achievement: ""
+    impact: |
+      Business impact or value delivered
+    date: ""
+
+  - achievement: ""
+    impact: |
+
+    date: ""
+
+  - achievement: ""
+    impact: |
+
+    date: ""
+
+---
+## TOP 3 RISKS & MITIGATION
+
+risks:
+  - risk_id: "RISK-001"
+    risk: ""
+    impact: "Critical/High/Medium/Low"
+    probability: "High/Medium/Low"
+    risk_score: "0/25"
+
+    business_impact: |
+      What this means for the business
+
+    mitigation: |
+      What we're doing about it
+
+    owner: ""
+    target_resolution: ""
+    status: "🟢 Green / 🟠 Amber / 🔴 Red"
+
+  - risk_id: "RISK-002"
+    risk: ""
+    impact: ""
+    probability: ""
+    risk_score: "0/25"
+    business_impact: |
+
+    mitigation: |
+
+    owner: ""
+    target_resolution: ""
+    status: ""
+
+  - risk_id: "RISK-003"
+    risk: ""
+    impact: ""
+    probability: ""
+    risk_score: "0/25"
+    business_impact: |
+
+    mitigation: |
+
+    owner: ""
+    target_resolution: ""
+    status: ""
+
+---
+## TOP 3 ISSUES & CORRECTIVE ACTIONS
+
+issues:
+  - issue_id: "ISS-001"
+    issue: ""
+    priority: "Critical/High/Medium/Low"
+
+    impact: |
+      Impact on project and business
+
+    root_cause: |
+      Why did this happen?
+
+    corrective_action: |
+      What we're doing to fix it
+
+    owner: ""
+    target_resolution: ""
+    status: "Open/In Progress/Resolved"
+
+  - issue_id: "ISS-002"
+    issue: ""
+    priority: ""
+    impact: |
+
+    root_cause: |
+
+    corrective_action: |
+
+    owner: ""
+    target_resolution: ""
+    status: ""
+
+  - issue_id: "ISS-003"
+    issue: ""
+    priority: ""
+    impact: |
+
+    root_cause: |
+
+    corrective_action: |
+
+    owner: ""
+    target_resolution: ""
+    status: ""
+
+---
+## UPCOMING MILESTONES (NEXT 30 DAYS)
+
+milestones:
+  - milestone: ""
+    target_date: ""
+    status: "🟢 On Track / 🟠 At Risk / 🔴 Delayed"
+    confidence: "High/Medium/Low"
+    dependencies:
+      - "Dependency 1"
+      - "Dependency 2"
+
+  - milestone: ""
+    target_date: ""
+    status: ""
+    confidence: ""
+    dependencies:
+      - ""
+
+---
+## DECISIONS NEEDED FROM LEADERSHIP
+
+decisions:
+  - decision: ""
+    urgency: "Immediate/High/Medium"
+    required_by: ""
+
+    context: |
+      Background and why this decision is needed
+
+    options:
+      - option: "Option 1"
+        pros:
+          - "Pro 1"
+          - "Pro 2"
+        cons:
+          - "Con 1"
+          - "Con 2"
+        cost_impact: "$0"
+        timeline_impact: "0 weeks"
+
+      - option: "Option 2"
+        pros:
+          - "Pro 1"
+        cons:
+          - "Con 1"
+        cost_impact: "$0"
+        timeline_impact: "0 weeks"
+
+    recommendation: |
+      Our recommended option and why
+
+    decision_maker: ""
+
+  - decision: ""
+    urgency: ""
+    required_by: ""
+    context: |
+
+    options:
+      - option: ""
+        pros: []
+        cons: []
+        cost_impact: ""
+        timeline_impact: ""
+    recommendation: |
+
+    decision_maker: ""
+
+---
+## RESOURCE NEEDS & REQUESTS
+
+resource_requests:
+  - request: ""
+    justification: |
+      Why this resource is needed
+
+    impact_if_not_approved: |
+      What happens if we don't get this
+
+    cost: "$0"
+    timeline: "When needed"
+    priority: "Critical/High/Medium/Low"
+
+  - request: ""
+    justification: |
+
+    impact_if_not_approved: |
+
+    cost: ""
+    timeline: ""
+    priority: ""
+
+---
+## SCOPE CHANGES
+
+scope_changes:
+  - change: ""
+    type: "Addition/Removal/Modification"
+    requested_by: ""
+    request_date: ""
+
+    rationale: |
+      Why this change is needed
+
+    impact:
+      cost: "$0"
+      timeline: "0 weeks"
+      resources: "0 FTE"
+      risk: "Introduces new risks or reduces existing?"
+
+    recommendation: "Approve/Reject/Defer to Phase 2"
+
+    status: "Pending/Approved/Rejected"
+    approved_by: ""
+    approval_date: ""
+
+---
+## BUDGET DETAIL
+
+### Budget Summary
+budget_summary:
+  original_budget: "$0"
+  approved_changes: "$0"
+  current_approved_budget: "$0"
+
+  spent_to_date: "$0"
+  committed: "$0"
+  remaining: "$0"
+
+  forecast_at_completion: "$0"
+  variance_at_completion: "$0"
+
+### Budget by Category
+budget_by_category:
+  labor:
+    budget: "$0"
+    spent: "$0"
+    forecast: "$0"
+    variance: "$0"
+
+  infrastructure:
+    budget: "$0"
+    spent: "$0"
+    forecast: "$0"
+    variance: "$0"
+
+  software_licenses:
+    budget: "$0"
+    spent: "$0"
+    forecast: "$0"
+    variance: "$0"
+
+  other:
+    budget: "$0"
+    spent: "$0"
+    forecast: "$0"
+    variance: "$0"
+
+### Burn Rate Analysis
+burn_rate:
+  planned_monthly_burn: "$0"
+  actual_monthly_burn: "$0"
+  variance: "$0"
+
+  months_remaining: 0
+  budget_remaining: "$0"
+  average_burn_needed: "$0/month"
+
+  burn_rate_trend: "Increasing/Stable/Decreasing"
+
+---
+## SCHEDULE DETAIL
+
+### Timeline
+timeline:
+  project_start: ""
+  original_completion: ""
+  current_forecast: ""
+  variance: "0 days/weeks"
+
+### Phase Progress
+phases:
+  - phase: "Requirements & Analysis"
+    status: "Complete/In Progress/Not Started"
+    planned_completion: ""
+    actual_completion: ""
+    percent_complete: "0%"
+
+  - phase: "Architecture & Design"
+    status: ""
+    planned_completion: ""
+    actual_completion: ""
+    percent_complete: "0%"
+
+  - phase: "Development"
+    status: ""
+    planned_completion: ""
+    actual_completion: ""
+    percent_complete: "0%"
+
+  - phase: "Testing & QA"
+    status: ""
+    planned_completion: ""
+    actual_completion: ""
+    percent_complete: "0%"
+
+  - phase: "Deployment & Go-Live"
+    status: ""
+    planned_completion: ""
+    actual_completion: ""
+    percent_complete: "0%"
+
+### Critical Path Activities
+critical_path:
+  - activity: ""
+    owner: ""
+    planned_completion: ""
+    current_forecast: ""
+    status: "🟢 On Track / 🟠 At Risk / 🔴 Delayed"
+    blockers:
+      - "Blocker 1"
+
+---
+## STAKEHOLDER FEEDBACK
+
+feedback:
+  - stakeholder: "Business Sponsor"
+    feedback: |
+      Recent feedback or concerns
+    date: ""
+
+  - stakeholder: "Technical Lead"
+    feedback: |
+
+    date: ""
+
+  - stakeholder: "End Users"
+    feedback: |
+
+    date: ""
+
+satisfaction_score: "0/5"
+satisfaction_trend: "↗️ Improving / → Stable / ↘️ Declining"
+
+---
+## NEXT PERIOD FOCUS
+
+next_period_priorities:
+  - priority: ""
+    target_completion: ""
+    owner: ""
+
+  - priority: ""
+    target_completion: ""
+    owner: ""
+
+  - priority: ""
+    target_completion: ""
+    owner: ""
+
+---
+## RECOMMENDATIONS FOR LEADERSHIP
+
+recommendations:
+  - recommendation: ""
+    rationale: |
+      Why this recommendation
+
+    expected_benefit: |
+      What we gain
+
+    required_action: |
+      What leadership needs to do
+
+    urgency: "Immediate/High/Medium/Low"
+
+  - recommendation: ""
+    rationale: |
+
+    expected_benefit: |
+
+    required_action: |
+
+    urgency: ""
+
+---
+## APPENDICES
+
+### Detailed Metrics Dashboard
+dashboard_link: "URL to live dashboard"
+
+### Supporting Documents
+documents:
+  - "Detailed Risk Register"
+  - "Sprint Burndown Charts"
+  - "Test Results Summary"
+  - "Architecture Diagrams"
+
+### Glossary
+glossary:
+  - term: "CPI"
+    definition: "Cost Performance Index (EV/AC) - Measures cost efficiency"
+  - term: "SPI"
+    definition: "Schedule Performance Index (EV/PV) - Measures schedule efficiency"
+  - term: "EV"
+    definition: "Earned Value - Value of work completed"
+  - term: "PV"
+    definition: "Planned Value - Value of work scheduled"
+  - term: "AC"
+    definition: "Actual Cost - Actual cost of work performed"
+
+### Contact Information
+contacts:
+  project_manager:
+    name: ""
+    email: ""
+    phone: ""
+
+  technical_lead:
+    name: ""
+    email: ""
+    phone: ""
+
+  executive_sponsor:
+    name: ""
+    email: ""
+    phone: ""
+
+---
+## REPORT APPROVAL
+
+approvals:
+  - role: "Project Manager"
+    name: ""
+    signature: ""
+    date: ""
+
+  - role: "Executive Sponsor"
+    name: ""
+    signature: ""
+    date: ""
+
+# Template metadata
+template_version: "1.0"
+last_updated: "January 22, 2026"
+maintained_by: "Delivery Lead Practice"
+
+# Best practices
+best_practices:
+  - "Keep it concise - 2-3 pages max for executives"
+  - "Lead with RAG status - Visual, at-a-glance understanding"
+  - "Focus on decisions needed - What requires executive action?"
+  - "Highlight business impact - Not technical details"
+  - "Be honest - Bad news doesn't get better with age"
+  - "Provide recommendations - Don't just report problems"
+  - "Use visuals - Charts, graphs, trend lines"
+  - "Consistent format - Same structure every period"

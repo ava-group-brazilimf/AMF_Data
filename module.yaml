@@ -1,0 +1,15 @@
+name: data-migration-factory
+version: "3.0.0"
+description: "Fábrica de Agentes especializada em migração de plataformas de dados (Databricks, Fabric, Snowflake)"
+author: "Avanade Data Migration Team"
+modules:
+  - upstream-discovery     # F1: 5 agentes — discovery e análise legado
+  - midstream-design       # F2: 5 agentes — design e geração de código
+  - midstream-quality      # F3: 2 agentes — qualidade e compliance
+  - downstream-execution   # F4: 5 agentes — execução e reconciliação
+  - core-coordination      # F5: 3 agentes — orquestração cross-phase
+shared:
+  templates: src/shared/templates
+  data: src/shared/data
+  schemas: src/shared/schemas
+  checklists: src/shared/checklists

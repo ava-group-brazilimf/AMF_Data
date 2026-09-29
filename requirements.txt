@@ -1,0 +1,6 @@
+# Data Migration Factory — Python dependencies
+pytest
+pyyaml
+
+# Context compression — optional but recommended
+headroom-ai[proxy,mcp,ml,code,memory]>=0.26.0

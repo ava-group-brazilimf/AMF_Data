@@ -1,0 +1,21 @@
+name: midstream-quality
+display_name: "Quality MIDSTREAM"
+version: "3.0.0"
+description: "Agentes de validação de qualidade, equivalência semântica e compliance de segurança"
+agents:
+  - id: quality-gate
+    file: agents/quality-gate/quality-gate.md
+    skill: ava-dmf-data-quality
+  - id: security-compliance
+    file: agents/security-compliance/security-compliance.md
+    skill: ava-dmf-agent-governance
+outputs:
+  base_path: "projects/{project_name}/outputs/midstream"
+  artifacts:
+    - validation-report.md
+    - validation-scorecard.html
+    - quality-scores.json
+    - test-results.md
+    - compliance-report.md
+    - pii-findings.md
+    - audit-trail.md

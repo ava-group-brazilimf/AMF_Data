@@ -1,0 +1,142 @@
+# Migration Coordinator Agent Configuration
+# AI-Agent Migration Factory™
+
+project:
+  name: "AI-Agent Migration Factory"
+  code: "migration-factory"
+  version: "4.0.0"
+
+agent:
+  id: migration-coordinator
+  name: Orion
+  title: "Migration Orchestrator & Gate Validator"
+  icon: "🧭"
+  version: "4.0"
+  phase: "CORE"
+  language: "pt-BR"
+  framework: "AI-Agent Migration Factory - Avanade-Enhanced Edition"
+
+output:
+  base_folder: "./migration-outputs"
+  subfolders:
+    - wave-reports
+    - gate-reports
+    - audit-logs
+    - rollback-plans
+    - status-reports
+
+autonomy:
+  default_level: 1  # Assisted — human decides
+  yolo_eligible: false
+  escalation_required:
+    - go_no_go_decisions
+    - rollback_initiation
+    - wave_strategy_changes
+
+gate_criteria:
+  gate_1:
+    name: "UPSTREAM → MIDSTREAM"
+    description: "Discovery & Logic Extraction complete"
+    required_artifacts:
+      - inventory.json
+      - dependency-graph.json
+      - dead-code-report.md
+      - pseudocode/*.json
+      - digital-twin.json
+    validations:
+      - "100% pipelines in scope scanned"
+      - "Complexity classification validated by SME"
+      - "Business logic reviewed by SME (20% sample)"
+      - "Zero unresolved dependency cycles"
+
+  gate_2:
+    name: "MIDSTREAM → DOWNSTREAM"
+    description: "Code Generation & Validation complete"
+    required_artifacts:
+      - generated-code/*.py
+      - generated-tests/*_test.py
+      - job-definition/*.json
+      - validation-report/*.json
+      - compliance-report/*.json
+    validations:
+      - ">= 85% pipelines approved by Quality Gate on 1st attempt"
+      - ">= 75% errors fixed by Self-Healing automatically"
+      - "Zero LGPD/SOX compliance violations"
+      - "100% unit tests passing"
+
+  gate_3:
+    name: "DOWNSTREAM → PRODUCTION"
+    description: "Reconciliation & Documentation complete"
+    required_artifacts:
+      - reconciliation-report.json
+      - healing-log/*.json
+      - migration-report.md
+      - runbooks/
+      - data-lineage-diagrams/
+    validations:
+      - "99.9% data parity (row count + checksum)"
+      - "Performance >= 100% baseline on 95% queries"
+      - "Dry Run executed successfully (min 2x)"
+      - "Rollback plan tested and documented"
+
+routing:
+  upstream_agents:
+    - id: discovery-scout
+      name: Scout
+      icon: "🔍"
+      expertise: [inventory, dependency-mapping, dead-code, volume-estimation]
+    - id: logic-extractor
+      name: Logan
+      icon: "🧠"
+      expertise: [business-logic, pseudocode, digital-twin, udf-parsing]
+
+  midstream_agents:
+    - id: code-generator
+      name: Coda
+      icon: "⚙️"
+      expertise: [pyspark, sql, delta-lake, job-definitions, unit-tests]
+    - id: quality-gate
+      name: Vera
+      icon: "✅"
+      expertise: [syntax-validation, semantic-equivalence, test-execution, performance]
+    - id: security-compliance
+      name: Shield
+      icon: "🔒"
+      expertise: [pii-detection, data-masking, lgpd, gdpr, sox, audit-trail]
+
+  downstream_agents:
+    - id: self-healing
+      name: Phoenix
+      icon: "🔧"
+      expertise: [error-recovery, root-cause-analysis, auto-fix, pattern-learning]
+    - id: reconciliation
+      name: Balance
+      icon: "⚖️"
+      expertise: [row-count, checksum, schema-diff, data-profiling]
+    - id: documentation
+      name: Scribe
+      icon: "📚"
+      expertise: [migration-report, data-lineage, runbooks, changelog]
+
+wave_management:
+  strategies:
+    - name: "pilot"
+      description: "5-10 low complexity pipelines"
+      parallelism: 2
+    - name: "batch_low"
+      description: "Low complexity pipelines"
+      parallelism: 10
+    - name: "batch_medium"
+      description: "Medium complexity pipelines"
+      parallelism: 5
+    - name: "batch_high"
+      description: "High complexity pipelines"
+      parallelism: 2
+    - name: "final"
+      description: "Remaining + re-runs"
+      parallelism: 3
+
+settings:
+  language: "pt-BR"
+  date_format: "YYYY-MM-DD"
+  timezone: "America/Sao_Paulo"

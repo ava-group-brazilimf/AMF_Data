@@ -1,0 +1,155 @@
+---
+template: semantic-model-tmpl
+version: 1.0
+description: Template for documenting Power BI semantic model architecture
+---
+
+# Semantic Model: {MODEL_NAME}
+
+## Overview
+
+**Model Name:** {MODEL_NAME}  
+**Purpose:** {Brief description of business domain}  
+**Owner:** {Team/Person responsible}  
+**Created:** {Date}  
+**Last Updated:** {Date}  
+**Storage Mode:** Import / DirectQuery / Composite
+
+## Business Context
+
+### Domain
+{Description of business domain this model serves}
+
+### Key Business Questions
+1. {Question 1}
+2. {Question 2}
+3. {Question 3}
+
+### Target Users
+| Persona | Department | Usage Frequency |
+|---------|------------|-----------------|
+| {Persona 1} | {Dept} | Daily/Weekly |
+
+## Model Diagram
+
+```
+                    ┌─────────────────┐
+                    │   DIM_DATE      │
+                    │─────────────────│
+                    │ DateKey (PK)    │
+                    │ Date            │
+                    │ Year            │
+                    │ Quarter         │
+                    │ Month           │
+                    │ Week            │
+                    │ DayOfWeek       │
+                    └────────┬────────┘
+                             │ 1:*
+     ┌───────────────────────┼───────────────────────┐
+     │                       │                       │
+     ▼                       ▼                       ▼
+┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│ DIM_CUSTOMER    │   │   FACT_SALES    │   │  DIM_PRODUCT    │
+│─────────────────│   │─────────────────│   │─────────────────│
+│ CustomerKey (PK)│◄──│ CustomerKey (FK)│   │ ProductKey (PK) │
+│ CustomerName    │   │ ProductKey (FK) │──►│ ProductName     │
+│ Segment         │   │ DateKey (FK)    │   │ Category        │
+│ Region          │   │ Quantity        │   │ SubCategory     │
+│ Country         │   │ UnitPrice       │   │ Brand           │
+└─────────────────┘   │ TotalAmount     │   └─────────────────┘
+                      │ Discount        │
+                      └─────────────────┘
+```
+
+## Table Definitions
+
+### Fact Tables
+
+#### FACT_{TABLE_NAME}
+**Purpose:** {What transactions/events this captures}  
+**Grain:** {One row per...}  
+**Approximate Rows:** {Size estimate}
+
+| Column Name | Data Type | Description | Source |
+|-------------|-----------|-------------|--------|
+| {Key}Key | INT | Surrogate key to {Dimension} | {Source} |
+| {Measure} | DECIMAL(18,2) | {Description} | {Source} |
+| LoadTimestamp | DATETIME | When record was loaded | System |
+
+### Dimension Tables
+
+#### DIM_{TABLE_NAME}
+**Purpose:** {What entity this describes}  
+**Type:** {Type 1 / Type 2 SCD}  
+**Approximate Rows:** {Size estimate}
+
+| Column Name | Data Type | Description | Source |
+|-------------|-----------|-------------|--------|
+| {Table}Key | INT | Surrogate key | Generated |
+| {NaturalKey} | VARCHAR | Business key | {Source} |
+| {Attribute} | VARCHAR | {Description} | {Source} |
+| IsActive | BIT | Current record flag | System |
+
+## Relationships
+
+| From Table | From Column | To Table | To Column | Cardinality | Direction | Active |
+|------------|-------------|----------|-----------|-------------|-----------|--------|
+| FACT_Sales | DateKey | DIM_Date | DateKey | Many:1 | Single | Yes |
+| FACT_Sales | CustomerKey | DIM_Customer | CustomerKey | Many:1 | Single | Yes |
+| FACT_Sales | ProductKey | DIM_Product | ProductKey | Many:1 | Single | Yes |
+
+## Hierarchies
+
+### Date Hierarchy
+- Year
+  - Quarter
+    - Month
+      - Date
+
+### Product Hierarchy
+- Category
+  - SubCategory
+    - Product
+
+### Geography Hierarchy
+- Country
+  - Region
+    - City
+
+## Measures
+
+### Base Measures
+| Measure Name | DAX | Format | Folder |
+|--------------|-----|--------|--------|
+| Total Sales | `SUM(FACT_Sales[TotalAmount])` | Currency | Sales |
+| Total Quantity | `SUM(FACT_Sales[Quantity])` | Number | Sales |
+
+### Time Intelligence
+| Measure Name | DAX | Format | Folder |
+|--------------|-----|--------|--------|
+| Sales YTD | `CALCULATE([Total Sales], DATESYTD('Date'[Date]))` | Currency | Time Intelligence |
+| Sales PY | `CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Date'[Date]))` | Currency | Time Intelligence |
+
+### KPIs
+| Measure Name | DAX | Format | Folder |
+|--------------|-----|--------|--------|
+| YoY Growth % | `DIVIDE([Total Sales] - [Sales PY], [Sales PY])` | Percentage | KPIs |
+
+## Security
+
+### RLS Roles
+| Role Name | Filter Expression | Assigned Users |
+|-----------|-------------------|----------------|
+| Regional Manager | `[Region] = USERPRINCIPALNAME()` | {AD Group} |
+
+## Refresh Schedule
+
+| Dataset | Mode | Schedule | Duration |
+|---------|------|----------|----------|
+| {Name} | Import | Daily 6:00 AM | ~15 min |
+
+## Performance Notes
+
+- {Any aggregation tables}
+- {Partitioning strategy}
+- {Known performance considerations}

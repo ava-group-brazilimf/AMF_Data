@@ -1,0 +1,117 @@
+{
+  "_template_metadata": {
+    "name": "quality-scores-tmpl.json",
+    "owner_agent": "quality-gate",
+    "phase": "MIDSTREAM",
+    "gate": 2,
+    "version": "1.0",
+    "purpose": "Canonical machine-readable validation scorecard. This JSON is the SINGLE SOURCE OF TRUTH read by Orion (migration-coordinator) for Gate 2 promotion, by Phoenix (self-healing) for rejection feedback, and by Balance (reconciliation) for downstream eligibility. Both validation-report.md and validation-scorecard.html are derived from this file.",
+    "instructions_for_llm": [
+      "Replace EVERY {{...}} placeholder with project data. Do NOT leave placeholders in the final file.",
+      "Remove this _template_metadata block from the produced quality-scores.json.",
+      "decision MUST be one of: APPROVED | NEEDS_REVIEW | REJECTED.",
+      "score is a 0.0-10.0 weighted score, rounded to 1 decimal place.",
+      "Each dimension score is 0.0-10.0; weights MUST sum to 1.00.",
+      "If any hard_blocker is present, decision MUST be REJECTED regardless of score.",
+      "objects_evaluated[] lists every pipeline_id processed in this validation run.",
+      "rejection_reasons[] is non-empty only when decision = REJECTED.",
+      "Every failing dimension (status != PASS) MUST appear in feedback.failing_dimensions[].",
+      "Persist this file at: projects/{project_name}/outputs/midstream/quality/scorecards/{pipeline_id}-quality-scores.json"
+    ]
+  },
+  "metadata": {
+    "agent": "quality-gate",
+    "agent_persona": "Vera",
+    "version": "{{VERSION}}",
+    "timestamp": "{{TIMESTAMP_ISO8601}}",
+    "wave": "{{WAVE_ID}}",
+    "trace_id": "{{TRACE_ID}}",
+    "project": "{{PROJECT_NAME}}",
+    "pipeline_id": "{{PIPELINE_ID}}",
+    "iteration": 1,
+    "max_iterations": 3
+  },
+  "decision": "APPROVED",
+  "score": 0.0,
+  "route_to": "{{NEXT_AGENT}}",
+  "dimensions": {
+    "syntax": {
+      "score": 0.0,
+      "weight": 0.15,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 10.0,
+      "findings": []
+    },
+    "lint": {
+      "score": 0.0,
+      "weight": 0.10,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 8.0,
+      "findings": []
+    },
+    "semantic": {
+      "score": 0.0,
+      "weight": 0.30,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 9.0,
+      "confidence": 0.0,
+      "findings": []
+    },
+    "tests": {
+      "score": 0.0,
+      "weight": 0.25,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 9.0,
+      "pass_rate": 0.0,
+      "coverage": 0.0,
+      "findings": []
+    },
+    "performance": {
+      "score": 0.0,
+      "weight": 0.10,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 8.0,
+      "findings": []
+    },
+    "security": {
+      "score": 0.0,
+      "weight": 0.10,
+      "weighted_score": 0.0,
+      "status": "PASS",
+      "threshold": 10.0,
+      "findings": []
+    }
+  },
+  "objects_evaluated": [
+    {
+      "pipeline_id": "{{PIPELINE_ID}}",
+      "code_file": "projects/{{PROJECT_NAME}}/outputs/midstream/generated-code/{{PIPELINE_ID}}.py",
+      "test_file": "projects/{{PROJECT_NAME}}/outputs/midstream/generated-tests/{{PIPELINE_ID}}_test.py",
+      "pseudocode_file": "projects/{{PROJECT_NAME}}/outputs/upstream/logic/pseudocode/{{PIPELINE_ID}}.json",
+      "complexity_class": "{{COMPLEXITY_CLASS}}",
+      "score": 0.0,
+      "decision": "APPROVED"
+    }
+  ],
+  "hard_blockers": [],
+  "rejection_reasons": [],
+  "feedback": {
+    "summary": "{{FEEDBACK_SUMMARY}}",
+    "failing_dimensions": [],
+    "re_validation_eligible": true
+  },
+  "kpis": {
+    "total_objects": 1,
+    "approved": 0,
+    "needs_review": 0,
+    "rejected": 0,
+    "approval_rate_pct": 0.0,
+    "avg_score": 0.0,
+    "high_critical_findings": 0
+  }
+}

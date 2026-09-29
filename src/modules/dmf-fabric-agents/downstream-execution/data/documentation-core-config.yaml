@@ -1,0 +1,123 @@
+# ============================================================
+# 📚 Documentation Agent — Core Configuration
+# AI-Agent Migration Factory™
+# ============================================================
+
+agent:
+  id: documentation
+  name: Scribe
+  icon: "📚"
+  phase: DOWNSTREAM
+  gate: 3
+  autonomy: 4
+  autonomy_label: "Autonomous"
+  yolo_eligible: true
+  yolo_scope: "all documentation generation"
+  activation: "@documentation"
+  description: >
+    Terminal agent in the pipeline. Automatically generates all migration
+    documentation from artifacts produced by other agents. Creates executive
+    reports, technical docs, data lineage diagrams (Mermaid), operational
+    runbooks, and changelogs. Zero human intervention needed.
+
+# ============================================================
+# Output Configuration
+# ============================================================
+output:
+  base_folder: ./documentation-outputs
+  subfolders:
+    - migration-reports
+    - technical-docs
+    - runbooks
+    - lineage-diagrams
+    - changelogs
+  formats:
+    - markdown
+    - mermaid
+    - json
+    - html
+  languages:
+    primary: pt-BR
+    secondary: en-US
+
+# ============================================================
+# Commands
+# ============================================================
+commands:
+  - name: help
+    description: "Display available commands and usage instructions"
+  - name: generate-report
+    description: "Generate the full migration report (executive + technical)"
+  - name: generate-lineage
+    description: "Generate Mermaid data lineage diagrams for all tables"
+  - name: generate-runbook
+    description: "Generate operational runbooks for the migrated environment"
+  - name: generate-changelog
+    description: "Generate changelog from Git log and agent execution history"
+  - name: generate-all
+    description: "Execute all generation tasks in sequence: report → lineage → runbook → changelog"
+  - name: yolo
+    description: "Full autonomous run — generate all documentation, no stops"
+  - name: exit
+    description: "Exit the Documentation Agent"
+
+# ============================================================
+# Dependencies
+# ============================================================
+dependencies:
+  upstream:
+    - agent: migration-coordinator
+      artifacts:
+        - execution-log.json
+        - wave-status-report.md
+    - agent: discovery-scout
+      artifacts:
+        - inventory.json
+        - dependency-graph.json
+    - agent: logic-extractor
+      artifacts:
+        - digital-twin.json
+        - "pseudocode/*.json"
+    - agent: code-generator
+      artifacts:
+        - "generated-code/*.py"
+    - agent: quality-gate
+      artifacts:
+        - "validation-report/*.json"
+    - agent: security-compliance
+      artifacts:
+        - "compliance-report/*.json"
+        - audit-trail.log
+    - agent: self-healing
+      artifacts:
+        - "healing-log/*.json"
+    - agent: reconciliation
+      artifacts:
+        - reconciliation-report.json
+  downstream: none  # terminal agent
+
+# ============================================================
+# Publishing Targets
+# ============================================================
+publishing:
+  targets:
+    - name: confluence
+      method: API
+      description: "Publish pages to Confluence space"
+    - name: sharepoint
+      method: API
+      description: "Upload documents to SharePoint library"
+    - name: git
+      method: commit
+      description: "Commit documentation to repository"
+    - name: pdf
+      method: export
+      description: "Export final documents as PDF"
+
+# ============================================================
+# Engine Configuration
+# ============================================================
+engine:
+  llm: GPT-4
+  template_engine: Jinja2
+  diagram_engine: Mermaid.js

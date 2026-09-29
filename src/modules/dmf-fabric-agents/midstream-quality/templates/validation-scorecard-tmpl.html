@@ -1,0 +1,827 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  Validation Scorecard — Reference Template
+  Owner: quality-gate (Vera ✅) — DMF Fabric Agents
+  Phase: MIDSTREAM | Gate: 2 | Version: 1.0
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Visual stakeholder-facing scorecard for the Gate 2 quality decision.
+  Derived from quality-scores.json (canonical source of truth).
+  The LLM MUST read this file BEFORE generating the project HTML output
+  and reproduce the structure, fonts, CSS variables, gauge pattern,
+  hover patterns, section ordering and section-title ::after-line
+  pattern exactly as defined here. Visual style is INTENTIONALLY
+  identical to asis-platform-landscape-tmpl.html and
+  sttm-visual-tmpl.html (dark theme).
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-2-2026-05-01)
+    {{WAVE_ID}}                 Wave identifier
+    {{PIPELINE_ID}}             Pipeline / object under validation
+    {{TIMESTAMP}}               ISO8601
+    {{ITERATION}}               Validation iteration (1..3)
+    {{FINAL_SCORE}}             Final weighted score 0.0-10.0
+    {{FINAL_SCORE_PCT}}         Final score expressed as percentage 0-100
+    {{DECISION}}                APPROVED | NEEDS_REVIEW | REJECTED
+    {{DECISION_CLASS}}          decision-approved | decision-review | decision-rejected
+    {{ROUTE_TO}}                Next agent (Balance / Phoenix / Human Reviewer)
+    {{KPI_TOTAL_OBJECTS}}       Number of objects evaluated
+    {{KPI_APPROVED}}            Approved count
+    {{KPI_NEEDS_REVIEW}}        Needs-review count
+    {{KPI_REJECTED}}            Rejected count
+    {{KPI_HIGH_CRITICAL}}       High/critical findings count
+    {{DIMENSIONS_BLOCK}}        Repeated dimension-row markup
+    {{BLOCKERS_BLOCK}}          Repeated blocker-card markup OR empty-state
+    {{OBJECTS_BLOCK}}           Repeated object-row markup
+    {{FINDINGS_BLOCK}}          Repeated finding-row markup OR empty-state
+    {{FAILING_BLOCK}}           Repeated failing-dimension card markup OR empty-state
+
+  FONTS (Google Fonts CDN; include local monospace fallback)
+    DM Serif Display — headings + italic accent
+    DM Mono          — labels, tags, metadata, table values
+    Outfit           — body copy
+
+  COLOR SCHEME (dark theme — identical to AS-IS landscape)
+    --bg #0D0F14
+    --teal  #14B8A6  PASS / APPROVED  (Gate 2 primary success)
+    --amber #F59E0B  NEEDS_REVIEW
+    --red   #EF4444  FAIL / REJECTED / hard blocker
+    --blue  #60A5FA  semantic / informational
+    --coral #FB923C  performance
+    --purple #A78BFA security accent
+
+  DIMENSION → COLOR
+    syntax       → red    (correctness foundation)
+    lint         → coral  (style)
+    semantic     → blue   (logic equivalence)
+    tests        → teal   (verification)
+    performance  → amber  (efficiency)
+    security     → purple (risk)
+
+  STATUS → CSS CLASS
+    PASS          → .status-pass    (teal)
+    WARN          → .status-warn    (amber)
+    FAIL          → .status-fail    (red)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation Scorecard — {{PROJECT_NAME}} · Gate 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES (mirror AS-IS landscape) ────────────── */
+    :root {
+      --bg: #0D0F14;
+      --surface: #13161D;
+      --surface2: #1A1E28;
+      --surface3: #222736;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.10);
+      --text: #E8EBF2;
+      --text2: #8B919F;
+      --text3: #5A6070;
+      --amber: #F59E0B;     --amber-dim: rgba(245,158,11,0.12);
+      --red: #EF4444;       --red-dim: rgba(239,68,68,0.12);
+      --teal: #14B8A6;      --teal-dim: rgba(20,184,166,0.10);
+      --blue: #60A5FA;      --blue-dim: rgba(96,165,250,0.10);
+      --purple: #A78BFA;    --purple-dim: rgba(167,139,250,0.10);
+      --coral: #FB923C;     --coral-dim: rgba(251,146,60,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 56px;
+      gap: 40px;
+    }
+    .header-left { max-width: 720px; }
+    .badge-gate {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--teal-dim);
+      color: var(--teal);
+      border: 1px solid var(--teal);
+      border-radius: 999px;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    h1 em { font-style: italic; color: var(--teal); }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── HERO SCORECARD ────────────────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 40px;
+      align-items: center;
+    }
+    .hero-gauge {
+      position: relative;
+      width: 240px; height: 240px;
+      margin: 0 auto;
+    }
+    .hero-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .gauge-track { fill: none; stroke: var(--surface3); stroke-width: 14; }
+    .gauge-arc {
+      fill: none;
+      stroke: var(--c, var(--teal));
+      stroke-width: 14;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1);
+    }
+    .gauge-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .gauge-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 64px;
+      line-height: 1;
+      color: var(--c, var(--teal));
+    }
+    .gauge-of {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+    .hero-info { display: flex; flex-direction: column; gap: 16px; }
+    .decision-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .decision-pill .dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: currentColor;
+    }
+    .decision-approved { background: var(--teal-dim);  color: var(--teal);  border: 1px solid var(--teal); }
+    .decision-review   { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+    .decision-rejected { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red); }
+    .hero-pipeline {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--text);
+    }
+    .hero-route {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .hero-route span { color: var(--text); }
+    .hero-summary {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* ─── KPI ROW ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 20px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--c, var(--teal));
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .kpi-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--c, var(--teal));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text3); }
+
+    /* ─── DIMENSION BARS ────────────────────────────────────── */
+    .dimensions {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+    .dim-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 80px 70px 80px 90px;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .dim-row:last-child { border-bottom: 0; }
+    .dim-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .dim-name .dim-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      margin-right: 10px;
+      vertical-align: middle;
+      background: var(--c, var(--teal));
+    }
+    .dim-bar-track {
+      height: 8px;
+      background: var(--surface3);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .dim-bar-fill {
+      height: 100%;
+      width: var(--w, 0%);
+      background: var(--c, var(--teal));
+      border-radius: 999px;
+      transition: width 1s cubic-bezier(.2,.8,.2,1);
+    }
+    .dim-score {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: var(--c, var(--teal));
+      text-align: right;
+    }
+    .dim-weight {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text3);
+      text-align: right;
+    }
+    .dim-weighted {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text2);
+      text-align: right;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .status-pass { background: var(--teal-dim);  color: var(--teal); }
+    .status-warn { background: var(--amber-dim); color: var(--amber); }
+    .status-fail { background: var(--red-dim);   color: var(--red); }
+
+    /* ─── BLOCKERS / FAILING DIMENSIONS ─────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .blocker-card {
+      background: var(--surface);
+      border: 1px solid var(--red);
+      border-left: 4px solid var(--red);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .blocker-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .blocker-dim {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .blocker-reason {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .blocker-remediation {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--surface2);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border-left: 2px solid var(--amber);
+    }
+
+    .failing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--c, var(--amber));
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .failing-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .failing-dim {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c, var(--amber));
+    }
+    .failing-score {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .failing-score .threshold { color: var(--text3); }
+    .failing-list {
+      list-style: none;
+      padding: 0;
+      margin: 6px 0 0;
+    }
+    .failing-list li {
+      font-size: 13px;
+      color: var(--text2);
+      padding: 4px 0 4px 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+    .failing-list li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--text3);
+    }
+    .failing-remediation {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border2);
+    }
+    .failing-remediation .label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 4px;
+    }
+
+    /* ─── OBJECTS TABLE ─────────────────────────────────────── */
+    .objects-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .objects-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .objects-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+    }
+    .objects-table tr:last-child td { border-bottom: 0; }
+    .objects-table tr:hover td { background: var(--surface3); }
+    .objects-table tr.row-approved td:first-child { border-left: 3px solid var(--teal); }
+    .objects-table tr.row-review   td:first-child { border-left: 3px solid var(--amber); }
+    .objects-table tr.row-rejected td:first-child { border-left: 3px solid var(--red); }
+
+    /* ─── FINDINGS TABLE ────────────────────────────────────── */
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .findings-table th,
+    .findings-table td {
+      padding: 11px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .findings-table th {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+    }
+    .findings-table tr:last-child td { border-bottom: 0; }
+    .sev-high     { color: var(--red); }
+    .sev-medium   { color: var(--amber); }
+    .sev-low      { color: var(--text2); }
+    .sev-info     { color: var(--blue); }
+
+    /* ─── EMPTY STATE ───────────────────────────────────────── */
+    .empty-state {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      color: var(--text2);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-gate">Gate 2 · Validation Scorecard</span>
+      <h1>Quality <em>Verdict</em></h1>
+      <p class="subtitle">
+        Weighted scorecard across syntax, lint, semantic equivalence, tests,
+        performance and security dimensions. Sole source of the Gate 2
+        promotion decision and routing to Balance, Phoenix, or human review.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">PROJECT</span> <span class="meta-val">{{PROJECT_NAME}}</span></div>
+      <div><span class="meta-key">WAVE</span> <span class="meta-val">{{WAVE_ID}}</span></div>
+      <div><span class="meta-key">PIPELINE</span> <span class="meta-val">{{PIPELINE_ID}}</span></div>
+      <div><span class="meta-key">TRACE</span> <span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">ITERATION</span> <span class="meta-val">{{ITERATION}}/3</span></div>
+      <div><span class="meta-key">DATE</span> <span class="meta-val">{{TIMESTAMP}}</span></div>
+      <div><span class="meta-key">AGENT</span> <span class="meta-val">quality-gate</span></div>
+    </div>
+  </header>
+
+  <!-- ─── HERO SCORECARD ──────────────────────────────────── -->
+  <section>
+    <div class="section-title">Final Verdict</div>
+    <div class="hero">
+      <!--
+        The gauge below uses a circle with circumference ≈ 691 (radius 110).
+        Set stroke-dasharray="691" and stroke-dashoffset = 691 * (1 - score/10)
+        on .gauge-arc. Set --c on .hero-gauge to the decision color:
+          APPROVED     → var(--teal)
+          NEEDS_REVIEW → var(--amber)
+          REJECTED     → var(--red)
+      -->
+      <div class="hero-gauge" style="--c: var(--{{DECISION_COLOR_VAR}})">
+        <svg viewBox="0 0 240 240">
+          <circle class="gauge-track" cx="120" cy="120" r="110"></circle>
+          <circle class="gauge-arc" cx="120" cy="120" r="110"
+                  stroke-dasharray="691"
+                  stroke-dashoffset="{{GAUGE_DASHOFFSET}}"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-value">{{FINAL_SCORE}}</div>
+          <div class="gauge-of">of 10.0</div>
+        </div>
+      </div>
+      <div class="hero-info">
+        <span class="decision-pill {{DECISION_CLASS}}">
+          <span class="dot"></span>{{DECISION}}
+        </span>
+        <div class="hero-pipeline">{{PIPELINE_ID}}</div>
+        <div class="hero-route">Route to → <span>{{ROUTE_TO}}</span></div>
+        <p class="hero-summary">{{FEEDBACK_SUMMARY}}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── KPI ROW ─────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Run KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--blue)">
+        <div class="kpi-value">{{KPI_TOTAL_OBJECTS}}</div>
+        <div class="kpi-label">Objects Evaluated</div>
+        <div class="kpi-sub">in this run</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--teal)">
+        <div class="kpi-value">{{KPI_APPROVED}}</div>
+        <div class="kpi-label">Approved</div>
+        <div class="kpi-sub">ready for Balance</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--amber)">
+        <div class="kpi-value">{{KPI_NEEDS_REVIEW}}</div>
+        <div class="kpi-label">Needs Review</div>
+        <div class="kpi-sub">human inspection</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--red)">
+        <div class="kpi-value">{{KPI_REJECTED}}</div>
+        <div class="kpi-label">Rejected</div>
+        <div class="kpi-sub">routed to Phoenix</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--purple)">
+        <div class="kpi-value">{{KPI_HIGH_CRITICAL}}</div>
+        <div class="kpi-label">High / Critical</div>
+        <div class="kpi-sub">blocking findings</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DIMENSION SCORES ────────────────────────────────── -->
+  <section>
+    <div class="section-title">Dimension Breakdown</div>
+    <div class="dimensions">
+      {{DIMENSIONS_BLOCK}}
+      <!--
+        Render one .dim-row per dimensions[] entry.
+        Set --c per dimension:
+          syntax      → var(--red)
+          lint        → var(--coral)
+          semantic    → var(--blue)
+          tests       → var(--teal)
+          performance → var(--amber)
+          security    → var(--purple)
+        Set --w on .dim-bar-fill to (score * 10)% (e.g. 9.3 → 93%).
+        status pill class:
+          PASS → status-pass · WARN → status-warn · FAIL → status-fail
+
+        <div class="dim-row" style="--c: var(--teal)">
+          <div class="dim-name"><span class="dim-dot"></span>{name}</div>
+          <div class="dim-bar-track"><div class="dim-bar-fill" style="--w: 93%"></div></div>
+          <div class="dim-score">{score}</div>
+          <div class="dim-weight">×{weight}</div>
+          <div class="dim-weighted">= {weighted_score}</div>
+          <div><span class="pill status-pass">{status}</span></div>
+        </div>
+      -->
+    </div>
+  </section>
+
+  <!-- ─── HARD BLOCKERS ───────────────────────────────────── -->
+  <section>
+    <div class="section-title">Hard Blockers</div>
+    {{BLOCKERS_BLOCK}}
+    <!--
+      If hard_blockers[] is empty, render literally:
+        <div class="empty-state">No hard blockers — pipeline cleared the auto-reject filters.</div>
+
+      Otherwise render inside a <div class="cards-grid"> one .blocker-card per item:
+
+      <div class="cards-grid">
+        <div class="blocker-card">
+          <div class="blocker-head">
+            <span class="blocker-dim">{dimension}</span>
+            <span class="pill status-fail">BLOCKER</span>
+          </div>
+          <div class="blocker-reason">{reason}</div>
+          <div class="blocker-remediation">{remediation}</div>
+        </div>
+      </div>
+    -->
+  </section>
+
+  <!-- ─── FAILING DIMENSIONS / FEEDBACK ───────────────────── -->
+  <section>
+    <div class="section-title">Failing Dimensions &amp; Remediation</div>
+    {{FAILING_BLOCK}}
+    <!--
+      If feedback.failing_dimensions[] is empty, render literally:
+        <div class="empty-state">All dimensions passed their thresholds — no remediation required.</div>
+
+      Otherwise render inside a <div class="cards-grid"> one .failing-card per item.
+      Use the dimension's color for --c:
+
+      <div class="cards-grid">
+        <div class="failing-card" style="--c: var(--blue)">
+          <div class="failing-head">
+            <span class="failing-dim">{dimension}</span>
+            <span class="failing-score">{score} <span class="threshold">/ {threshold}</span></span>
+          </div>
+          <ul class="failing-list">
+            <li>{issue}</li>
+          </ul>
+          <div class="failing-remediation">
+            <div class="label">Remediation</div>
+            <ul class="failing-list">
+              <li>{remediation_step}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    -->
+  </section>
+
+  <!-- ─── OBJECTS EVALUATED ───────────────────────────────── -->
+  <section>
+    <div class="section-title">Objects Evaluated</div>
+    <table class="objects-table">
+      <thead>
+        <tr>
+          <th>Pipeline</th>
+          <th>Complexity</th>
+          <th>Code File</th>
+          <th>Test File</th>
+          <th>Score</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{OBJECTS_BLOCK}}
+        <!--
+          Repeat one <tr> per objects_evaluated[] entry. Row class:
+            APPROVED      → row-approved
+            NEEDS_REVIEW  → row-review
+            REJECTED      → row-rejected
+
+          <tr class="row-approved">
+            <td>{pipeline_id}</td>
+            <td>{complexity_class}</td>
+            <td>{code_file}</td>
+            <td>{test_file}</td>
+            <td>{score}</td>
+            <td><span class="pill status-pass">{decision}</span></td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── ALL FINDINGS ────────────────────────────────────── -->
+  <section>
+    <div class="section-title">All Findings</div>
+    {{FINDINGS_BLOCK}}
+    <!--
+      Aggregate findings across all dimensions[].findings[]. If empty, render:
+        <div class="empty-state">No findings recorded.</div>
+
+      Otherwise render a <table class="findings-table"> with one <tr> per finding.
+      severity → cell class:
+        HIGH | CRITICAL → sev-high
+        MEDIUM          → sev-medium
+        LOW             → sev-low
+        INFO            → sev-info
+
+      <table class="findings-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Severity</th>
+            <th>Rule / Code</th>
+            <th>Location</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{dimension}</td>
+            <td class="sev-high">{severity}</td>
+            <td>{rule}</td>
+            <td>{file}:{line}</td>
+            <td>{message}</td>
+          </tr>
+        </tbody>
+      </table>
+    -->
+  </section>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>quality-gate · Vera ✅</span>
+    <span>Generated {{TIMESTAMP}} · Gate 2</span>
+    <span>DMF Fabric Agents</span>
+  </footer>
+
+</body>
+</html>

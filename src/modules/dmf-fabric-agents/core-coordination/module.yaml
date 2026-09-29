@@ -1,0 +1,20 @@
+name: core-coordination
+display_name: "Core Coordination"
+version: "3.0.0"
+description: "Agentes de orquestração cross-phase, triage de usuários e melhoria contínua"
+agents:
+  - id: master-agent
+    file: agents/master-agent/master-agent.md
+    skill: ava-dmf-agent-orchestrator
+  - id: migration-coordinator
+    file: agents/migration-coordinator/migration-coordinator.md
+    skill: ava-dmf-agent-orchestrator
+  - id: iteration-improvement
+    file: agents/iteration-improvement/iteration-improvement.md
+    skill: ava-dmf-orchestration-improve
+outputs:
+  base_path: "projects/{project_name}/outputs/summary"
+  artifacts:
+    - gate-decisions/*.md
+    - wave-status.md
+    - improvement-backlog.md

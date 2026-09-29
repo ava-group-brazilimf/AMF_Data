@@ -1,0 +1,12 @@
+{
+  "subscriptionId": "SUBSTITUA_PELO_SEU_SUBSCRIPTION_ID",
+  "resourceGroup": "rg-databricks-data-migration",
+  "location": "eastus2",
+  "workspaceName": "dbw-data-engineering-prod",
+  "pricingTier": "premium",
+  "tags": {
+    "Environment": "Production",
+    "Project": "Data-Migration",
+    "ManagedBy": "Avanade-Core-Agents"
+  }
+}

@@ -1,0 +1,784 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  Reconciliation Dashboard — Reference Template
+  Owner: reconciliation (Balance ⚖️) — DMF Fabric Agents
+  Phase: DOWNSTREAM | Gate: 3 | Version: 1.0
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Visual stakeholder-facing dashboard for the Gate 3 reconciliation verdict.
+  Derived from reconciliation-report.json (canonical source of truth).
+  The LLM MUST read this file BEFORE generating the project HTML output
+  and reproduce the structure, fonts, CSS variables, gauge pattern,
+  L1-L5 accordion, hover patterns and section ordering exactly.
+  Visual style is INTENTIONALLY identical to asis-platform-landscape-tmpl.html
+  and validation-scorecard-tmpl.html (dark theme).
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+  --------------------------------------------------------------------
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-3-2026-05-01)
+    {{WAVE_ID}}                 Wave identifier
+    {{TIMESTAMP}}               ISO8601
+    {{DURATION_MIN}}            Duration in minutes
+    {{PARITY_PCT}}              Overall parity 0.00-100.00
+    {{PARITY_BAND_CLASS}}       parity-green | parity-amber | parity-red
+    {{PARITY_COLOR_VAR}}        teal | amber | red
+    {{GAUGE_DASHOFFSET}}        691 * (1 - parity_pct/100), rounded
+    {{STATUS}}                  APPROVED | PARTIAL | FAILED
+    {{STATUS_CLASS}}            status-approved | status-partial | status-failed
+    {{SIGN_OFF_ELIGIBLE}}       Yes / No
+    {{KPI_TOTAL_TABLES}}        Numeric KPI
+    {{KPI_TABLES_PASSED}}       Numeric KPI
+    {{KPI_CRITICAL}}            Numeric KPI
+    {{KPI_WARNING}}             Numeric KPI
+    {{KPI_TABLES_FAILED}}       Numeric KPI
+    {{LEVELS_BLOCK}}            Repeated level-card markup (L1..L5)
+    {{TABLES_ROWS_BLOCK}}       Repeated <tr> rows
+    {{CRITICAL_BLOCK}}          Repeated critical-card markup OR empty-state
+    {{WARNINGS_BLOCK}}          Repeated warning-card markup OR empty-state
+    {{TREND_BLOCK}}             Repeated trend-row markup OR empty-state
+    {{RECOMMENDATIONS_BLOCK}}   Repeated <li> items OR empty-state
+
+  FONTS (Google Fonts CDN; include local monospace fallback)
+    DM Serif Display — headings + italic accent
+    DM Mono          — labels, tags, metadata, table values
+    Outfit           — body copy
+
+  COLOR SCHEME (dark theme — identical to AS-IS landscape)
+    --bg #0D0F14
+    --teal  #14B8A6  PASS / APPROVED / parity ≥ 99.9%
+    --amber #F59E0B  WARN / PARTIAL / parity 95-99.9%
+    --red   #EF4444  FAIL / FAILED  / parity < 95%
+    --blue  #60A5FA  informational
+    --coral #FB923C  drift / data profile
+    --purple #A78BFA business rules accent
+
+  LEVEL → COLOR
+    L1 row_count       → blue   (count)
+    L2 checksum        → teal   (hash integrity)
+    L3 schema_diff     → amber  (structure)
+    L4 data_profile    → coral  (drift)
+    L5 business_rules  → purple (manual / rules)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reconciliation Dashboard — {{PROJECT_NAME}} · {{WAVE_ID}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES (mirror AS-IS landscape) ────────────── */
+    :root {
+      --bg: #0D0F14;
+      --surface: #13161D;
+      --surface2: #1A1E28;
+      --surface3: #222736;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.10);
+      --text: #E8EBF2;
+      --text2: #8B919F;
+      --text3: #5A6070;
+      --amber: #F59E0B;     --amber-dim: rgba(245,158,11,0.12);
+      --red: #EF4444;       --red-dim: rgba(239,68,68,0.12);
+      --teal: #14B8A6;      --teal-dim: rgba(20,184,166,0.10);
+      --blue: #60A5FA;      --blue-dim: rgba(96,165,250,0.10);
+      --purple: #A78BFA;    --purple-dim: rgba(167,139,250,0.10);
+      --coral: #FB923C;     --coral-dim: rgba(251,146,60,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 56px;
+      gap: 40px;
+    }
+    .header-left { max-width: 720px; }
+    .badge-gate {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--teal-dim);
+      color: var(--teal);
+      border: 1px solid var(--teal);
+      border-radius: 999px;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    h1 em { font-style: italic; color: var(--teal); }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .status-approved { background: var(--teal-dim);  color: var(--teal);  border: 1px solid var(--teal); }
+    .status-partial  { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+    .status-failed   { background: var(--red-dim);   color: var(--red);   border: 1px solid var(--red); }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── PARITY HERO ───────────────────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 40px;
+      align-items: center;
+    }
+    .hero-gauge {
+      position: relative;
+      width: 240px; height: 240px;
+      margin: 0 auto;
+    }
+    .hero-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .gauge-track { fill: none; stroke: var(--surface3); stroke-width: 14; }
+    .gauge-arc {
+      fill: none;
+      stroke: var(--c, var(--teal));
+      stroke-width: 14;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1);
+    }
+    .gauge-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .gauge-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 60px;
+      line-height: 1;
+      color: var(--c, var(--teal));
+    }
+    .gauge-of {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+    .hero-info { display: flex; flex-direction: column; gap: 14px; }
+    .hero-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: var(--text);
+    }
+    .hero-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .hero-meta span { color: var(--text); }
+    .signoff-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+    }
+    .signoff-yes { color: var(--teal); border-color: var(--teal); }
+    .signoff-no  { color: var(--red);  border-color: var(--red); }
+
+    /* ─── KPI ROW ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 20px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--c, var(--teal));
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .kpi-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--c, var(--teal));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text3); }
+
+    /* ─── L1–L5 LEVELS ──────────────────────────────────────── */
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .level-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--c, var(--teal));
+      border-radius: 12px;
+      padding: 22px 22px;
+      transition: all 0.2s;
+    }
+    .level-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .level-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .level-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c, var(--teal));
+    }
+    .level-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .level-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 14px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .level-stats .k {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: block;
+    }
+    .level-stats .v {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .level-detail {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.55;
+    }
+
+    /* ─── TABLES TABLE ──────────────────────────────────────── */
+    .tables-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .tables-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .tables-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+    }
+    .tables-table tr:last-child td { border-bottom: 0; }
+    .tables-table tr:hover td { background: var(--surface3); }
+    .tables-table tr.row-pass td:first-child { border-left: 3px solid var(--teal); }
+    .tables-table tr.row-warn td:first-child { border-left: 3px solid var(--amber); }
+    .tables-table tr.row-fail td:first-child { border-left: 3px solid var(--red); }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .pill-pass   { background: var(--teal-dim);  color: var(--teal); }
+    .pill-warn   { background: var(--amber-dim); color: var(--amber); }
+    .pill-fail   { background: var(--red-dim);   color: var(--red); }
+    .pill-manual { background: var(--purple-dim);color: var(--purple); }
+
+    /* ─── ISSUE CARDS (CRITICAL / WARNINGS) ─────────────────── */
+    .issues-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .issue-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--c, var(--amber));
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .issue-card.critical { --c: var(--red); border-color: var(--red); }
+    .issue-card.warning  { --c: var(--amber); }
+    .issue-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .issue-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--c, var(--amber));
+    }
+    .issue-table {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .issue-table .k { color: var(--text3); }
+    .issue-detail {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+    .issue-action {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--surface2);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border-left: 2px solid var(--c, var(--amber));
+    }
+
+    /* ─── PARITY TREND ──────────────────────────────────────── */
+    .trend-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .trend-table th, .trend-table td {
+      padding: 11px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .trend-table th {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+    }
+    .trend-table tr:last-child td { border-bottom: 0; }
+
+    /* ─── RECOMMENDATIONS ───────────────────────────────────── */
+    .recommendations {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 28px;
+    }
+    .recommendations ul { list-style: none; padding: 0; margin: 0; }
+    .recommendations li {
+      padding: 10px 0 10px 22px;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .recommendations li:last-child { border-bottom: 0; }
+    .recommendations li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ─── EMPTY STATE ───────────────────────────────────────── */
+    .empty-state {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      color: var(--text2);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-gate">Gate 3 · Reconciliation</span>
+      <h1>Source vs Target <em>Parity</em></h1>
+      <p class="subtitle">
+        Five-level reconciliation across row counts, checksums, schema diff,
+        data profile drift and business rules. The parity_pct and status
+        published here gate the wave promotion together with Diego's wave-report.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">PROJECT</span> <span class="meta-val">{{PROJECT_NAME}}</span></div>
+      <div><span class="meta-key">WAVE</span> <span class="meta-val">{{WAVE_ID}}</span></div>
+      <div><span class="meta-key">TRACE</span> <span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">DURATION</span> <span class="meta-val">{{DURATION_MIN}} min</span></div>
+      <div><span class="meta-key">DATE</span> <span class="meta-val">{{TIMESTAMP}}</span></div>
+      <div><span class="meta-key">AGENT</span> <span class="meta-val">reconciliation</span></div>
+      <div><span class="status-pill {{STATUS_CLASS}}">{{STATUS}}</span></div>
+    </div>
+  </header>
+
+  <!-- ─── PARITY HERO ─────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Overall Parity</div>
+    <div class="hero">
+      <!--
+        Gauge: circumference ≈ 691 (radius 110).
+        Set stroke-dasharray="691" and stroke-dashoffset = 691 * (1 - parity_pct/100).
+        Set --c on .hero-gauge based on parity band:
+          ≥ 99.9%  → var(--teal)   (green band)
+          95-99.9% → var(--amber)
+          < 95%    → var(--red)
+      -->
+      <div class="hero-gauge" style="--c: var(--{{PARITY_COLOR_VAR}})">
+        <svg viewBox="0 0 240 240">
+          <circle class="gauge-track" cx="120" cy="120" r="110"></circle>
+          <circle class="gauge-arc" cx="120" cy="120" r="110"
+                  stroke-dasharray="691"
+                  stroke-dashoffset="{{GAUGE_DASHOFFSET}}"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-value">{{PARITY_PCT}}%</div>
+          <div class="gauge-of">parity · target ≥ 99.9%</div>
+        </div>
+      </div>
+      <div class="hero-info">
+        <div class="hero-headline">{{KPI_TABLES_PASSED}} of {{KPI_TOTAL_TABLES}} tables aligned</div>
+        <div class="hero-meta">
+          Status <span>{{STATUS}}</span> · Critical <span>{{KPI_CRITICAL}}</span> · Warnings <span>{{KPI_WARNING}}</span>
+        </div>
+        <span class="signoff-row signoff-{{SIGN_OFF_ELIGIBLE_LOWER}}">
+          Sign-off eligible: {{SIGN_OFF_ELIGIBLE}}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── KPI ROW ─────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Wave KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--blue)">
+        <div class="kpi-value">{{KPI_TOTAL_TABLES}}</div>
+        <div class="kpi-label">Tables Total</div>
+        <div class="kpi-sub">in scope</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--teal)">
+        <div class="kpi-value">{{KPI_TABLES_PASSED}}</div>
+        <div class="kpi-label">Tables Passed</div>
+        <div class="kpi-sub">all 5 levels</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--red)">
+        <div class="kpi-value">{{KPI_CRITICAL}}</div>
+        <div class="kpi-label">Critical Issues</div>
+        <div class="kpi-sub">block sign-off</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--amber)">
+        <div class="kpi-value">{{KPI_WARNING}}</div>
+        <div class="kpi-label">Warnings</div>
+        <div class="kpi-sub">monitor / triage</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--coral)">
+        <div class="kpi-value">{{KPI_TABLES_FAILED}}</div>
+        <div class="kpi-label">Tables Failed</div>
+        <div class="kpi-sub">parity &lt; 100%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── L1–L5 LEVEL CARDS ───────────────────────────────── -->
+  <section>
+    <div class="section-title">Reconciliation Levels (L1–L5)</div>
+    <div class="levels-grid">
+      {{LEVELS_BLOCK}}
+      <!--
+        Render one .level-card per levels.L* entry. Set --c per level:
+          L1_row_count       → var(--blue)
+          L2_checksum        → var(--teal)
+          L3_schema_diff     → var(--amber)
+          L4_data_profile    → var(--coral)
+          L5_business_rules  → var(--purple)
+        Status pill class: pill-pass | pill-warn | pill-fail | pill-manual
+
+        <div class="level-card" style="--c: var(--blue)">
+          <div class="level-head">
+            <span class="level-name">L1 · Row Count</span>
+            <span class="pill pill-pass">{status}</span>
+          </div>
+          <div class="level-title">Row count parity</div>
+          <div class="level-stats">
+            <div><span class="k">Source</span><span class="v">{source_rows}</span></div>
+            <div><span class="k">Target</span><span class="v">{target_rows}</span></div>
+            <div><span class="k">Delta</span><span class="v">{delta} ({delta_pct}%)</span></div>
+            <div><span class="k">Tables Passed</span><span class="v">{tables_passed}/{tables_passed+tables_failed}</span></div>
+          </div>
+          <div class="level-detail">{free-text remark}</div>
+        </div>
+
+        For L2 use match_pct + algorithm.
+        For L3 use tables_identical + tables_with_diffs.
+        For L4 use tables_no_drift + tables_with_drift.
+        For L5 use rules_evaluated + rules_passed/rules_failed + notes.
+      -->
+    </div>
+  </section>
+
+  <!-- ─── TABLES DETAIL ───────────────────────────────────── -->
+  <section>
+    <div class="section-title">Per-Table Results</div>
+    <table class="tables-table">
+      <thead>
+        <tr>
+          <th>Table</th>
+          <th>Source Rows</th>
+          <th>Target Rows</th>
+          <th>Delta</th>
+          <th>Parity</th>
+          <th>L1</th>
+          <th>L2</th>
+          <th>L3</th>
+          <th>L4</th>
+          <th>Overall</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{TABLES_ROWS_BLOCK}}
+        <!--
+          Repeat one <tr> per tables[] entry. Row class:
+            PASS → row-pass · WARN → row-warn · FAIL → row-fail
+
+          <tr class="row-pass">
+            <td>{name}</td>
+            <td>{source_rows}</td>
+            <td>{target_rows}</td>
+            <td>{delta}</td>
+            <td>{parity_pct}%</td>
+            <td><span class="pill pill-pass">{row_count_status}</span></td>
+            <td><span class="pill pill-pass">{checksum_status}</span></td>
+            <td><span class="pill pill-pass">{schema_status}</span></td>
+            <td><span class="pill pill-pass">{profile_status}</span></td>
+            <td><span class="pill pill-pass">{overall_status}</span></td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── CRITICAL ISSUES ─────────────────────────────────── -->
+  <section>
+    <div class="section-title">Critical Issues</div>
+    {{CRITICAL_BLOCK}}
+    <!--
+      If critical_issues[] is empty, render literally:
+        <div class="empty-state">No critical issues — wave eligible for sign-off.</div>
+
+      Otherwise render inside <div class="issues-grid"> one .issue-card.critical per item:
+
+      <div class="issues-grid">
+        <div class="issue-card critical">
+          <div class="issue-head">
+            <span class="issue-id">{id} · {check} · {level}</span>
+            <span class="pill pill-fail">CRITICAL</span>
+          </div>
+          <div class="issue-table"><span class="k">TABLE</span> {table}</div>
+          <div class="issue-detail">{detail}</div>
+          <div class="issue-action">{action_required}</div>
+        </div>
+      </div>
+    -->
+  </section>
+
+  <!-- ─── WARNINGS ────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Warnings</div>
+    {{WARNINGS_BLOCK}}
+    <!--
+      If warnings[] is empty, render literally:
+        <div class="empty-state">No warnings recorded.</div>
+
+      Otherwise render inside <div class="issues-grid"> one .issue-card.warning per item.
+    -->
+  </section>
+
+  <!-- ─── PARITY TREND ────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Parity Trend</div>
+    {{TREND_BLOCK}}
+    <!--
+      If parity_trend[] is empty, render literally:
+        <div class="empty-state">No prior waves to compare.</div>
+
+      Otherwise render:
+        <table class="trend-table">
+          <thead>
+            <tr><th>Wave</th><th>Parity %</th><th>Critical</th><th>Warnings</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>{wave_id}</td><td>{parity_pct}%</td><td>{critical_count}</td><td>{warning_count}</td><td><span class="pill pill-pass">{status}</span></td></tr>
+          </tbody>
+        </table>
+    -->
+  </section>
+
+  <!-- ─── RECOMMENDATIONS ─────────────────────────────────── -->
+  <section>
+    <div class="section-title">Recommendations</div>
+    {{RECOMMENDATIONS_BLOCK}}
+    <!--
+      If recommendations[] is empty, render literally:
+        <div class="empty-state">No follow-up recommendations.</div>
+
+      Otherwise render:
+        <div class="recommendations"><ul>
+          <li>{recommendation}</li>
+        </ul></div>
+    -->
+  </section>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>reconciliation · Balance ⚖️</span>
+    <span>Generated {{TIMESTAMP}} · Gate 3</span>
+    <span>DMF Fabric Agents</span>
+  </footer>
+
+</body>
+</html>

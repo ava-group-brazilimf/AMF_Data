@@ -1,0 +1,754 @@
+<!--
+  ──────────────────────────────────────────────────────────────────────
+  STTM — Source-to-Target Mapping (Visual) — Reference Template
+  Owner: business-analyst (Mary 📊) — DMF Fabric Agents
+  Phase: UPSTREAM | Gate: 1 | Version: 1.0
+  ──────────────────────────────────────────────────────────────────────
+
+  PURPOSE
+  -------
+  Visual, filterable rendering of sttm.json for Gate 1 stakeholder
+  review. The LLM MUST read this file BEFORE generating the project
+  HTML output and reproduce the structure, fonts, CSS variables,
+  hover patterns, section ordering and section-title ::after-line
+  pattern exactly as defined here. Visual style is INTENTIONALLY
+  identical to asis-platform-landscape-tmpl.html (dark theme).
+
+  PLACEHOLDERS (replace with project data — never leave {{...}} in output)
+    {{PROJECT_NAME}}            Project name
+    {{TRACE_ID}}                Trace identifier (e.g., GATE-1-2026-05-01)
+    {{WAVE_ID}}                 Wave identifier
+    {{SCAN_DATE}}               YYYY-MM-DD
+    {{TOTAL_MAPPINGS}}          Numeric KPI
+    {{DIRECT_PCT}}              Percentage (e.g., 72%)
+    {{DERIVED_PCT}}             Percentage
+    {{UNRESOLVED_COUNT}}        Numeric KPI
+    {{SOURCES_COUNT}}           Numeric KPI
+    {{SOURCES_BLOCK}}           Repeated source-card markup
+    {{MAPPINGS_BLOCK}}          Repeated <tr> rows of the mapping table
+    {{RULES_BLOCK}}             Repeated transformation-rule markup
+    {{UNRESOLVED_BLOCK}}        Repeated unresolved-row markup OR empty-state
+
+  FONTS (Google Fonts CDN; include local monospace fallback)
+    DM Serif Display — headings + italic accent
+    DM Mono          — labels, tags, metadata, table values
+    Outfit           — body copy
+
+  COLOR SCHEME (dark theme — identical to AS-IS landscape)
+    --bg #0D0F14   --amber #F59E0B (primary / Gate 1)
+    --teal #14B8A6 (MAPPED + DIRECT)
+    --amber-secondary #FB923C (DERIVED/LOOKUP/AGG via --coral)
+    --red #EF4444 (UNRESOLVED)
+    --blue #60A5FA (informational)
+    --purple #A78BFA (rule type accent)
+
+  STATUS / TRANSFORMATION COLOR MAPPING
+    MAPPED + DIRECT/CAST     → teal  (.row-mapped)
+    MAPPED + DERIVED|LOOKUP|AGG → coral (.row-derived)
+    UNRESOLVED               → red   (.row-unresolved)
+    DEFERRED                 → text2 (.row-deferred)
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STTM — {{PROJECT_NAME}} Source-to-Target Mapping</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── CSS VARIABLES (mirror AS-IS landscape) ────────────── */
+    :root {
+      --bg: #0D0F14;
+      --surface: #13161D;
+      --surface2: #1A1E28;
+      --surface3: #222736;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(255,255,255,0.10);
+      --text: #E8EBF2;
+      --text2: #8B919F;
+      --text3: #5A6070;
+      --amber: #F59E0B;     --amber-dim: rgba(245,158,11,0.12);
+      --red: #EF4444;       --red-dim: rgba(239,68,68,0.12);
+      --teal: #14B8A6;      --teal-dim: rgba(20,184,166,0.10);
+      --blue: #60A5FA;      --blue-dim: rgba(96,165,250,0.10);
+      --purple: #A78BFA;    --purple-dim: rgba(167,139,250,0.10);
+      --coral: #FB923C;     --coral-dim: rgba(251,146,60,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 300;
+      line-height: 1.5;
+      padding: 48px 56px;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 56px;
+      gap: 40px;
+    }
+    .header-left { max-width: 720px; }
+    .badge-gate {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--amber-dim);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      border-radius: 999px;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 56px;
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+    .subtitle {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 640px;
+    }
+    .header-meta {
+      text-align: right;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.9;
+    }
+    .header-meta .meta-key { color: var(--text3); }
+    .header-meta .meta-val { color: var(--text); }
+
+    /* ─── SECTION TITLE PATTERN ─────────────────────────────── */
+    .section-title {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    section { margin-bottom: 56px; }
+
+    /* ─── KPI ROW ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 20px 20px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--c, var(--amber));
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .kpi-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--c, var(--amber));
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text3); }
+
+    /* ─── SOURCE SYSTEM CARDS ───────────────────────────────── */
+    .sources-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .source-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+    .source-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .source-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .source-icon {
+      width: 48px; height: 48px;
+      background: var(--surface3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: var(--amber);
+    }
+    .source-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+    }
+    .source-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+    }
+    .source-attrs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .source-attrs div { font-size: 13px; }
+    .source-attrs .k {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: block;
+    }
+    .source-attrs .v { color: var(--text); }
+    .source-conn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      background: var(--surface2);
+      padding: 10px 12px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+
+    /* ─── FILTER BAR ────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-bar label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+    .filter-bar select,
+    .filter-bar input[type="text"] {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .filter-bar select:focus,
+    .filter-bar input[type="text"]:focus { border-color: var(--amber); }
+    .legend {
+      display: flex;
+      gap: 14px;
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text2);
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .legend-dot.teal { background: var(--teal); }
+    .legend-dot.coral { background: var(--coral); }
+    .legend-dot.red { background: var(--red); }
+
+    /* ─── MAPPING TABLE ─────────────────────────────────────── */
+    .mappings-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .mappings-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text3);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .mappings-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      font-family: 'DM Mono', monospace;
+    }
+    .mappings-table tr:last-child td { border-bottom: 0; }
+    .mappings-table tr:hover td { background: var(--surface3); }
+    .mappings-table tr.row-mapped     td:first-child { border-left: 3px solid var(--teal); }
+    .mappings-table tr.row-derived    td:first-child { border-left: 3px solid var(--coral); }
+    .mappings-table tr.row-unresolved td:first-child { border-left: 3px solid var(--red); }
+    .mappings-table tr.row-deferred   td:first-child { border-left: 3px solid var(--text3); }
+    .mappings-table tr.hidden { display: none; }
+    .col-num {
+      color: var(--text3);
+      width: 56px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .pill-direct  { background: var(--teal-dim);   color: var(--teal); }
+    .pill-cast    { background: var(--teal-dim);   color: var(--teal); }
+    .pill-derived { background: var(--coral-dim);  color: var(--coral); }
+    .pill-lookup  { background: var(--blue-dim);   color: var(--blue); }
+    .pill-agg     { background: var(--purple-dim); color: var(--purple); }
+    .pill-pk      { background: var(--amber-dim);  color: var(--amber); }
+    .pill-fk      { background: var(--blue-dim);   color: var(--blue); }
+    .pill-status-mapped     { background: var(--teal-dim);  color: var(--teal); }
+    .pill-status-unresolved { background: var(--red-dim);   color: var(--red); }
+    .pill-status-deferred   { background: var(--surface3);  color: var(--text2); }
+
+    /* ─── TRANSFORMATION RULES ──────────────────────────────── */
+    .rules-list { display: flex; flex-direction: column; gap: 12px; }
+    .rule {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .rule summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: background 0.2s;
+    }
+    .rule summary::-webkit-details-marker { display: none; }
+    .rule summary:hover { background: var(--surface2); }
+    .rule[open] summary { background: var(--surface2); border-bottom: 1px solid var(--border); }
+    .rule-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--amber);
+      min-width: 72px;
+    }
+    .rule-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      flex: 1;
+    }
+    .rule-body { padding: 18px 20px; }
+    .rule-body .meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+    .rule-body .meta span { color: var(--text); margin-right: 18px; }
+    .rule-body pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    .rule-body .example {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text2);
+    }
+    .rule-body .justification {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* ─── UNRESOLVED ────────────────────────────────────────── */
+    .unresolved-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--red);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .unresolved-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--red);
+      background: var(--red-dim);
+      border-bottom: 1px solid var(--red);
+    }
+    .unresolved-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+    }
+    .unresolved-table tr:last-child td { border-bottom: 0; }
+    .agent-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      margin-right: 4px;
+      background: var(--surface3);
+      color: var(--text);
+      border-radius: 4px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+    .empty-state {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: 10px;
+      color: var(--text2);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <span class="badge-gate">Gate 1 · STTM</span>
+      <h1>Source-to-Target <em>Mapping</em></h1>
+      <p class="subtitle">
+        Canonical mapping of every source column into its target table and column,
+        including transformation rules, data quality references and unresolved gaps
+        flagged for downstream agents.
+      </p>
+    </div>
+    <div class="header-meta">
+      <div><span class="meta-key">PROJECT</span> <span class="meta-val">{{PROJECT_NAME}}</span></div>
+      <div><span class="meta-key">WAVE</span> <span class="meta-val">{{WAVE_ID}}</span></div>
+      <div><span class="meta-key">TRACE</span> <span class="meta-val">{{TRACE_ID}}</span></div>
+      <div><span class="meta-key">DATE</span> <span class="meta-val">{{SCAN_DATE}}</span></div>
+      <div><span class="meta-key">AGENT</span> <span class="meta-val">business-analyst</span></div>
+    </div>
+  </header>
+
+  <!-- ─── KPI ROW ─────────────────────────────────────────── -->
+  <section>
+    <div class="section-title">Coverage KPIs</div>
+    <div class="kpi-row">
+      <div class="kpi-card" style="--c: var(--amber)">
+        <div class="kpi-value">{{TOTAL_MAPPINGS}}</div>
+        <div class="kpi-label">Total Mappings</div>
+        <div class="kpi-sub">columns mapped</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--teal)">
+        <div class="kpi-value">{{DIRECT_PCT}}%</div>
+        <div class="kpi-label">Direct</div>
+        <div class="kpi-sub">no transformation</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--coral)">
+        <div class="kpi-value">{{DERIVED_PCT}}%</div>
+        <div class="kpi-label">Derived</div>
+        <div class="kpi-sub">transformed / lookup / agg</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--red)">
+        <div class="kpi-value">{{UNRESOLVED_COUNT}}</div>
+        <div class="kpi-label">Unresolved</div>
+        <div class="kpi-sub">blocking downstream agents</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--blue)">
+        <div class="kpi-value">{{SOURCES_COUNT}}</div>
+        <div class="kpi-label">Source Systems</div>
+        <div class="kpi-sub">in scope</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SOURCE SYSTEMS ──────────────────────────────────── -->
+  <section>
+    <div class="section-title">Source Systems</div>
+    <div class="sources-grid">
+      {{SOURCES_BLOCK}}
+      <!--
+        Repeat the block below for each source_systems[] entry:
+
+        <div class="source-card">
+          <div class="source-head">
+            <div class="source-icon">SRC</div>
+            <div>
+              <div class="source-name">{name}</div>
+              <div class="source-id">{id} · {type}</div>
+            </div>
+          </div>
+          <div class="source-attrs">
+            <div><span class="k">Technology</span><span class="v">{technology} {version}</span></div>
+            <div><span class="k">Refresh</span><span class="v">{refresh_frequency}</span></div>
+            <div><span class="k">Owner</span><span class="v">{owner}</span></div>
+            <div><span class="k">Contact</span><span class="v">{owner_contact}</span></div>
+          </div>
+          <div class="source-conn">{connection_pattern}</div>
+        </div>
+      -->
+    </div>
+  </section>
+
+  <!-- ─── MAPPING TABLE ───────────────────────────────────── -->
+  <section>
+    <div class="section-title">Field-Level Mapping</div>
+    <div class="filter-bar">
+      <label for="filter-source">Source</label>
+      <select id="filter-source">
+        <option value="">All sources</option>
+        <!-- Render one <option value="{id}">{name}</option> per source_systems[] entry -->
+      </select>
+      <label for="filter-status">Status</label>
+      <select id="filter-status">
+        <option value="">All</option>
+        <option value="MAPPED">Mapped</option>
+        <option value="UNRESOLVED">Unresolved</option>
+        <option value="DEFERRED">Deferred</option>
+      </select>
+      <label for="filter-search">Search</label>
+      <input id="filter-search" type="text" placeholder="column, table…">
+      <div class="legend">
+        <span><span class="legend-dot teal"></span> Direct</span>
+        <span><span class="legend-dot coral"></span> Derived</span>
+        <span><span class="legend-dot red"></span> Unresolved</span>
+      </div>
+    </div>
+    <table class="mappings-table" id="mappings-table">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th>Source</th>
+          <th>Src Schema</th>
+          <th>Src Table</th>
+          <th>Src Column</th>
+          <th>Src Type</th>
+          <th>Tgt Layer</th>
+          <th>Tgt Table</th>
+          <th>Tgt Column</th>
+          <th>Tgt Type</th>
+          <th>Transformation</th>
+          <th>Type</th>
+          <th>PK/FK</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{MAPPINGS_BLOCK}}
+        <!--
+          Repeat one <tr> per mappings[] entry. Add row class:
+            row-mapped     when status=MAPPED and transformation_type ∈ {DIRECT, CAST}
+            row-derived    when status=MAPPED and transformation_type ∈ {DERIVED, LOOKUP, AGG}
+            row-unresolved when status=UNRESOLVED
+            row-deferred   when status=DEFERRED
+          Set data-source="{source.system}" and data-status="{status}" on the <tr>.
+
+          <tr class="row-mapped" data-source="SRC-001" data-status="MAPPED">
+            <td class="col-num">M-0001</td>
+            <td>{source.system}</td>
+            <td>{source.schema}</td>
+            <td>{source.table}</td>
+            <td>{source.column}</td>
+            <td>{source.data_type}</td>
+            <td>{target.layer}</td>
+            <td>{target.table}</td>
+            <td>{target.column}</td>
+            <td>{target.data_type}</td>
+            <td>{transformation_rule_id}</td>
+            <td><span class="pill pill-direct">DIRECT</span></td>
+            <td>-</td>
+            <td><span class="pill pill-status-mapped">MAPPED</span></td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ─── TRANSFORMATION RULES ────────────────────────────── -->
+  <section>
+    <div class="section-title">Transformation Rules</div>
+    <div class="rules-list">
+      {{RULES_BLOCK}}
+      <!--
+        Repeat one <details class="rule"> per transformation_rules[] entry:
+
+        <details class="rule">
+          <summary>
+            <span class="rule-id">TR-001</span>
+            <span class="rule-name">{name}</span>
+            <span class="pill pill-direct">{type}</span>
+          </summary>
+          <div class="rule-body">
+            <div class="meta">
+              <span>Target: {target}</span>
+            </div>
+            <pre>{sql_or_pseudocode}</pre>
+            <div class="example">Example — input: {example.input} → output: {example.output}</div>
+            <div class="justification">{business_justification}</div>
+          </div>
+        </details>
+      -->
+    </div>
+  </section>
+
+  <!-- ─── UNRESOLVED MAPPINGS ─────────────────────────────── -->
+  <section>
+    <div class="section-title">Unresolved Mappings</div>
+    {{UNRESOLVED_BLOCK}}
+    <!--
+      If unresolved_mappings[] is empty, render literally:
+        <div class="empty-state">No unresolved mappings — STTM ready for Gate 1 review.</div>
+
+      Otherwise render:
+
+      <table class="unresolved-table">
+        <thead>
+          <tr>
+            <th>Mapping ID</th>
+            <th>Reason</th>
+            <th>Blocks Agents</th>
+            <th>Follow-up Owner</th>
+            <th>Due</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>M-XXXX</td>
+            <td>{reason}</td>
+            <td>
+              <span class="agent-badge">data-architect</span>
+              <span class="agent-badge">data-steward</span>
+            </td>
+            <td>{follow_up_owner}</td>
+            <td>{due_date}</td>
+          </tr>
+        </tbody>
+      </table>
+    -->
+  </section>
+
+  <!-- ─── FOOTER ──────────────────────────────────────────── -->
+  <div class="footer">
+    <span>STTM · Gate 1 · {{PROJECT_NAME}}</span>
+    <span>business-analyst · DMF Fabric Agents</span>
+  </div>
+
+  <script>
+    // ─── Filter logic ────────────────────────────────────────
+    const fSource = document.getElementById('filter-source');
+    const fStatus = document.getElementById('filter-status');
+    const fSearch = document.getElementById('filter-search');
+    const rows = document.querySelectorAll('#mappings-table tbody tr');
+
+    function applyFilters() {
+      const src = fSource.value;
+      const st = fStatus.value;
+      const q = fSearch.value.trim().toLowerCase();
+      rows.forEach(r => {
+        const matchSrc = !src || r.dataset.source === src;
+        const matchStatus = !st || r.dataset.status === st;
+        const matchSearch = !q || r.textContent.toLowerCase().includes(q);
+        r.classList.toggle('hidden', !(matchSrc && matchStatus && matchSearch));
+      });
+    }
+    [fSource, fStatus].forEach(el => el && el.addEventListener('change', applyFilters));
+    fSearch && fSearch.addEventListener('input', applyFilters);
+  </script>
+</body>
+</html>

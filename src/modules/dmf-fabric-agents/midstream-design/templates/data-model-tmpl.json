@@ -1,0 +1,155 @@
+{
+  "_template_metadata": {
+    "name": "data-model-tmpl.json",
+    "owner_agent": "data-modeler",
+    "phase": "MIDSTREAM",
+    "gate": 2,
+    "version": "1.0",
+    "purpose": "Canonical machine-readable logical data model. SINGLE SOURCE OF TRUTH consumed by Coda (code-generator) for DDL/ETL generation, by Diego (downstream-executor) for execution planning, by Gaia (data-steward) for governance binding and by Bianca (bi-semantic) for the semantic layer. Both data-model.md and data-model-er.html are derived from this file.",
+    "instructions_for_llm": [
+      "Replace EVERY {{...}} placeholder with project data. Do NOT leave placeholders in the final file.",
+      "Remove this _template_metadata block from the produced data-model.json.",
+      "Layer naming MUST follow: bronze=brz_, silver=slv_, gold_facts=gld_fact_, gold_dims=gld_dim_.",
+      "Each entity MUST declare grain, scd_type (where applicable) and source lineage to STTM mapping_id(s).",
+      "Each column[].pk_fk ∈ { PK, FK, NK, '-' }; pk MUST be unique per entity.",
+      "Each relationship[].cardinality ∈ { '1:1', '1:N', 'N:N' }; type ∈ { IDENTIFYING, NON_IDENTIFYING, BRIDGE }.",
+      "scd_type ∈ { 1, 2, 3 } for dimensions; null for facts.",
+      "Recompute kpis from the layers[] arrays before persisting.",
+      "Every relationship.from / .to MUST reference an existing entity name in layers[*].entities[].",
+      "Persist this file at: projects/{project_name}/outputs/midstream/data-model.json"
+    ]
+  },
+  "metadata": {
+    "agent": "data-modeler",
+    "agent_persona": "Sofia",
+    "project": "{{PROJECT_NAME}}",
+    "wave_id": "{{WAVE_ID}}",
+    "trace_id": "{{TRACE_ID}}",
+    "version": "{{VERSION}}",
+    "date": "{{DATE_ISO8601}}",
+    "gate": 2,
+    "pattern": "{{PATTERN}}",
+    "target_platform": "{{TARGET_PLATFORM}}"
+  },
+  "naming_conventions": {
+    "bronze_prefix": "brz_",
+    "silver_prefix": "slv_",
+    "fact_prefix": "gld_fact_",
+    "dim_prefix": "gld_dim_",
+    "bridge_prefix": "gld_bridge_",
+    "pk_suffix": "_key",
+    "fk_suffix": "_key"
+  },
+  "layers": {
+    "bronze": [
+      {
+        "name": "brz_{{ENTITY}}",
+        "type": "TABLE",
+        "grain": "1:1 with source row",
+        "source_lineage": [
+          { "system": "SRC-001", "table": "{{SRC_TABLE}}", "mapping_ids": ["M-0001"] }
+        ],
+        "scd_type": null,
+        "owner": "{{OWNER_NAME}}",
+        "columns": [
+          { "name": "{{ENTITY}}_id",   "type": "STRING",    "nullable": false, "pk_fk": "NK", "description": "Natural key from source" },
+          { "name": "ingested_at",     "type": "TIMESTAMP", "nullable": false, "pk_fk": "-",  "description": "Bronze ingestion timestamp" }
+        ]
+      }
+    ],
+    "silver": [
+      {
+        "name": "slv_{{ENTITY}}",
+        "type": "TABLE",
+        "grain": "One clean {{ENTITY}}",
+        "source_lineage": [
+          { "from_entity": "brz_{{ENTITY}}", "transformation_rule_ids": ["TR-001"] }
+        ],
+        "scd_type": 1,
+        "owner": "{{OWNER_NAME}}",
+        "columns": [
+          { "name": "{{ENTITY}}_id", "type": "STRING",    "nullable": false, "pk_fk": "NK", "description": "Cleansed natural key" },
+          { "name": "valid_from",    "type": "TIMESTAMP", "nullable": false, "pk_fk": "-",  "description": "SCD valid_from" },
+          { "name": "valid_to",      "type": "TIMESTAMP", "nullable": true,  "pk_fk": "-",  "description": "SCD valid_to" }
+        ]
+      }
+    ],
+    "gold_facts": [
+      {
+        "name": "gld_fact_{{SUBJECT}}",
+        "type": "FACT",
+        "grain": "One row per {{BUSINESS_EVENT}}",
+        "update_frequency": "DAILY",
+        "retention": "7 years",
+        "source_lineage": [
+          { "from_entity": "slv_{{ENTITY}}", "transformation_rule_ids": ["TR-002"] }
+        ],
+        "scd_type": null,
+        "owner": "{{OWNER_NAME}}",
+        "columns": [
+          { "name": "{{SUBJECT}}_key",  "type": "BIGINT",  "nullable": false, "pk_fk": "PK", "description": "Surrogate key" },
+          { "name": "customer_key",     "type": "BIGINT",  "nullable": false, "pk_fk": "FK", "description": "FK to gld_dim_customer" },
+          { "name": "product_key",      "type": "BIGINT",  "nullable": false, "pk_fk": "FK", "description": "FK to gld_dim_product" },
+          { "name": "date_key",         "type": "INT",     "nullable": false, "pk_fk": "FK", "description": "FK to gld_dim_date" },
+          { "name": "amount",           "type": "DECIMAL(18,2)", "nullable": false, "pk_fk": "-", "description": "Monetary amount" },
+          { "name": "quantity",         "type": "INT",     "nullable": false, "pk_fk": "-", "description": "Units" }
+        ],
+        "measures": [
+          { "name": "amount",   "aggregation": "SUM" },
+          { "name": "quantity", "aggregation": "SUM" }
+        ]
+      }
+    ],
+    "gold_dims": [
+      {
+        "name": "gld_dim_{{ENTITY}}",
+        "type": "DIM",
+        "grain": "One row per {{ENTITY}}",
+        "scd_type": 2,
+        "tracked_attributes": ["{{ATTR_1}}", "{{ATTR_2}}"],
+        "history_retention": "Unlimited",
+        "source_lineage": [
+          { "from_entity": "slv_{{ENTITY}}", "transformation_rule_ids": ["TR-003"] }
+        ],
+        "owner": "{{OWNER_NAME}}",
+        "columns": [
+          { "name": "{{ENTITY}}_key", "type": "BIGINT",    "nullable": false, "pk_fk": "PK", "description": "Surrogate key" },
+          { "name": "{{ENTITY}}_id",  "type": "STRING",    "nullable": false, "pk_fk": "NK", "description": "Natural key from source" },
+          { "name": "valid_from",     "type": "TIMESTAMP", "nullable": false, "pk_fk": "-",  "description": "SCD2 valid_from" },
+          { "name": "valid_to",       "type": "TIMESTAMP", "nullable": true,  "pk_fk": "-",  "description": "SCD2 valid_to" },
+          { "name": "is_current",     "type": "BOOLEAN",   "nullable": false, "pk_fk": "-",  "description": "Current record flag" }
+        ],
+        "hierarchies": [
+          { "name": "{{HIERARCHY_NAME}}", "levels": ["Level1", "Level2", "Level3"] }
+        ]
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "from": "gld_fact_{{SUBJECT}}",
+      "to": "gld_dim_{{ENTITY}}",
+      "type": "IDENTIFYING",
+      "cardinality": "N:1",
+      "from_column": "{{ENTITY}}_key",
+      "to_column": "{{ENTITY}}_key"
+    }
+  ],
+  "validation_rules": [
+    "No orphan facts: every FK must have matching PK in dimension",
+    "Complete dimensions: all required attributes present",
+    "Valid SCD2 dates: valid_from < valid_to",
+    "Single current: only one is_current=true per natural key"
+  ],
+  "kpis": {
+    "entities_total": 0,
+    "facts_count": 0,
+    "dims_count": 0,
+    "bridges_count": 0,
+    "bronze_count": 0,
+    "silver_count": 0,
+    "gold_count": 0,
+    "scd2_dims_count": 0,
+    "relationships_count": 0
+  }
+}
